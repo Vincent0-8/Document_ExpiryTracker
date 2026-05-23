@@ -1,0 +1,193 @@
+{% extends 'authentication/base.html' %}
+
+{% block title %}Dashboard Admin — DocuGuard ERP{% endblock %}
+{% block page_title %}Dashboard Admin{% endblock %}
+
+{% block content %}
+<!-- Welcome Banner -->
+<div class="card mb-4" style="background: linear-gradient(135deg, #1a1f2e, #3b82f6); color:#fff; border-radius:16px;">
+    <div class="card-body p-4">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h4 class="fw-bold mb-1">
+                    Selamat Datang, {{ user.get_full_name|default:user.username }}! 👋
+                </h4>
+                <p class="mb-0 opacity-75">
+                    <i class="bi bi-shield-check me-1"></i>
+                    Anda login sebagai <strong>Administrator</strong> — Akses Penuh Sistem
+                </p>
+            </div>
+            <div class="d-none d-md-block" style="font-size: 4rem; opacity: 0.3;">
+                <i class="bi bi-shield-fill"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="text-muted" style="font-size:0.78rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">Total Pengguna</div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                         style="width:36px;height:36px;background:#eff6ff;">
+                        <i class="bi bi-people-fill text-primary"></i>
+                    </div>
+                </div>
+                <div class="fw-bold" style="font-size:2rem;">{{ total_users }}</div>
+                <div class="text-muted" style="font-size:0.75rem;">Semua role</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="text-muted" style="font-size:0.78rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">Admin</div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                         style="width:36px;height:36px;background:#fff1f2;">
+                        <i class="bi bi-person-fill-gear" style="color:#dc2626;"></i>
+                    </div>
+                </div>
+                <div class="fw-bold" style="font-size:2rem; color:#dc2626;">{{ total_admin }}</div>
+                <div class="text-muted" style="font-size:0.75rem;">Administrator</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="text-muted" style="font-size:0.78rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">HRD</div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                         style="width:36px;height:36px;background:#f5f3ff;">
+                        <i class="bi bi-person-badge-fill" style="color:#7c3aed;"></i>
+                    </div>
+                </div>
+                <div class="fw-bold" style="font-size:2rem; color:#7c3aed;">{{ total_hrd }}</div>
+                <div class="text-muted" style="font-size:0.75rem;">HR Department</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="text-muted" style="font-size:0.78rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">Staff</div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                         style="width:36px;height:36px;background:#ecfdf5;">
+                        <i class="bi bi-person-fill" style="color:#059669;"></i>
+                    </div>
+                </div>
+                <div class="fw-bold" style="font-size:2rem; color:#059669;">{{ total_staff }}</div>
+                <div class="text-muted" style="font-size:0.75rem;">Karyawan</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- Recent Users -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between py-3">
+                <div class="fw-semibold"><i class="bi bi-people me-2 text-primary"></i>Pengguna Terbaru</div>
+                <a href="{% url 'authentication:user_list' %}" class="btn btn-sm btn-outline-primary">
+                    Lihat Semua
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="font-size:0.8rem; font-weight:600; padding: 0.75rem 1rem;">Pengguna</th>
+                                <th style="font-size:0.8rem; font-weight:600;">Role</th>
+                                <th style="font-size:0.8rem; font-weight:600;">OTP</th>
+                                <th style="font-size:0.8rem; font-weight:600;">Bergabung</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in recent_users %}
+                            <tr>
+                                <td style="padding: 0.75rem 1rem;">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white"
+                                             style="width:34px;height:34px;font-size:0.85rem;
+                                             background:{% if u.role == 'admin' %}#dc2626{% elif u.role == 'hrd' %}#7c3aed{% else %}#059669{% endif %};">
+                                            {{ u.first_name|first|upper|default:u.username|first|upper }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold" style="font-size:0.875rem;">
+                                                {{ u.get_full_name|default:u.username }}
+                                            </div>
+                                            <div class="text-muted" style="font-size:0.75rem;">{{ u.email }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge {% if u.role == 'admin' %}badge-admin{% elif u.role == 'hrd' %}badge-hrd{% else %}badge-staff{% endif %}"
+                                          style="font-size:0.72rem;">
+                                        {{ u.get_role_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if u.is_otp_enabled %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size:0.72rem;">
+                                        <i class="bi bi-shield-check me-1"></i>Aktif
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size:0.72rem;">
+                                        <i class="bi bi-shield-exclamation me-1"></i>Belum
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-muted" style="font-size:0.8rem;">
+                                    {{ u.date_joined|date:"d M Y" }}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    <i class="bi bi-inbox me-2"></i>Belum ada pengguna
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header bg-white border-bottom py-3">
+                <div class="fw-semibold"><i class="bi bi-lightning me-2 text-warning"></i>Aksi Cepat</div>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'authentication:user_create' %}" class="btn btn-primary">
+                        <i class="bi bi-person-plus-fill me-2"></i>Tambah Pengguna
+                    </a>
+                    <a href="{% url 'authentication:user_list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-people me-2"></i>Kelola Pengguna
+                    </a>
+                    <a href="#" class="btn btn-outline-secondary">
+                        <i class="bi bi-tag me-2"></i>Kelola Kategori
+                    </a>
+                    <a href="#" class="btn btn-outline-secondary">
+                        <i class="bi bi-clock-history me-2"></i>Lihat Log Aktivitas
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

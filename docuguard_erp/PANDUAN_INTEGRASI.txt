@@ -1,0 +1,223 @@
+# PANDUAN INTEGRASI — DocuGuard ERP
+# Untuk: Jacky, Vincent, Damai, Arsat
+# Dibuat oleh: Julianto (Authentication Module)
+
+============================================================
+CARA MEMAKAI SISTEM AUTH JULIANTO DI APP KALIAN
+============================================================
+
+Kalian TIDAK perlu buat login, OTP, atau role check sendiri.
+Semua sudah dihandle oleh middleware dan mixins dari app `authentication`.
+
+------------------------------------------------------------
+LANGKAH 1 — Import mixin yang kalian butuhkan
+------------------------------------------------------------
+
+```python
+# Di views.py app kalian masing-masing
+
+from authentication.mixins import (
+    OTPRequiredMixin,    # User harus login + OTP verified
+    AdminRequiredMixin,  # Hanya Admin
+    HRDRequiredMixin,    # Hanya HRD dan Admin
+)
+```
+
+------------------------------------------------------------
+LANGKAH 2 — Tambahkan mixin ke CBV kalian
+------------------------------------------------------------
+
+Contoh untuk JACKY (app documents_hrd):
+
+```python
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
+from authentication.mixins import HRDRequiredMixin
+
+class DokumenHRDListView(HRDRequiredMixin, ListView):
+    model = DokumenHRD
+    template_name = 'documents_hrd/daftar.html'
+    context_object_name = 'dokumen_list'
+
+class DokumenHRDCreateView(HRDRequiredMixin, CreateView):
+    model = DokumenHRD
+    form_class = DokumenHRDForm
+    template_name = 'documents_hrd/form.html'
+    success_url = reverse_lazy('hrd:daftar')
+```
+
+------------------------------------------------------------
+Contoh untuk VINCENT (app documents_staff):
+
+```python
+from django.views.generic import ListView, DetailView
+from authentication.mixins import OTPRequiredMixin
+
+class DokumenStaffListView(OTPRequiredMixin, ListView):
+    model = DokumenStaff
+    template_name = 'documents_staff/daftar.html'
+
+    def get_queryset(self):
+        # Staff hanya bisa lihat dokumen miliknya sendiri
+        user = self.request.user
+        if user.is_admin_role:
+            return DokumenStaff.objects.all()
+        return DokumenStaff.objects.filter(user=user)
+```
+
+------------------------------------------------------------
+Contoh untuk DAMAI (app activity_log):
+
+```python
+from authentication.mixins import AdminRequiredMixin
+
+class LogAktivitasListView(AdminRequiredMixin, ListView):
+    model = LogAktivitas
+    template_name = 'activity_log/daftar.html'
+```
+
+------------------------------------------------------------
+Contoh untuk ARSAT (app categories):
+
+```python
+from authentication.mixins import AdminRequiredMixin
+
+class KategoriListView(AdminRequiredMixin, ListView):
+    model = Kategori
+    template_name = 'categories/daftar.html'
+```
+
+------------------------------------------------------------
+LANGKAH 3 — Gunakan base.html Julianto sebagai parent template
+------------------------------------------------------------
+
+Template kalian cukup extends dari base.html Julianto.
+Sidebar, topbar, navbar sudah otomatis muncul.
+
+```html
+{% extends 'authentication/base.html' %}
+
+{% block title %}Judul Halaman{% endblock %}
+{% block page_title %}Judul di Topbar{% endblock %}
+
+{% block content %}
+  <!-- Konten kalian di sini -->
+{% endblock %}
+```
+
+------------------------------------------------------------
+LANGKAH 4 — Cek role di template
+------------------------------------------------------------
+
+Berkat context_processor, variabel ini tersedia di semua template:
+
+```html
+{% if is_admin %}
+  <!-- Hanya tampil untuk Admin -->
+{% endif %}
+
+{% if is_hrd %}
+  <!-- Hanya tampil untuk HRD -->
+{% endif %}
+
+{% if is_staff_user %}
+  <!-- Hanya tampil untuk Staff -->
+{% endif %}
+
+<!-- Atau gunakan bawaan Django: -->
+{% if user.is_admin_role %}...{% endif %}
+{% if user.role == 'hrd' %}...{% endif %}
+```
+
+------------------------------------------------------------
+LANGKAH 5 — Akses data user yang sedang login
+------------------------------------------------------------
+
+Di views.py:
+```python
+def get_queryset(self):
+    current_user = self.request.user
+    print(current_user.username)   # username
+    print(current_user.role)       # 'admin' / 'hrd' / 'staff'
+    print(current_user.email)      # email
+    print(current_user.is_admin_role)  # True/False
+```
+
+Di template:
+```html
+{{ user.username }}
+{{ user.get_full_name }}
+{{ user.get_role_display }}
+{{ user.email }}
+```
+
+------------------------------------------------------------
+LANGKAH 6 — Daftarkan app kalian di settings.py dan urls.py
+------------------------------------------------------------
+
+Di docuguard_erp/settings.py:
+```python
+INSTALLED_APPS = [
+    ...
+    'authentication',       # Julianto (sudah ada)
+    'documents_hrd',        # Jacky   — uncomment ini
+    'documents_staff',      # Vincent — uncomment ini
+    'activity_log',         # Damai   — uncomment ini
+    'categories',           # Arsat   — uncomment ini
+]
+```
+
+Di docuguard_erp/urls.py:
+```python
+urlpatterns = [
+    ...
+    path('hrd/', include('documents_hrd.urls', namespace='hrd')),         # Jacky
+    path('staff/', include('documents_staff.urls', namespace='staff')),   # Vincent
+    path('log/', include('activity_log.urls', namespace='activity_log')), # Damai
+    path('categories/', include('categories.urls', namespace='categories')), # Arsat
+]
+```
+
+------------------------------------------------------------
+CUSTOM USER MODEL — Cara pakai di model kalian
+------------------------------------------------------------
+
+JANGAN pakai `from django.contrib.auth.models import User`.
+WAJIB pakai `get_user_model()` agar compatible dengan CustomUser.
+
+```python
+# Di models.py app kalian masing-masing
+from django.conf import settings
+from django.db import models
+
+class DokumenHRD(models.Model):
+    # ForeignKey ke CustomUser dengan cara yang benar:
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,   # <-- BUKAN 'auth.User'!
+        on_delete=models.CASCADE,
+        related_name='dokumen_hrd'
+    )
+    judul = models.CharField(max_length=200)
+    # ... field lainnya
+```
+
+============================================================
+TROUBLESHOOTING UMUM
+============================================================
+
+Q: "403 Akses Ditolak" padahal sudah login?
+A: Cek role user kamu. Pakai mixin yang sesuai rolenya.
+   AdminRequiredMixin → hanya admin
+   HRDRequiredMixin   → hrd + admin
+   OTPRequiredMixin   → semua role (asalkan OTP verified)
+
+Q: Redirect ke /auth/otp/verify/ terus?
+A: User belum verifikasi OTP. Scan QR Code dulu di Google Authenticator.
+
+Q: CustomUser tidak ditemukan?
+A: Pastikan AUTH_USER_MODEL = 'authentication.CustomUser' ada di settings.py
+   DAN kalian sudah run: python manage.py migrate
+
+Q: Template tidak pakai sidebar?
+A: Pastikan {% extends 'authentication/base.html' %} ada di baris pertama template.
+
+============================================================

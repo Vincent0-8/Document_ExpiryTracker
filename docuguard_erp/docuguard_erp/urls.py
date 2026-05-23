@@ -1,23 +1,35 @@
 """
-URL configuration for docuguard_erp project.
+docuguard_erp/urls.py — URL utama project.
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+CARA INTEGRASI ANGGOTA LAIN:
+Setiap anggota cukup tambahkan satu baris path() di sini.
+Contoh Jacky: path('hrd/', include('documents_hrd.urls', namespace='hrd')),
 """
+
 from django.contrib import admin
-from django.urls import path,include
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from django.shortcuts import redirect
 
 urlpatterns = [
+    # Admin Django bawaan
     path('admin/', admin.site.urls),
-     path('', include('core.urls')),
+
+    # ─── Authentication & User Management (Julianto) ───
+    path('auth/', include('authentication.urls', namespace='authentication')),
+
+    # ─── Redirect root ke dashboard ───
+    path('', lambda request: redirect('authentication:login'), name='home'),
+
+    # ─── Tambahkan app anggota lain di sini (jangan ubah yang sudah ada) ───
+    # path('hrd/', include('documents_hrd.urls', namespace='hrd')),       # Jacky
+    # path('staff/', include('documents_staff.urls', namespace='staff')), # Vincent
+    # path('log/', include('dashboard.urls', namespace='dashboard')),     # Damai
+    # path('categories/', include('categories.urls', namespace='categories')), # Arsat
 ]
+
+# Serve media files saat development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

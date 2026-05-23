@@ -1,0 +1,210 @@
+{% extends 'authentication/base.html' %}
+
+{% block title %}Daftar Pengguna — DocuGuard ERP{% endblock %}
+{% block page_title %}Manajemen Pengguna{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h5 class="fw-bold mb-0">Daftar Pengguna</h5>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">
+            Total <strong>{{ paginator.count }}</strong> pengguna terdaftar
+        </p>
+    </div>
+    <a href="{% url 'authentication:user_create' %}" class="btn btn-primary">
+        <i class="bi bi-person-plus-fill me-2"></i>Tambah Pengguna
+    </a>
+</div>
+
+<!-- Filter & Search -->
+<div class="card mb-3">
+    <div class="card-body py-3">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-6">
+                <label class="form-label mb-1" style="font-size:0.8rem; font-weight:600;">Cari Pengguna</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="search" class="form-control"
+                           placeholder="Cari username, nama, atau email..."
+                           value="{{ search }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label mb-1" style="font-size:0.8rem; font-weight:600;">Filter Role</label>
+                <select name="role" class="form-select">
+                    <option value="">Semua Role</option>
+                    {% for val, label in role_choices %}
+                    <option value="{{ val }}" {% if role_filter == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill">
+                        <i class="bi bi-funnel me-1"></i>Filter
+                    </button>
+                    {% if search or role_filter %}
+                    <a href="{% url 'authentication:user_list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="padding:0.9rem 1rem; font-size:0.8rem; font-weight:600;">#</th>
+                        <th style="font-size:0.8rem; font-weight:600;">Pengguna</th>
+                        <th style="font-size:0.8rem; font-weight:600;">Role</th>
+                        <th style="font-size:0.8rem; font-weight:600;">OTP</th>
+                        <th style="font-size:0.8rem; font-weight:600;">Status</th>
+                        <th style="font-size:0.8rem; font-weight:600;">Bergabung</th>
+                        <th style="font-size:0.8rem; font-weight:600; text-align:right; padding-right:1rem;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td style="padding:0.85rem 1rem; color:#9ca3af; font-size:0.8rem;">
+                            {{ forloop.counter|add:page_obj.start_index|add:"-1" }}
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white"
+                                     style="width:36px;height:36px;font-size:0.85rem;flex-shrink:0;
+                                     background:{% if u.role == 'admin' %}#dc2626{% elif u.role == 'hrd' %}#7c3aed{% else %}#059669{% endif %};">
+                                    {{ u.first_name|first|upper|default:u.username|first|upper }}
+                                </div>
+                                <div>
+                                    <div class="fw-semibold" style="font-size:0.875rem;">
+                                        {{ u.get_full_name|default:u.username }}
+                                        {% if u == request.user %}
+                                        <span class="badge bg-secondary ms-1" style="font-size:0.65rem;">Anda</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-muted" style="font-size:0.75rem;">
+                                        @{{ u.username }} &bull; {{ u.email|default:"—" }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge {% if u.role == 'admin' %}badge-admin{% elif u.role == 'hrd' %}badge-hrd{% else %}badge-staff{% endif %}"
+                                  style="font-size:0.72rem;">
+                                {{ u.get_role_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if u.is_otp_enabled %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size:0.72rem;">
+                                <i class="bi bi-shield-check me-1"></i>Aktif
+                            </span>
+                            {% else %}
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size:0.72rem;">
+                                <i class="bi bi-shield-exclamation me-1"></i>Belum Setup
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if u.is_active %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size:0.72rem;">
+                                Aktif
+                            </span>
+                            {% else %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size:0.72rem;">
+                                Nonaktif
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted" style="font-size:0.8rem;">
+                            {{ u.date_joined|date:"d M Y" }}
+                        </td>
+                        <td style="text-align:right; padding-right:1rem;">
+                            <div class="d-flex gap-1 justify-content-end">
+                                <a href="{% url 'authentication:user_update' u.pk %}"
+                                   class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                                <!-- Reset OTP -->
+                                {% if u.is_otp_enabled %}
+                                <form method="post" action="{% url 'authentication:user_reset_otp' u.pk %}"
+                                      onsubmit="return confirm('Reset OTP untuk {{ u.username }}? User harus setup OTP ulang saat login berikutnya.')">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Reset OTP">
+                                        <i class="bi bi-shield-slash"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <!-- Hapus (tidak bisa hapus diri sendiri) -->
+                                {% if u != request.user %}
+                                <a href="{% url 'authentication:user_delete' u.pk %}"
+                                   class="btn btn-sm btn-outline-danger" title="Hapus">
+                                    <i class="bi bi-trash-fill"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox" style="font-size:2rem; display:block; margin-bottom:0.5rem;"></i>
+                            Tidak ada pengguna yang ditemukan.
+                            {% if search or role_filter %}
+                            <br>
+                            <a href="{% url 'authentication:user_list' %}" class="text-decoration-none">Reset filter</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="card-footer bg-white border-top d-flex align-items-center justify-content-between py-3 px-4">
+        <div class="text-muted" style="font-size:0.8rem;">
+            Menampilkan {{ page_obj.start_index }}–{{ page_obj.end_index }} dari {{ paginator.count }}
+        </div>
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search }}&role={{ role_filter }}">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}&search={{ search }}&role={{ role_filter }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search }}&role={{ role_filter }}">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

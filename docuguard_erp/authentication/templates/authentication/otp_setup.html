@@ -1,0 +1,214 @@
+{% extends 'authentication/base.html' %}
+
+{% block title %}Setup OTP — DocuGuard ERP{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { background: linear-gradient(135deg, #1a1f2e 0%, #252d40 50%, #1a1f2e 100%); }
+
+    .otp-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .otp-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 520px;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+    }
+
+    .step-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px; height: 32px;
+        background: #3b82f6;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 0.85rem;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .qr-container {
+        background: #f8fafc;
+        border: 2px dashed #cbd5e1;
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .qr-container img {
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .secret-key-box {
+        background: #1a1f2e;
+        color: #60a5fa;
+        font-family: 'Courier New', monospace;
+        font-size: 1rem;
+        letter-spacing: 0.15em;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        word-break: break-all;
+        cursor: pointer;
+        transition: background 0.2s;
+        position: relative;
+    }
+
+    .secret-key-box:hover { background: #252d40; }
+
+    .otp-input {
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: 0.5em;
+        text-align: center;
+        border-radius: 12px;
+        border: 2px solid #e5e7eb;
+        padding: 0.75rem;
+        transition: border-color 0.2s;
+    }
+
+    .otp-input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+        outline: none;
+    }
+
+    .btn-verify {
+        background: #3b82f6;
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .btn-verify:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59,130,246,0.4);
+    }
+</style>
+{% endblock %}
+
+{% block auth_content %}
+<div class="otp-wrapper">
+    <div class="otp-card">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <div style="font-size:2.5rem; color:#3b82f6; margin-bottom:0.5rem;">
+                <i class="bi bi-qr-code-scan"></i>
+            </div>
+            <h4 class="fw-bold mb-1">Setup Google Authenticator</h4>
+            <p class="text-muted" style="font-size:0.875rem;">
+                Halo, <strong>{{ user_obj.username }}</strong>! Scan QR Code berikut untuk mengaktifkan OTP.
+            </p>
+        </div>
+
+        <!-- Langkah-langkah -->
+        <div class="mb-4">
+            <div class="d-flex align-items-start gap-3 mb-3">
+                <span class="step-badge">1</span>
+                <div>
+                    <div class="fw-semibold" style="font-size:0.9rem;">Install Google Authenticator</div>
+                    <div class="text-muted" style="font-size:0.8rem;">Unduh di App Store atau Google Play Store</div>
+                </div>
+            </div>
+            <div class="d-flex align-items-start gap-3 mb-3">
+                <span class="step-badge">2</span>
+                <div>
+                    <div class="fw-semibold" style="font-size:0.9rem;">Scan QR Code di bawah ini</div>
+                    <div class="text-muted" style="font-size:0.8rem;">Buka app → Tambah akun → Scan QR Code</div>
+                </div>
+            </div>
+            <div class="d-flex align-items-start gap-3">
+                <span class="step-badge">3</span>
+                <div>
+                    <div class="fw-semibold" style="font-size:0.9rem;">Masukkan kode 6 digit</div>
+                    <div class="text-muted" style="font-size:0.8rem;">Kode berubah setiap 30 detik</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR Code -->
+        <div class="qr-container mb-3">
+            <img src="data:image/png;base64,{{ qr_code_b64 }}"
+                 alt="QR Code OTP"
+                 width="200" height="200">
+            <p class="text-muted mt-2 mb-0" style="font-size:0.75rem;">
+                <i class="bi bi-phone me-1"></i>Scan dengan Google Authenticator
+            </p>
+        </div>
+
+        <!-- Manual Key -->
+        <div class="mb-4">
+            <p class="text-muted mb-1" style="font-size:0.78rem;">
+                <i class="bi bi-info-circle me-1"></i>Tidak bisa scan? Masukkan kunci ini secara manual:
+            </p>
+            <div class="secret-key-box" onclick="copySecret(this)" title="Klik untuk copy">
+                {{ otp_secret }}
+                <span class="badge bg-secondary ms-2" style="font-size:0.65rem;">KLIK COPY</span>
+            </div>
+        </div>
+
+        <!-- Form Verifikasi -->
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label fw-semibold text-center d-block" style="font-size:0.9rem;">
+                    Kode OTP dari Google Authenticator
+                </label>
+                {{ form.token }}
+                {% if form.token.errors %}
+                <div class="text-danger text-center mt-1" style="font-size:0.8rem;">
+                    {{ form.token.errors|join:", " }}
+                </div>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn btn-verify btn-primary w-100 text-white">
+                <i class="bi bi-shield-check me-2"></i>Verifikasi & Aktifkan OTP
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <a href="{% url 'authentication:login' %}" class="text-muted" style="font-size:0.8rem;">
+                <i class="bi bi-arrow-left me-1"></i>Kembali ke Login
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function copySecret(el) {
+    const text = '{{ otp_secret }}';
+    navigator.clipboard.writeText(text).then(() => {
+        const badge = el.querySelector('.badge');
+        badge.textContent = '✓ TERSALIN!';
+        badge.classList.replace('bg-secondary', 'bg-success');
+        setTimeout(() => {
+            badge.textContent = 'KLIK COPY';
+            badge.classList.replace('bg-success', 'bg-secondary');
+        }, 2000);
+    });
+}
+
+// Auto-focus dan format input OTP
+const otpInput = document.querySelector('input[name="token"]');
+if (otpInput) {
+    otpInput.focus();
+    otpInput.addEventListener('input', function() {
+        this.value = this.value.replace(/\D/g, '').slice(0, 6);
+    });
+}
+</script>
+{% endblock %}

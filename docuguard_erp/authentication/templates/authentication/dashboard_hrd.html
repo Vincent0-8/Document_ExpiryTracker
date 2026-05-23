@@ -1,0 +1,63 @@
+{% extends 'authentication/base.html' %}
+
+{% block title %}Dashboard HRD — DocuGuard ERP{% endblock %}
+{% block page_title %}Dashboard HRD{% endblock %}
+
+{% block content %}
+<div class="card mb-4" style="background: linear-gradient(135deg, #4c1d95, #7c3aed); color:#fff; border-radius:16px;">
+    <div class="card-body p-4">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h4 class="fw-bold mb-1">Selamat Datang, {{ user.get_full_name|default:user.username }}! 👋</h4>
+                <p class="mb-0 opacity-75">
+                    <i class="bi bi-person-badge me-1"></i>
+                    Anda login sebagai <strong>HRD</strong> — Human Resource Department
+                </p>
+            </div>
+            <div class="d-none d-md-block" style="font-size: 4rem; opacity: 0.3;">
+                <i class="bi bi-briefcase-fill"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <div style="font-size:3rem; color:#7c3aed; margin-bottom:1rem;">
+                    <i class="bi bi-file-earmark-text-fill"></i>
+                </div>
+                <h5 class="fw-bold">Dokumen HRD</h5>
+                <p class="text-muted mb-3">Kelola dokumen kontrak, BPJS, sertifikat, dan dokumen HRD lainnya.</p>
+                <a href="#" class="btn btn-outline-primary">
+                    <i class="bi bi-folder-open me-2"></i>Buka Dokumen HRD
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <div style="font-size:3rem; color:#f59e0b; margin-bottom:1rem;">
+                    <i class="bi bi-bell-fill"></i>
+                </div>
+                <h5 class="fw-bold">Dokumen Hampir Expired</h5>
+                <p class="text-muted mb-3">Pantau dokumen yang akan segera expired dalam 30 hari ke depan.</p>
+                <a href="#" class="btn btn-outline-warning">
+                    <i class="bi bi-clock-history me-2"></i>Lihat Reminder
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-body text-center py-4">
+        <i class="bi bi-info-circle text-muted" style="font-size:1.5rem;"></i>
+        <p class="text-muted mt-2 mb-0">
+            Fitur Dokumen HRD dikelola oleh <strong>Jacky</strong>. Modul ini akan tersedia setelah branch <code>jacky</code> di-merge.
+        </p>
+    </div>
+</div>
+{% endblock %}
