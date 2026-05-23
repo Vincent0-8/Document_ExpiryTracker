@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard Utama — DocuGuard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg-base:#f4f5f7;--bg-card:#fff;--bg-hover:#f0f2f5;--border:#e4e7ec;--border-mid:#dde1e8;--text-primary:#111827;--text-secondary:#374151;--text-muted:#6b7280;--text-dim:#9ca3af;--blue:#2563eb;--green:#16a34a;--red:#dc2626;--amber:#d97706;--shadow:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 12px rgba(0,0,0,.08)}
+*{box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg-base);color:var(--text-primary);font-size:13px;min-height:100vh}
+.sidebar{width:210px;min-height:100vh;background:var(--bg-card);border-right:1px solid var(--border);position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;box-shadow:2px 0 8px rgba(0,0,0,.04)}
+.brand{display:flex;align-items:center;gap:10px;padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.brand-icon{width:32px;height:32px;border-radius:8px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;box-shadow:0 2px 8px rgba(37,99,235,.3)}
+.brand-name{font-size:13px;font-weight:700;color:var(--text-primary)}
+.brand-sub{font-size:10px;color:var(--text-muted);margin-top:1px}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);padding:14px 16px 5px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:7px 16px;color:var(--text-muted);border-left:2px solid transparent;text-decoration:none;font-size:12px;font-weight:500;transition:all .15s}
+.sb-item:hover{color:var(--text-secondary);background:var(--bg-hover)}
+.sb-item.active{color:var(--blue);background:#eff6ff;border-left-color:var(--blue)}
+.sb-item i{font-size:15px;width:16px}
+.sb-bottom{margin-top:auto;border-top:1px solid var(--border)}
+.sb-user{display:flex;align-items:center;gap:9px;padding:12px 14px}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:#dbeafe;color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.main{margin-left:210px;display:flex;flex-direction:column;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--bg-card);position:sticky;top:0;z-index:50;box-shadow:var(--shadow)}
+.topbar h1{font-size:15px;font-weight:700;color:var(--text-primary);margin:0}
+.topbar p{font-size:11px;color:var(--text-muted);margin:2px 0 0}
+.date-chip{font-size:10px;color:var(--text-muted);background:var(--bg-hover);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-family:'DM Mono',monospace}
+.notif-btn{position:relative;width:32px;height:32px;border-radius:8px;background:var(--bg-hover);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-muted);cursor:pointer;font-size:15px}
+.notif-badge{position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:var(--red);color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg-card)}
+.body{padding:24px;flex:1}
+/* Welcome banner */
+.welcome-banner{background:linear-gradient(135deg,#1d4ed8,#2563eb,#3b82f6);border-radius:14px;padding:24px 28px;color:#fff;margin-bottom:20px;position:relative;overflow:hidden}
+.welcome-banner::after{content:'';position:absolute;right:-30px;top:-30px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.07)}
+.welcome-banner::before{content:'';position:absolute;right:60px;bottom:-40px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.05)}
+.wb-greeting{font-size:18px;font-weight:700;margin-bottom:4px}
+.wb-sub{font-size:12px;opacity:.8;margin-bottom:16px}
+.wb-chips{display:flex;gap:8px;flex-wrap:wrap}
+.wb-chip{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:500;display:flex;align-items:center;gap:5px;backdrop-filter:blur(4px)}
+/* Role cards */
+.role-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all .2s;text-decoration:none;display:block;box-shadow:var(--shadow)}
+.role-card:hover{border-color:var(--blue);box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.rc-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px}
+.rc-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:4px}
+.rc-desc{font-size:11px;color:var(--text-muted);line-height:1.5;margin-bottom:14px}
+.rc-arrow{font-size:11px;color:var(--blue);font-weight:600;display:flex;align-items:center;gap:4px}
+/* stat mini */
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:10px 10px 0 0}
+.s-green::after{background:var(--green)}.s-red::after{background:var(--red)}.s-amber::after{background:var(--amber)}.s-blue::after{background:var(--blue)}
+.stat-label{font-size:10px;color:var(--text-muted);margin-bottom:5px;display:flex;align-items:center;gap:5px;font-weight:500}
+.stat-val{font-size:24px;font-weight:700;line-height:1}
+.stat-sub{font-size:10px;color:var(--text-dim);margin-top:4px}
+.v-green{color:var(--green)}.v-red{color:var(--red)}.v-amber{color:var(--amber)}.v-blue{color:var(--blue)}
+/* activity feed */
+.feed-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.feed-item:last-child{border-bottom:none}
+.feed-dot{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.fd-in{background:#dbeafe;color:var(--blue)}.fd-add{background:#dcfce7;color:var(--green)}.fd-ed{background:#fef3c7;color:var(--amber)}.fd-del{background:#fee2e2;color:var(--red)}.fd-out{background:var(--bg-hover);color:var(--text-muted)}
+.feed-text{font-size:11px;color:var(--text-secondary);flex:1}
+.feed-time{font-size:9px;color:var(--text-dim);font-family:'DM Mono',monospace;white-space:nowrap}
+/* section title */
+.sec-title{font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.sec-title i{font-size:14px;color:var(--blue)}
+/* live */
+.live-badge{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--green);font-family:'DM Mono',monospace;font-weight:600}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.dg-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:var(--shadow)}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="brand">
+    <div class="brand-icon"><i class="ti ti-shield-check"></i></div>
+    <div><div class="brand-name">DocuGuard</div><div class="brand-sub">ERP System</div></div>
+  </div>
+  <div class="sb-section">Utama</div>
+  <a href="#" class="sb-item active"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+  <a href="#" class="sb-item"><i class="ti ti-activity"></i>Monitoring</a>
+  <a href="#" class="sb-item"><i class="ti ti-list-details"></i>Log Aktivitas</a>
+  <div class="sb-section">Manajemen</div>
+  <a href="#" class="sb-item"><i class="ti ti-users"></i>Pengguna</a>
+  <a href="#" class="sb-item"><i class="ti ti-folder"></i>Dok. HRD</a>
+  <a href="#" class="sb-item"><i class="ti ti-id"></i>Dok. Staff</a>
+  <a href="#" class="sb-item"><i class="ti ti-tags"></i>Kategori</a>
+  <div class="sb-section">Sistem</div>
+  <a href="#" class="sb-item"><i class="ti ti-settings"></i>Pengaturan</a>
+  <div class="sb-bottom">
+    <div class="sb-user">
+      <div class="sb-avatar">DA</div>
+      <div><div style="font-size:11px;font-weight:600;color:var(--text-secondary)">Damai Alyndina</div><div style="font-size:10px;color:var(--text-dim)">Administrator</div></div>
+    </div>
+  </div>
+</div>
+<div class="main">
+  <div class="topbar">
+    <div><h1>Dashboard Utama Sistem</h1><p>Selamat datang di DocuGuard ERP</p></div>
+    <div class="d-flex align-items-center gap-2">
+      <div class="date-chip" id="clock">--:--:-- WIB</div>
+      <div class="notif-btn"><i class="ti ti-bell"></i><div class="notif-badge">3</div></div>
+    </div>
+  </div>
+  <div class="body">
+
+    <!-- Welcome Banner -->
+    <div class="welcome-banner">
+      <div class="wb-greeting">Selamat datang, Damai Alyndina 👋</div>
+      <div class="wb-sub">Rabu, 22 Mei 2026 · Anda login sebagai Administrator</div>
+      <div class="wb-chips">
+        <div class="wb-chip"><i class="ti ti-clock" style="font-size:11px"></i>Login: 08:00 WIB</div>
+        <div class="wb-chip"><i class="ti ti-map-pin" style="font-size:11px"></i>192.168.1.10</div>
+        <div class="wb-chip"><i class="ti ti-shield-check" style="font-size:11px"></i>Sesi aktif</div>
+      </div>
+    </div>
+
+    <!-- ROW 1: Stat cards -->
+    <div class="row g-2 mb-4">
+      <div class="col-3"><div class="stat-card s-green"><div class="stat-label"><i class="ti ti-file-check"></i>Dokumen Aktif</div><div class="stat-val v-green">142</div><div class="stat-sub">↑ 8 baru bulan ini</div></div></div>
+      <div class="col-3"><div class="stat-card s-red"><div class="stat-label"><i class="ti ti-file-x"></i>Expired</div><div class="stat-val v-red">17</div><div class="stat-sub">Perlu tindakan segera</div></div></div>
+      <div class="col-3"><div class="stat-card s-amber"><div class="stat-label"><i class="ti ti-alert-triangle"></i>Hampir Expired</div><div class="stat-val v-amber">24</div><div class="stat-sub">Dalam 30 hari</div></div></div>
+      <div class="col-3"><div class="stat-card s-blue"><div class="stat-label"><i class="ti ti-users"></i>Pengguna Aktif</div><div class="stat-val v-blue">38</div><div class="stat-sub">Admin · HRD · Staff</div></div></div>
+    </div>
+
+    <!-- ROW 2: Akses Cepat per Role + Live Feed -->
+    <div class="row g-3">
+      <div class="col-8">
+        <div class="sec-title"><i class="ti ti-layout-grid"></i>Akses per Role</div>
+        <div class="row g-2 mb-3">
+          <div class="col-4">
+            <a href="{% url 'dashboard_admin' %}" class="role-card">
+              <div class="rc-icon" style="background:#dbeafe;color:var(--blue)"><i class="ti ti-shield-check"></i></div>
+              <div class="rc-title">Dashboard Admin</div>
+              <div class="rc-desc">Kelola pengguna, dokumen, kategori, dan pantau log aktivitas seluruh sistem.</div>
+              <div class="rc-arrow"><i class="ti ti-arrow-right"></i>Masuk</div>
+            </a>
+          </div>
+          <div class="col-4">
+            <a href="{% url 'dashboard_hrd' %}" class="role-card">
+              <div class="rc-icon" style="background:#dcfce7;color:var(--green)"><i class="ti ti-folder-open"></i></div>
+              <div class="rc-title">Dashboard HRD</div>
+              <div class="rc-desc">Kelola dokumen HRD, kontrak kerja, BPJS, sertifikat, dan data kepegawaian.</div>
+              <div class="rc-arrow"><i class="ti ti-arrow-right"></i>Masuk</div>
+            </a>
+          </div>
+          <div class="col-4">
+            <a href="{% url 'dashboard_staff' %}" class="role-card">
+              <div class="rc-icon" style="background:#fef3c7;color:var(--amber)"><i class="ti ti-user"></i></div>
+              <div class="rc-title">Dashboard Staff</div>
+              <div class="rc-desc">Lihat dan kelola dokumen pribadi, status BPJS, dan identitas diri.</div>
+              <div class="rc-arrow"><i class="ti ti-arrow-right"></i>Masuk</div>
+            </a>
+          </div>
+        </div>
+        <!-- Quick nav -->
+        <div class="sec-title"><i class="ti ti-bolt"></i>Navigasi Cepat</div>
+        <div class="row g-2">
+          <div class="col-3"><a href="{% url 'monitoring' %}" style="text-decoration:none"><div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all .15s;box-shadow:var(--shadow)" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'"><i class="ti ti-chart-bar" style="font-size:20px;color:var(--blue)"></i><div style="font-size:10px;color:var(--text-secondary);margin-top:5px;font-weight:500">Monitoring</div></div></a></div>
+          <div class="col-3"><a href="{% url 'log_aktivitas' %}" style="text-decoration:none"><div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all .15s;box-shadow:var(--shadow)" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'"><i class="ti ti-list-details" style="font-size:20px;color:var(--green)"></i><div style="font-size:10px;color:var(--text-secondary);margin-top:5px;font-weight:500">Log Aktivitas</div></div></a></div>
+          <div class="col-3"><a href="#" style="text-decoration:none"><div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all .15s;box-shadow:var(--shadow)" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'"><i class="ti ti-users" style="font-size:20px;color:var(--amber)"></i><div style="font-size:10px;color:var(--text-secondary);margin-top:5px;font-weight:500">Pengguna</div></div></a></div>
+          <div class="col-3"><a href="#" style="text-decoration:none"><div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all .15s;box-shadow:var(--shadow)" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'"><i class="ti ti-settings" style="font-size:20px;color:var(--text-muted)"></i><div style="font-size:10px;color:var(--text-secondary);margin-top:5px;font-weight:500">Pengaturan</div></div></a></div>
+        </div>
+      </div>
+      <!-- Live feed -->
+      <div class="col-4">
+        <div class="dg-card h-100">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="sec-title mb-0"><i class="ti ti-activity"></i>Aktivitas Terkini</div>
+            <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+          </div>
+          <div id="feedList">
+            <div class="feed-item"><div class="feed-dot fd-add"><i class="ti ti-plus"></i></div><div class="feed-text">Damai tambah pengguna baru</div><div class="feed-time">10:02</div></div>
+            <div class="feed-item"><div class="feed-dot fd-del"><i class="ti ti-trash"></i></div><div class="feed-text">Admin hapus kategori</div><div class="feed-time">10:00</div></div>
+            <div class="feed-item"><div class="feed-dot fd-out"><i class="ti ti-logout"></i></div><div class="feed-text">Julianto logout</div><div class="feed-time">09:58</div></div>
+            <div class="feed-item"><div class="feed-dot fd-ed"><i class="ti ti-edit"></i></div><div class="feed-text">Jacky edit Kontrak HRD</div><div class="feed-time">09:50</div></div>
+            <div class="feed-item"><div class="feed-dot fd-in"><i class="ti ti-login"></i></div><div class="feed-text">Vincent berhasil login</div><div class="feed-time">09:45</div></div>
+          </div>
+          <a href="04_log_aktivitas.html" style="display:block;text-align:center;margin-top:12px;font-size:10px;color:var(--blue);font-weight:600;text-decoration:none;padding:6px;background:#eff6ff;border-radius:7px">Lihat semua log →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function tick(){const now=new Date(),pad=n=>n.toString().padStart(2,'0');document.getElementById('clock').textContent=`${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} WIB`;setTimeout(tick,1000)})();
+const lf=[{c:'fd-in',i:'ti-login',t:'Rina login'},{c:'fd-ed',i:'ti-edit',t:'Siti edit BPJS'},{c:'fd-add',i:'ti-plus',t:'Jacky upload dok.'},{c:'fd-out',i:'ti-logout',t:'Hendra logout'}];
+let li=0;
+setInterval(()=>{const l=lf[li%lf.length];li++;const now=new Date();const ts=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');const fl=document.getElementById('feedList');const d=document.createElement('div');d.className='feed-item';d.style.opacity='0';d.style.transition='opacity .3s';d.innerHTML=`<div class="feed-dot ${l.c}"><i class="ti ${l.i}"></i></div><div class="feed-text">${l.t}</div><div class="feed-time">${ts}</div>`;fl.insertBefore(d,fl.firstChild);requestAnimationFrame(()=>d.style.opacity='1');if(fl.children.length>5)fl.removeChild(fl.lastChild)},3500);
+</script>
+</body></html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riwayat Aktivitas Pengguna — DocuGuard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-base:#f4f5f7;
+  --bg-card:#ffffff;
+  --bg-hover:#f0f2f5;
+  --border:#e4e7ec;
+  --border-mid:#dde1e8;
+  --text-primary:#111827;
+  --text-secondary:#374151;
+  --text-muted:#6b7280;
+  --text-dim:#9ca3af;
+  --blue:#2563eb;
+  --green:#16a34a;
+  --red:#dc2626;
+  --amber:#d97706;
+  --shadow:0 1px 3px rgba(0,0,0,.08);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg-base);color:var(--text-primary);font-size:13px;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:210px;min-height:100vh;background:var(--bg-card);border-right:1px solid var(--border);position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;box-shadow:2px 0 8px rgba(0,0,0,.04)}
+.brand{display:flex;align-items:center;gap:10px;padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.brand-icon{width:32px;height:32px;border-radius:8px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;box-shadow:0 2px 8px rgba(37,99,235,.3)}
+.brand-name{font-size:13px;font-weight:700;color:var(--text-primary)}
+.brand-sub{font-size:10px;color:var(--text-muted);margin-top:1px}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);padding:14px 16px 5px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 16px;color:var(--text-muted);border-left:2px solid transparent;text-decoration:none;font-size:12px;font-weight:500;transition:all .15s}
+.sb-item:hover{color:var(--text-secondary);background:var(--bg-hover)}
+.sb-item.active{color:var(--blue);background:#eff6ff;border-left-color:var(--blue)}
+.sb-item i{font-size:15px;width:16px}
+.sb-bottom{margin-top:auto;border-top:1px solid var(--border)}
+.sb-user{display:flex;align-items:center;gap:9px;padding:12px 14px}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:#dbeafe;color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+
+/* MAIN */
+.main{margin-left:210px;display:flex;flex-direction:column;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--bg-card);position:sticky;top:0;z-index:50;box-shadow:var(--shadow)}
+.topbar h1{font-size:15px;font-weight:700;color:var(--text-primary);margin:0}
+.topbar p{font-size:11px;color:var(--text-muted);margin:2px 0 0}
+.date-chip{font-size:10px;color:var(--text-muted);background:var(--bg-hover);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-family:'DM Mono',monospace}
+.notif-btn{position:relative;width:32px;height:32px;border-radius:8px;background:var(--bg-hover);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-muted);cursor:pointer;font-size:15px}
+.notif-badge{position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:var(--red);color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg-card)}
+.body{padding:24px;flex:1}
+
+/* DG-CARD */
+.dg-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow)}
+.card-title{font-size:12px;font-weight:700;color:var(--text-secondary);display:flex;align-items:center;gap:6px}
+.card-title i{font-size:14px;color:var(--blue)}
+.card-link{font-size:10px;color:var(--blue);font-weight:600;text-decoration:none;cursor:pointer}
+
+/* USER PROFILE CARD */
+.user-profile-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.user-cover{height:64px;background:linear-gradient(135deg,#1d4ed8,#3b82f6)}
+.user-profile-body{padding:0 16px 16px}
+.user-big-av{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;margin-top:-26px;border:3px solid var(--bg-card);box-shadow:var(--shadow)}
+.av-admin{background:#dbeafe;color:var(--blue)}
+.av-hrd  {background:#dcfce7;color:var(--green)}
+.av-staff{background:#fef3c7;color:var(--amber)}
+.upc-name{font-size:14px;font-weight:700;color:var(--text-primary);margin-top:8px}
+.upc-role{font-size:10px;color:var(--text-muted);margin-top:2px}
+
+/* ROLE BADGE */
+.role-badge{font-size:9px;padding:2px 9px;border-radius:20px;font-family:'DM Mono',monospace;font-weight:700}
+.rb-admin{background:#dbeafe;color:var(--blue);border:1px solid #bfdbfe}
+.rb-hrd  {background:#dcfce7;color:var(--green);border:1px solid #bbf7d0}
+.rb-staff{background:#fef3c7;color:var(--amber);border:1px solid #fde68a}
+
+/* STAT MINI */
+.stat-mini{text-align:center;flex:1}
+.sm-val{font-size:18px;font-weight:700;line-height:1}
+.sm-label{font-size:9px;color:var(--text-dim);margin-top:2px}
+
+/* USER LIST */
+.ulist-item{display:flex;align-items:center;gap:9px;padding:8px 12px;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--border)}
+.ulist-item:last-child{border-bottom:none}
+.ulist-item:hover{background:var(--bg-hover)}
+.ulist-item.selected{background:#eff6ff;border-left:2px solid var(--blue)}
+.ul-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.ul-name{font-size:11px;color:var(--text-primary);font-weight:500}
+.ul-meta{font-size:9px;color:var(--text-dim)}
+
+/* ONLINE DOT */
+.online-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot-on  {background:var(--green);box-shadow:0 0 4px rgba(22,163,74,.4)}
+.dot-off {background:var(--text-dim)}
+.dot-away{background:var(--amber)}
+
+/* SEARCH INPUT */
+.search-input{width:100%;background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:7px 10px 7px 30px;font-size:11px;font-family:'DM Sans',sans-serif;outline:none;transition:border .15s}
+.search-input:focus{border-color:var(--blue)}
+.search-input::placeholder{color:var(--text-dim)}
+
+/* FILTER SELECT */
+.filter-select{background:var(--bg-hover);border:1px solid var(--border);color:var(--text-secondary);border-radius:6px;padding:5px 10px;font-size:11px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer}
+.filter-select:focus{border-color:var(--blue)}
+
+/* TIMELINE */
+.tl-date-sep{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-dim);padding:10px 0 6px;display:flex;align-items:center;gap:8px}
+.tl-date-sep::after{content:'';flex:1;height:1px;background:var(--border)}
+.tl-item{display:flex;gap:12px;padding:8px 0;position:relative}
+.tl-line{position:absolute;left:13px;top:32px;bottom:-8px;width:1px;background:var(--border-mid)}
+.tl-item:last-child .tl-line{display:none}
+.tl-ico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;position:relative;z-index:1}
+.ti-login {background:#dbeafe;color:var(--blue)}
+.ti-logout{background:var(--bg-hover);color:var(--text-muted);border:1px solid var(--border)}
+.ti-add   {background:#dcfce7;color:var(--green)}
+.ti-edit  {background:#fef3c7;color:var(--amber)}
+.ti-del   {background:#fee2e2;color:var(--red)}
+.ti-view  {background:#f3e8ff;color:#7c3aed}
+.tl-body{flex:1}
+.tl-title{font-size:12px;color:var(--text-primary);font-weight:500;margin-bottom:2px}
+.tl-meta{font-size:10px;color:var(--text-dim)}
+.tl-module{font-size:9px;font-weight:600;background:var(--bg-hover);border:1px solid var(--border);color:var(--text-muted);border-radius:4px;padding:1px 7px;margin-left:6px}
+.tl-time{font-size:10px;color:var(--text-dim);font-family:'DM Mono',monospace;white-space:nowrap;flex-shrink:0;margin-top:2px}
+
+/* ACT BADGE */
+.act-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace}
+.ab-login {background:#dbeafe;color:var(--blue)}
+.ab-logout{background:var(--bg-hover);color:var(--text-muted);border:1px solid var(--border)}
+.ab-tambah{background:#dcfce7;color:var(--green)}
+.ab-edit  {background:#fef3c7;color:var(--amber)}
+.ab-hapus {background:#fee2e2;color:var(--red)}
+.ab-lihat {background:#f3e8ff;color:#7c3aed}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="brand">
+    <div class="brand-icon"><i class="ti ti-shield-check"></i></div>
+    <div><div class="brand-name">DocuGuard</div><div class="brand-sub">ERP System</div></div>
+  </div>
+  <div class="sb-section">Utama</div>
+  <a href="{% url 'dashboard_admin' %}" class="sb-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+  <a href="{% url 'monitoring' %}" class="sb-item"><i class="ti ti-activity"></i>Monitoring</a>
+  <a href="{% url 'log_aktivitas' %}" class="sb-item active"><i class="ti ti-list-details"></i>Log Aktivitas</a>
+  <div class="sb-section">Manajemen</div>
+  <a href="{% url 'pengguna' %}" class="sb-item"><i class="ti ti-users"></i>Pengguna</a>
+  <a href="{% url 'dok_hrd' %}" class="sb-item"><i class="ti ti-folder"></i>Dok. HRD</a>
+  <a href="{% url 'dok_staff' %}" class="sb-item"><i class="ti ti-id"></i>Dok. Staff</a>
+  <a href="{% url 'kategori' %}" class="sb-item"><i class="ti ti-tags"></i>Kategori</a>
+  <div class="sb-section">Sistem</div>
+  <a href="{% url 'pengaturan' %}" class="sb-item"><i class="ti ti-settings"></i>Pengaturan</a>
+  <div class="sb-bottom">
+    <div class="sb-user">
+      <div class="sb-avatar">DA</div>
+      <div>
+        <div style="font-size:11px;color:var(--text-secondary);font-weight:600">Damai Alyndina</div>
+        <div style="font-size:10px;color:var(--text-dim)">Administrator</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div><h1>Riwayat Aktivitas Pengguna</h1><p>Detail rekam jejak aktivitas per pengguna</p></div>
+    <div class="d-flex align-items-center gap-2">
+      <div class="date-chip" id="clock">--:--:-- WIB</div>
+      <div class="notif-btn"><i class="ti ti-bell"></i><div class="notif-badge">3</div></div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="row g-3">
+
+      <!-- KIRI: daftar user -->
+      <div class="col-3">
+        <!-- Search -->
+        <div class="mb-2" style="position:relative">
+          <i class="ti ti-search" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:13px"></i>
+          <input id="userSearch" type="text" placeholder="Cari pengguna..." class="search-input">
+        </div>
+        <!-- Filter role -->
+        <select class="filter-select w-100 mb-2" id="roleFilter">
+          <option value="">Semua Role</option>
+          <option value="Admin">Admin</option>
+          <option value="HRD">HRD</option>
+          <option value="Staff">Staff</option>
+        </select>
+        <!-- User list -->
+        <div class="dg-card p-0" id="userListCard"></div>
+      </div>
+
+      <!-- KANAN: profile + timeline -->
+      <div class="col-9">
+
+        <!-- Profile Card -->
+        <div class="user-profile-card mb-3" id="profileCard">
+          <div class="user-cover"></div>
+          <div class="user-profile-body">
+            <div class="d-flex align-items-end justify-content-between">
+              <div id="profileAv" class="user-big-av av-admin">DA</div>
+              <div class="d-flex gap-2 pb-1">
+                <a href="#" style="font-size:11px;font-weight:600;padding:5px 12px;background:var(--bg-hover);border:1px solid var(--border);border-radius:7px;color:var(--text-secondary);text-decoration:none;display:flex;align-items:center;gap:4px">
+                  <i class="ti ti-eye" style="font-size:12px"></i>Lihat Profil
+                </a>
+                <a href="#" style="font-size:11px;font-weight:600;padding:5px 12px;background:var(--bg-hover);border:1px solid var(--border);border-radius:7px;color:var(--text-secondary);text-decoration:none;display:flex;align-items:center;gap:4px">
+                  <i class="ti ti-file-download" style="font-size:12px"></i>Export
+                </a>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-2 mt-1">
+              <div class="upc-name" id="profileName">Damai Alyndina</div>
+              <span class="role-badge rb-admin" id="profileRole">Admin</span>
+            </div>
+            <div class="upc-role" id="profileEmail">damai@docuguard.id · Bergabung Jan 2024</div>
+
+            <!-- Mini stats -->
+            <div class="d-flex mt-3 pt-2" style="border-top:1px solid var(--border)">
+              <div class="stat-mini"><div class="sm-val" style="color:var(--blue)" id="stTotal">46</div><div class="sm-label">Total</div></div>
+              <div class="stat-mini"><div class="sm-val" style="color:var(--green)" id="stLogin">12</div><div class="sm-label">Login</div></div>
+              <div class="stat-mini"><div class="sm-val" style="color:var(--amber)" id="stEdit">18</div><div class="sm-label">Edit/Tambah</div></div>
+              <div class="stat-mini"><div class="sm-val" style="color:var(--red)" id="stHapus">5</div><div class="sm-label">Hapus</div></div>
+              <div class="stat-mini"><div class="sm-val" style="color:#7c3aed" id="stLihat">11</div><div class="sm-label">Lihat</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timeline Card -->
+        <div class="dg-card p-0">
+          <div class="d-flex align-items-center gap-2 px-3 py-2"
+               style="border-bottom:1px solid var(--border-mid);background:var(--bg-hover);border-radius:12px 12px 0 0">
+            <div class="card-title"><i class="ti ti-timeline"></i>Timeline Aktivitas</div>
+            <div class="ms-auto d-flex gap-2">
+              <select class="filter-select" id="periodeFilter">
+                <option>Hari Ini</option>
+                <option>7 Hari</option>
+                <option>30 Hari</option>
+              </select>
+              <select class="filter-select" id="aksiFilter">
+                <option value="">Semua Aksi</option>
+                <option value="login">Login</option>
+                <option value="logout">Logout</option>
+                <option value="tambah">Tambah</option>
+                <option value="edit">Edit</option>
+                <option value="hapus">Hapus</option>
+                <option value="lihat">Lihat</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="padding:14px 20px;max-height:380px;overflow-y:auto" id="timelineBody"></div>
+
+          <div class="d-flex align-items-center justify-content-between px-4 py-2"
+               style="border-top:1px solid var(--border)">
+            <span style="font-size:10px;color:var(--text-dim);font-family:'DM Mono',monospace" id="tlCount">Menampilkan 12 aktivitas</span>
+            <a href="#" class="card-link">Lihat semua riwayat →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const users = [
+  { id:1, name:'Damai Alyndina', role:'Admin', av:'DA', avCls:'av-admin', rbCls:'rb-admin', email:'damai@docuguard.id', joined:'Jan 2024', online:'on',   stats:{total:46,login:12,edit:18,hapus:5,lihat:11} },
+  { id:2, name:'Jacky Pratama',  role:'HRD',   av:'JP', avCls:'av-hrd',   rbCls:'rb-hrd',   email:'jacky@docuguard.id', joined:'Mar 2024', online:'on',   stats:{total:32,login:8,edit:15,hapus:2,lihat:7} },
+  { id:3, name:'Rina Wati',      role:'HRD',   av:'RW', avCls:'av-hrd',   rbCls:'rb-hrd',   email:'rina@docuguard.id',  joined:'Feb 2024', online:'away', stats:{total:20,login:6,edit:9,hapus:1,lihat:4} },
+  { id:4, name:'Vincent K.',     role:'Staff', av:'VK', avCls:'av-staff', rbCls:'rb-staff', email:'vincent@docuguard.id',joined:'Apr 2024', online:'on',   stats:{total:15,login:7,edit:3,hapus:0,lihat:5} },
+  { id:5, name:'Ahmad Fauzi',    role:'Staff', av:'AF', avCls:'av-staff', rbCls:'rb-staff', email:'ahmad@docuguard.id', joined:'Jan 2024', online:'off',  stats:{total:11,login:5,edit:2,hapus:0,lihat:4} },
+  { id:6, name:'Siti Rahayu',    role:'HRD',   av:'SR', avCls:'av-hrd',   rbCls:'rb-hrd',   email:'siti@docuguard.id',  joined:'Jun 2024', online:'off',  stats:{total:28,login:9,edit:12,hapus:3,lihat:4} },
+  { id:7, name:'Arsat Kurniawan',role:'Admin', av:'AK', avCls:'av-admin', rbCls:'rb-admin', email:'arsat@docuguard.id', joined:'Feb 2024', online:'off',  stats:{total:38,login:11,edit:16,hapus:6,lihat:5} },
+  { id:8, name:'Dewi Lestari',   role:'Staff', av:'DL', avCls:'av-staff', rbCls:'rb-staff', email:'dewi@docuguard.id',  joined:'May 2024', online:'on',   stats:{total:9,login:4,edit:2,hapus:0,lihat:3} },
+];
+
+const timelines = {
+  1:[
+    {date:'22 Mei 2026',items:[
+      {aksi:'tambah',icon:'ti-plus',  title:'Tambah pengguna baru: Hendra P.',  modul:'Pengguna',   time:'10:02',ip:'192.168.1.10'},
+      {aksi:'hapus', icon:'ti-trash', title:'Hapus kategori: Surat Tugas',      modul:'Kategori',   time:'09:50',ip:'192.168.1.10'},
+      {aksi:'login', icon:'ti-login', title:'Login berhasil ke sistem',         modul:'Auth',       time:'08:00',ip:'192.168.1.10'},
+      {aksi:'edit',  icon:'ti-edit',  title:'Edit pengaturan notifikasi sistem',modul:'Pengaturan', time:'08:44',ip:'192.168.1.10'},
+      {aksi:'lihat', icon:'ti-eye',   title:'Lihat laporan monitoring dokumen', modul:'Monitoring', time:'08:20',ip:'192.168.1.10'},
+    ]},
+    {date:'21 Mei 2026',items:[
+      {aksi:'tambah',icon:'ti-plus',  title:'Upload sertifikat — Tim B',        modul:'Dok. HRD',   time:'16:30',ip:'192.168.1.10'},
+      {aksi:'edit',  icon:'ti-edit',  title:'Edit profil pengguna: Rina W.',    modul:'Pengguna',   time:'15:10',ip:'192.168.1.10'},
+      {aksi:'logout',icon:'ti-logout',title:'Logout dari sistem',               modul:'Auth',       time:'17:05',ip:'192.168.1.10'},
+    ]},
+  ],
+  2:[
+    {date:'22 Mei 2026',items:[
+      {aksi:'edit',  icon:'ti-edit',  title:'Edit Kontrak Kerja — Budi S.',     modul:'Dok. HRD',   time:'09:50',ip:'192.168.1.15'},
+      {aksi:'tambah',icon:'ti-plus',  title:'Upload BPJS Kesehatan — Rina W.', modul:'Dok. HRD',   time:'08:58',ip:'192.168.1.15'},
+      {aksi:'login', icon:'ti-login', title:'Login berhasil ke sistem',         modul:'Auth',       time:'08:05',ip:'192.168.1.15'},
+      {aksi:'lihat', icon:'ti-eye',   title:'Lihat daftar dokumen HRD',        modul:'Dok. HRD',   time:'08:10',ip:'192.168.1.15'},
+    ]},
+    {date:'21 Mei 2026',items:[
+      {aksi:'edit',  icon:'ti-edit',  title:'Edit BPJS TK — Ahmad F.',         modul:'Dok. HRD',   time:'14:20',ip:'192.168.1.15'},
+      {aksi:'logout',icon:'ti-logout',title:'Logout dari sistem',              modul:'Auth',       time:'17:00',ip:'192.168.1.15'},
+    ]},
+  ],
+};
+const defaultTimeline=[{date:'22 Mei 2026',items:[
+  {aksi:'login', icon:'ti-login', title:'Login berhasil ke sistem',modul:'Auth',     time:'09:00',ip:'192.168.1.x'},
+  {aksi:'lihat', icon:'ti-eye',   title:'Lihat dashboard',         modul:'Dashboard',time:'09:05',ip:'192.168.1.x'},
+  {aksi:'logout',icon:'ti-logout',title:'Logout dari sistem',      modul:'Auth',     time:'12:30',ip:'192.168.1.x'},
+]}];
+
+let selectedUserId=1;
+
+function getOnlineDot(s){return{on:'dot-on',away:'dot-away',off:'dot-off'}[s]}
+function getOnlineLabel(s){return{on:'Online',away:'Away',off:'Offline'}[s]}
+
+function renderUserList(filter='',roleF=''){
+  const card=document.getElementById('userListCard');
+  const f=users.filter(u=>u.name.toLowerCase().includes(filter.toLowerCase())&&(!roleF||u.role===roleF));
+  card.innerHTML=f.map(u=>`
+    <div class="ulist-item${u.id===selectedUserId?' selected':''}" onclick="selectUser(${u.id})">
+      <div class="ul-av ${u.avCls}">${u.av}</div>
+      <div style="flex:1;min-width:0">
+        <div class="ul-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.name}</div>
+        <div class="ul-meta">${u.role} · ${getOnlineLabel(u.online)}</div>
+      </div>
+      <div class="online-dot ${getOnlineDot(u.online)}"></div>
+    </div>`).join('');
+}
+
+function renderProfile(u){
+  document.getElementById('profileAv').className=`user-big-av ${u.avCls}`;
+  document.getElementById('profileAv').textContent=u.av;
+  document.getElementById('profileName').textContent=u.name;
+  document.getElementById('profileRole').textContent=u.role;
+  document.getElementById('profileRole').className=`role-badge ${u.rbCls}`;
+  document.getElementById('profileEmail').textContent=`${u.email} · Bergabung ${u.joined}`;
+  document.getElementById('stTotal').textContent=u.stats.total;
+  document.getElementById('stLogin').textContent=u.stats.login;
+  document.getElementById('stEdit').textContent=u.stats.edit;
+  document.getElementById('stHapus').textContent=u.stats.hapus;
+  document.getElementById('stLihat').textContent=u.stats.lihat;
+}
+
+function getIcoCls(a){return{login:'ti-login',logout:'ti-logout',tambah:'ti-add',edit:'ti-edit',hapus:'ti-del',lihat:'ti-view'}[a]||'ti-view'}
+function getActBadge(a){
+  const m={login:['ab-login','LOGIN'],logout:['ab-logout','LOGOUT'],tambah:['ab-tambah','TAMBAH'],edit:['ab-edit','EDIT'],hapus:['ab-hapus','HAPUS'],lihat:['ab-lihat','LIHAT']};
+  const[cls,lbl]=m[a]||['ab-lihat','AKSI'];
+  return`<span class="act-badge ${cls}">${lbl}</span>`;
+}
+
+function renderTimeline(userId,aksiFilter=''){
+  const tl=timelines[userId]||defaultTimeline;
+  const body=document.getElementById('timelineBody');
+  let count=0;
+  body.innerHTML=tl.map(group=>{
+    const items=aksiFilter?group.items.filter(i=>i.aksi===aksiFilter):group.items;
+    if(!items.length)return'';
+    count+=items.length;
+    return`
+      <div class="tl-date-sep">${group.date}</div>
+      ${items.map((item,idx)=>`
+        <div class="tl-item">
+          ${idx<items.length-1?'<div class="tl-line"></div>':''}
+          <div class="tl-ico ${getIcoCls(item.aksi)}"><i class="ti ${item.icon}"></i></div>
+          <div class="tl-body">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <span class="tl-title">${item.title}</span>
+              ${getActBadge(item.aksi)}
+              <span class="tl-module">${item.modul}</span>
+            </div>
+            <div class="tl-meta mt-1">IP: ${item.ip}</div>
+          </div>
+          <div class="tl-time">${item.time}</div>
+        </div>`).join('')}`;
+  }).join('');
+  document.getElementById('tlCount').textContent=`Menampilkan ${count} aktivitas`;
+}
+
+function selectUser(id){
+  selectedUserId=id;
+  const u=users.find(u=>u.id===id);
+  if(!u)return;
+  renderUserList(document.getElementById('userSearch').value,document.getElementById('roleFilter').value);
+  renderProfile(u);
+  renderTimeline(id,document.getElementById('aksiFilter').value);
+}
+
+document.getElementById('userSearch').addEventListener('input',e=>renderUserList(e.target.value,document.getElementById('roleFilter').value));
+document.getElementById('roleFilter').addEventListener('change',e=>renderUserList(document.getElementById('userSearch').value,e.target.value));
+document.getElementById('aksiFilter').addEventListener('change',e=>renderTimeline(selectedUserId,e.target.value));
+
+(function tick(){
+  const now=new Date(),pad=n=>n.toString().padStart(2,'0');
+  document.getElementById('clock').textContent=`${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} WIB`;
+  setTimeout(tick,1000);
+})();
+
+renderUserList();
+renderProfile(users[0]);
+renderTimeline(1);
+</script>
+</body>
+</html>

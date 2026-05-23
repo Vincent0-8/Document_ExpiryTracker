@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log Aktivitas — DocuGuard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-base:#f4f5f7;--bg-card:#ffffff;--bg-hover:#f0f2f5;
+  --border:#e4e7ec;--border-mid:#dde1e8;
+  --text-primary:#111827;--text-secondary:#374151;
+  --text-muted:#6b7280;--text-dim:#9ca3af;
+  --blue:#2563eb;--green:#16a34a;--red:#dc2626;--amber:#d97706;
+  --shadow:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 12px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg-base);color:var(--text-primary);font-size:13px;min-height:100vh}
+.sidebar{width:210px;min-height:100vh;background:var(--bg-card);border-right:1px solid var(--border);position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;box-shadow:2px 0 8px rgba(0,0,0,.04)}
+.brand{display:flex;align-items:center;gap:10px;padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.brand-icon{width:32px;height:32px;border-radius:8px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;box-shadow:0 2px 8px rgba(37,99,235,.3)}
+.brand-name{font-size:13px;font-weight:700;color:var(--text-primary)}
+.brand-sub{font-size:10px;color:var(--text-muted);margin-top:1px}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);padding:14px 16px 5px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 16px;color:var(--text-muted);border-left:2px solid transparent;text-decoration:none;font-size:12px;font-weight:500;transition:all .15s}
+.sb-item:hover{color:var(--text-secondary);background:var(--bg-hover)}
+.sb-item.active{color:var(--blue);background:#eff6ff;border-left-color:var(--blue)}
+.sb-item i{font-size:15px;width:16px}
+.sb-bottom{margin-top:auto;border-top:1px solid var(--border)}
+.sb-user{display:flex;align-items:center;gap:9px;padding:12px 14px}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:#dbeafe;color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.main{margin-left:210px;display:flex;flex-direction:column;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--bg-card);position:sticky;top:0;z-index:50;box-shadow:var(--shadow)}
+.topbar h1{font-size:15px;font-weight:700;color:var(--text-primary);margin:0}
+.topbar p{font-size:11px;color:var(--text-muted);margin:2px 0 0}
+.date-chip{font-size:10px;color:var(--text-muted);background:var(--bg-hover);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-family:'DM Mono',monospace}
+.notif-btn{position:relative;width:32px;height:32px;border-radius:8px;background:var(--bg-hover);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-muted);cursor:pointer;font-size:15px}
+.notif-badge{position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:var(--red);color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg-card)}
+.body{padding:24px;flex:1}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
+.s-blue::after{background:var(--blue)}.s-green::after{background:var(--green)}.s-amber::after{background:var(--amber)}.s-red::after{background:var(--red)}
+.stat-label{font-size:10px;color:var(--text-muted);margin-bottom:5px;display:flex;align-items:center;gap:5px;font-weight:500}
+.stat-val{font-size:26px;font-weight:700;line-height:1}
+.stat-sub{font-size:10px;color:var(--text-dim);margin-top:4px}
+.v-blue{color:var(--blue)}.v-green{color:var(--green)}.v-amber{color:var(--amber)}.v-red{color:var(--red)}
+.dg-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow)}
+.card-title{font-size:12px;font-weight:700;color:var(--text-secondary);display:flex;align-items:center;gap:6px}
+.card-title i{font-size:14px;color:var(--blue)}
+.filter-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border-mid)}
+.filter-select{background:var(--bg-hover);border:1px solid var(--border-mid);color:var(--text-secondary);border-radius:6px;padding:5px 10px;font-size:11px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer}
+.filter-select:focus{border-color:var(--blue)}
+.search-wrap{position:relative}
+.search-input{background:var(--bg-hover);border:1px solid var(--border-mid);color:var(--text-primary);border-radius:6px;padding:5px 10px 5px 30px;font-size:11px;font-family:'DM Sans',sans-serif;outline:none;width:200px}
+.search-input:focus{border-color:var(--blue)}
+.search-wrap i{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:13px;pointer-events:none}
+.btn-export{display:flex;align-items:center;gap:5px;background:var(--bg-hover);border:1px solid var(--border-mid);color:var(--text-secondary);border-radius:6px;padding:5px 12px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s;text-decoration:none}
+.btn-export:hover{border-color:var(--blue);color:var(--blue);background:#eff6ff}
+.live-badge{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--green);font-family:'DM Mono',monospace;font-weight:600}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.summary-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;padding:3px 10px;border-radius:20px;font-family:'DM Mono',monospace;font-weight:600;border:1px solid}
+.log-table{width:100%;border-collapse:collapse}
+.log-table th{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;padding:10px 16px;border-bottom:1px solid var(--border-mid);text-align:left;white-space:nowrap;cursor:pointer;user-select:none;background:var(--bg-hover)}
+.log-table th:hover{color:var(--text-secondary)}
+.log-table th i{font-size:11px;margin-left:3px}
+.log-table td{padding:10px 16px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text-secondary);vertical-align:middle}
+.log-table tr:last-child td{border-bottom:none}
+.log-table tr:hover td{background:var(--bg-hover)}
+@keyframes fadeIn{from{background:#dbeafe}to{background:transparent}}
+.action-ico{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.ico-login{background:#dbeafe;color:#1d4ed8}.ico-logout{background:var(--bg-hover);color:var(--text-muted);border:1px solid var(--border)}.ico-add{background:#dcfce7;color:var(--green)}.ico-edit{background:#fef3c7;color:var(--amber)}.ico-delete{background:#fee2e2;color:var(--red)}.ico-view{background:#ede9fe;color:#7c3aed}
+.act-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace;white-space:nowrap}
+.act-login{background:#dbeafe;color:#1d4ed8}.act-logout{background:var(--bg-hover);color:var(--text-muted);border:1px solid var(--border)}.act-tambah{background:#dcfce7;color:var(--green)}.act-edit{background:#fef3c7;color:var(--amber)}.act-hapus{background:#fee2e2;color:var(--red)}.act-lihat{background:#ede9fe;color:#7c3aed}
+.btn-detail{font-size:10px;color:var(--blue);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;text-decoration:none;transition:background .15s;font-weight:600}
+.btn-detail:hover{background:#eff6ff;color:#1d4ed8}
+.user-mini{display:flex;align-items:center;gap:7px}
+.user-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.av-admin{background:#dbeafe;color:#1d4ed8}.av-hrd{background:#dcfce7;color:var(--green)}.av-staff{background:#fef3c7;color:var(--amber)}
+.user-role{font-size:9px;color:var(--text-dim)}
+/* ── nama user jadi link ── */
+.user-link{font-size:11px;font-weight:600;color:var(--text-primary);text-decoration:none;transition:color .15s;cursor:pointer}
+.user-link:hover{color:var(--blue);text-decoration:underline}
+.pag-info{font-size:10px;color:var(--text-dim);font-family:'DM Mono',monospace}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="brand">
+    <div class="brand-icon"><i class="ti ti-shield-check"></i></div>
+    <div><div class="brand-name">DocuGuard</div><div class="brand-sub">ERP System</div></div>
+  </div>
+  <div class="sb-section">Utama</div>
+  <a href="{% url 'dashboard_admin' %}" class="sb-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+  <a href="{% url 'monitoring' %}" class="sb-item"><i class="ti ti-activity"></i>Monitoring</a>
+  <a href="{% url 'log_aktivitas' %}" class="sb-item active"><i class="ti ti-list-details"></i>Log Aktivitas</a>
+  <div class="sb-section">Manajemen</div>
+  <a href="{% url 'pengguna' %}" class="sb-item"><i class="ti ti-users"></i>Pengguna</a>
+  <a href="{% url 'dashboard_hrd' %}" class="sb-item"><i class="ti ti-folder"></i>Dok. HRD</a>
+  <a href="{% url 'dashboard_staff' %}" class="sb-item"><i class="ti ti-id"></i>Dok. Staff</a>
+  <a href="{% url 'kategori' %}" class="sb-item"><i class="ti ti-tags"></i>Kategori</a>
+  <div class="sb-section">Sistem</div>
+  <a href="{% url 'pengaturan' %}" class="sb-item"><i class="ti ti-settings"></i>Pengaturan</a>
+  <div class="sb-bottom">
+    <div class="sb-user">
+      <div class="sb-avatar">DA</div>
+      <div>
+        <div style="font-size:11px;color:var(--text-secondary);font-weight:600">Damai Alyndina</div>
+        <div style="font-size:10px;color:var(--text-dim)">Administrator</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div><h1>Log Aktivitas</h1><p>Riwayat seluruh aktivitas pengguna sistem DocuGuard</p></div>
+    <div class="d-flex align-items-center gap-2">
+      <div class="date-chip" id="clock">--:--:-- WIB</div>
+      <div class="notif-btn"><i class="ti ti-bell"></i><div class="notif-badge">3</div></div>
+    </div>
+  </div>
+
+  <div class="body">
+    <!-- STAT CARDS -->
+    <div class="row g-2 mb-3">
+      <div class="col-3"><div class="stat-card s-blue">
+        <div class="stat-label"><i class="ti ti-list-check"></i>Total Aktivitas Hari Ini</div>
+        <div class="stat-val v-blue" id="total-count">46</div>
+        <div class="stat-sub">Semua jenis aksi</div>
+      </div></div>
+      <div class="col-3"><div class="stat-card s-green">
+        <div class="stat-label"><i class="ti ti-login"></i>Login Hari Ini</div>
+        <div class="stat-val v-green">12</div>
+        <div class="stat-sub">Dari 38 pengguna aktif</div>
+      </div></div>
+      <div class="col-3"><div class="stat-card s-amber">
+        <div class="stat-label"><i class="ti ti-edit"></i>Tambah / Edit Dokumen</div>
+        <div class="stat-val v-amber">21</div>
+        <div class="stat-sub">8 tambah · 13 edit</div>
+      </div></div>
+      <div class="col-3"><div class="stat-card s-red">
+        <div class="stat-label"><i class="ti ti-trash"></i>Hapus</div>
+        <div class="stat-val v-red">5</div>
+        <div class="stat-sub">Dokumen & data lainnya</div>
+      </div></div>
+    </div>
+
+    <!-- LOG TABLE CARD -->
+    <div class="dg-card p-0">
+      <div class="d-flex align-items-center justify-content-between px-4 py-3"
+           style="border-bottom:1px solid var(--border-mid);background:var(--bg-hover);border-radius:12px 12px 0 0">
+        <div class="card-title"><i class="ti ti-list-details"></i>Daftar Log Aktivitas</div>
+        <div class="d-flex align-items-center gap-3">
+          <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+        </div>
+      </div>
+
+      <!-- FILTER BAR -->
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <i class="ti ti-search"></i>
+          <input class="search-input" type="text" id="searchInput" placeholder="Cari pengguna / aksi...">
+        </div>
+        <select class="filter-select" id="filterAksi">
+          <option value="">Semua Aksi</option>
+          <option value="login">Login</option>
+          <option value="logout">Logout</option>
+          <option value="tambah">Tambah</option>
+          <option value="edit">Edit</option>
+          <option value="hapus">Hapus</option>
+          <option value="lihat">Lihat</option>
+        </select>
+        <select class="filter-select" id="filterRole">
+          <option value="">Semua Role</option>
+          <option value="Admin">Admin</option>
+          <option value="HRD">HRD</option>
+          <option value="Staff">Staff</option>
+        </select>
+        <select class="filter-select" id="filterTanggal">
+          <option>Hari Ini</option>
+          <option>7 Hari Terakhir</option>
+          <option>30 Hari Terakhir</option>
+          <option>Bulan Ini</option>
+        </select>
+        <div class="ms-auto d-flex gap-2">
+          <a href="#" class="btn-export"><i class="ti ti-file-spreadsheet"></i>Export CSV</a>
+          <a href="#" class="btn-export"><i class="ti ti-printer"></i>Print</a>
+        </div>
+      </div>
+
+      <!-- Summary chips -->
+      <div class="d-flex align-items-center gap-2 px-4 py-2" style="border-bottom:1px solid var(--border)">
+        <span style="font-size:10px;color:var(--text-dim)">Filter aktif:</span>
+        <span class="summary-chip" style="color:#1d4ed8;border-color:#bfdbfe;background:#eff6ff">
+          <i class="ti ti-calendar" style="font-size:11px"></i>Hari Ini
+        </span>
+        <span class="summary-chip" style="color:var(--green);border-color:#bbf7d0;background:#f0fdf4" id="chip-count">
+          46 aktivitas ditemukan
+        </span>
+        <!-- hint klik nama -->
+        <span style="font-size:10px;color:var(--text-dim);margin-left:auto">
+          <i class="ti ti-info-circle" style="font-size:11px"></i>
+          Klik nama pengguna untuk melihat riwayat aktivitasnya
+        </span>
+      </div>
+
+      <!-- TABLE -->
+      <div style="overflow-x:auto">
+        <table class="log-table">
+          <thead>
+            <tr>
+              <th style="width:40px">#</th>
+              <th>Pengguna <i class="ti ti-selector"></i></th>
+              <th>Aksi <i class="ti ti-selector"></i></th>
+              <th>Deskripsi</th>
+              <th>Modul</th>
+              <th>IP Address</th>
+              <th>Waktu <i class="ti ti-selector"></i></th>
+              <th style="text-align:center">Detail</th>
+            </tr>
+          </thead>
+          <tbody id="logTableBody"></tbody>
+        </table>
+      </div>
+
+      <!-- PAGINATION -->
+      <div class="d-flex align-items-center justify-content-between px-4 py-3"
+           style="border-top:1px solid var(--border);background:var(--bg-hover);border-radius:0 0 12px 12px">
+        <span class="pag-info" id="pagInfo">Menampilkan 1–10 dari 46 aktivitas</span>
+        <nav>
+          <ul class="pagination pagination-sm mb-0"
+            style="--bs-pagination-bg:var(--bg-card);--bs-pagination-border-color:var(--border-mid);--bs-pagination-color:var(--text-secondary);--bs-pagination-active-bg:var(--blue);--bs-pagination-active-border-color:var(--blue);--bs-pagination-hover-bg:var(--bg-hover);--bs-pagination-hover-color:var(--text-primary);--bs-pagination-disabled-color:var(--text-dim);--bs-pagination-disabled-bg:var(--bg-card)">
+            <li class="page-item" id="prevPage"><a class="page-link" href="#" onclick="changePage(-1);return false">‹ Prev</a></li>
+            <li class="page-item active"><a class="page-link" href="#" id="pageNum1" onclick="goPage(1);return false">1</a></li>
+            <li class="page-item"><a class="page-link" href="#" id="pageNum2" onclick="goPage(2);return false">2</a></li>
+            <li class="page-item"><a class="page-link" href="#" id="pageNum3" onclick="goPage(3);return false">3</a></li>
+            <li class="page-item"><a class="page-link" href="#" id="pageNum4" onclick="goPage(4);return false">4</a></li>
+            <li class="page-item"><a class="page-link" href="#" id="pageNum5" onclick="goPage(5);return false">5</a></li>
+            <li class="page-item" id="nextPage"><a class="page-link" href="#" onclick="changePage(1);return false">Next ›</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const allLogs = [
+  { id:46, user:'Damai Alyndina', role:'Admin', aksi:'tambah', desc:'Tambah pengguna baru: Hendra P.', modul:'Pengguna', ip:'192.168.1.10', waktu:'10:02' },
+  { id:45, user:'Admin',          role:'Admin', aksi:'hapus',  desc:'Hapus kategori: Surat Tugas',     modul:'Kategori', ip:'192.168.1.1',  waktu:'10:00' },
+  { id:44, user:'Julianto',       role:'Admin', aksi:'logout', desc:'Logout dari sistem',               modul:'Auth',     ip:'192.168.1.22', waktu:'09:58' },
+  { id:43, user:'Jacky Pratama',  role:'HRD',   aksi:'edit',   desc:'Edit Kontrak Kerja — Budi S.',    modul:'Dok. HRD', ip:'192.168.1.15', waktu:'09:50' },
+  { id:42, user:'Vincent',        role:'Staff', aksi:'login',  desc:'Login berhasil ke sistem',         modul:'Auth',     ip:'192.168.1.31', waktu:'09:45' },
+  { id:41, user:'Arsat',          role:'Admin', aksi:'tambah', desc:'Tambah kategori: Medical Check',  modul:'Kategori', ip:'192.168.1.10', waktu:'09:40' },
+  { id:40, user:'Damai Alyndina', role:'Admin', aksi:'tambah', desc:'Tambah pengguna baru: Sari M.',   modul:'Pengguna', ip:'192.168.1.10', waktu:'09:35' },
+  { id:39, user:'Admin',          role:'Admin', aksi:'hapus',  desc:'Hapus kategori: Surat Izin',      modul:'Kategori', ip:'192.168.1.1',  waktu:'09:30' },
+  { id:38, user:'Rina Wati',      role:'HRD',   aksi:'lihat',  desc:'Lihat dokumen BPJS — Dodi M.',   modul:'Dok. HRD', ip:'192.168.1.18', waktu:'09:22' },
+  { id:37, user:'Ahmad Fauzi',    role:'Staff', aksi:'lihat',  desc:'Lihat dokumen SIM B1 pribadi',    modul:'Dok. Staff',ip:'192.168.1.40',waktu:'09:15' },
+  { id:36, user:'Julianto',       role:'Admin', aksi:'login',  desc:'Login berhasil ke sistem',         modul:'Auth',     ip:'192.168.1.22', waktu:'09:10' },
+  { id:35, user:'Dewi Lestari',   role:'Staff', aksi:'edit',   desc:'Edit data profil pribadi',         modul:'Pengguna', ip:'192.168.1.44', waktu:'09:05' },
+  { id:34, user:'Jacky Pratama',  role:'HRD',   aksi:'tambah', desc:'Upload BPJS Kesehatan — Rina W.',modul:'Dok. HRD', ip:'192.168.1.15', waktu:'08:58' },
+  { id:33, user:'Vincent',        role:'Staff', aksi:'lihat',  desc:'Lihat dashboard staff',            modul:'Dashboard',ip:'192.168.1.31', waktu:'08:50' },
+  { id:32, user:'Damai Alyndina', role:'Admin', aksi:'edit',   desc:'Edit pengaturan notifikasi sistem',modul:'Pengaturan',ip:'192.168.1.10',waktu:'08:44' },
+  { id:31, user:'Siti Rahayu',    role:'HRD',   aksi:'login',  desc:'Login berhasil ke sistem',         modul:'Auth',     ip:'192.168.1.20', waktu:'08:30' },
+  { id:30, user:'Admin',          role:'Admin', aksi:'tambah', desc:'Tambah kategori: Sertifikat ISO', modul:'Kategori', ip:'192.168.1.1',  waktu:'08:25' },
+  { id:29, user:'Hendra P.',      role:'Staff', aksi:'login',  desc:'Login berhasil ke sistem',         modul:'Auth',     ip:'192.168.1.55', waktu:'08:20' },
+  { id:28, user:'Rina Wati',      role:'HRD',   aksi:'edit',   desc:'Edit data BPJS TK — Ahmad F.',   modul:'Dok. HRD', ip:'192.168.1.18', waktu:'08:15' },
+  { id:27, user:'Arsat',          role:'Admin', aksi:'hapus',  desc:'Hapus log lama (> 90 hari)',       modul:'Log Aktivitas',ip:'192.168.1.10',waktu:'08:10' },
+  { id:26, user:'Jacky Pratama',  role:'HRD',   aksi:'login',  desc:'Login berhasil ke sistem',         modul:'Auth',     ip:'192.168.1.15', waktu:'08:05' },
+  { id:25, user:'Damai Alyndina', role:'Admin', aksi:'login',  desc:'Login berhasil ke sistem',         modul:'Auth',     ip:'192.168.1.10', waktu:'08:00' },
+];
+const extraLogs = Array.from({length:24},(_,i)=>({
+  id:24-i, user:['Siti Rahayu','Ahmad Fauzi','Dewi Lestari','Hendra P.','Rina Wati'][i%5],
+  role:['HRD','Staff','Staff','Staff','HRD'][i%5], aksi:['login','lihat','edit','logout','lihat'][i%5],
+  desc:['Login sistem','Lihat dokumen','Edit profil','Logout sistem','Cek status BPJS'][i%5],
+  modul:['Auth','Dok. Staff','Pengguna','Auth','Dok. HRD'][i%5],
+  ip:`192.168.1.${30+i}`, waktu:`${String(7-Math.floor(i/6)).padStart(2,'0')}:${String(55-(i*10)%60).padStart(2,'0')}`
+}));
+const logs=[...allLogs,...extraLogs];
+
+const PER_PAGE=10; let currentPage=1; let filtered=[...logs];
+
+const icoClass={login:'ico-login',logout:'ico-logout',tambah:'ico-add',edit:'ico-edit',hapus:'ico-delete',lihat:'ico-view'};
+const icoIcon ={login:'ti-login',logout:'ti-logout',tambah:'ti-plus',edit:'ti-edit',hapus:'ti-trash',lihat:'ti-eye'};
+const actLabel={login:'LOGIN',logout:'LOGOUT',tambah:'TAMBAH',edit:'EDIT',hapus:'HAPUS',lihat:'LIHAT'};
+const avMap   ={Admin:'av-admin',HRD:'av-hrd',Staff:'av-staff'};
+
+function initials(n){return n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase()}
+
+function renderTable(){
+  const start=(currentPage-1)*PER_PAGE;
+  const page=filtered.slice(start,start+PER_PAGE);
+  document.getElementById('logTableBody').innerHTML=page.map(l=>`
+    <tr>
+      <td style="color:var(--text-dim);font-family:'DM Mono',monospace;font-size:10px">${l.id}</td>
+      <td>
+        <div class="user-mini">
+          <div class="user-av ${avMap[l.role]||'av-staff'}">${initials(l.user)}</div>
+          <div>
+           <a href="/log_aktivitas/riwayat_user/${l.id}/"
+               class="user-link"
+               title="Lihat riwayat user ${l.user}">${l.user}</a>
+            <div class="user-role">${l.role}</div>
+          </div>
+        </div>
+      </td>
+      <td>
+        <div class="d-flex align-items-center gap-2">
+          <div class="action-ico ${icoClass[l.aksi]||'ico-view'}"><i class="ti ${icoIcon[l.aksi]||'ti-eye'}"></i></div>
+          <span class="act-badge act-${l.aksi}">${actLabel[l.aksi]||l.aksi.toUpperCase()}</span>
+        </div>
+      </td>
+      <td style="color:var(--text-primary);max-width:220px">${l.desc}</td>
+      <td><span style="font-size:10px;color:var(--text-muted);background:var(--bg-hover);padding:2px 8px;border-radius:6px;border:1px solid var(--border)">${l.modul}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim)">${l.ip}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:10px;white-space:nowrap">
+        <span style="color:var(--text-secondary)">22 Mei 2026</span>
+        <span style="color:var(--text-dim);margin-left:4px">${l.waktu}</span>
+      </td>
+      <td style="text-align:center">
+        <a href="/log_aktivitas/detail_aktivitas/${l.id}/" class="btn-detail">
+          <i class="ti ti-eye" style="font-size:11px"></i> Lihat
+        </a>
+      </td>
+    </tr>`).join('');
+
+  const total=filtered.length;
+  document.getElementById('pagInfo').textContent=`Menampilkan ${start+1}–${Math.min(start+PER_PAGE,total)} dari ${total} aktivitas`;
+  document.getElementById('chip-count').textContent=`${total} aktivitas ditemukan`;
+  document.getElementById('total-count').textContent=total;
+  const tp=Math.ceil(total/PER_PAGE);
+  for(let p=1;p<=5;p++){
+    const el=document.getElementById(`pageNum${p}`);
+    el.parentElement.classList.toggle('active',p===currentPage);
+    el.parentElement.classList.toggle('disabled',p>tp);
+  }
+  document.getElementById('prevPage').classList.toggle('disabled',currentPage===1);
+  document.getElementById('nextPage').classList.toggle('disabled',currentPage>=tp);
+}
+
+function applyFilter(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const aksi=document.getElementById('filterAksi').value;
+  const role=document.getElementById('filterRole').value;
+  filtered=logs.filter(l=>{
+    const mQ=!q||l.user.toLowerCase().includes(q)||l.desc.toLowerCase().includes(q);
+    const mA=!aksi||l.aksi===aksi;
+    const mR=!role||l.role===role;
+    return mQ&&mA&&mR;
+  });
+  currentPage=1; renderTable();
+}
+function changePage(dir){const tp=Math.ceil(filtered.length/PER_PAGE);currentPage=Math.max(1,Math.min(tp,currentPage+dir));renderTable()}
+function goPage(p){currentPage=p;renderTable()}
+
+document.getElementById('searchInput').addEventListener('input',applyFilter);
+document.getElementById('filterAksi').addEventListener('change',applyFilter);
+document.getElementById('filterRole').addEventListener('change',applyFilter);
+
+const liveData=[
+  {user:'Rina Wati',role:'HRD',aksi:'login',desc:'Login berhasil ke sistem',modul:'Auth',ip:'192.168.1.18'},
+  {user:'Hendra P.',role:'Staff',aksi:'lihat',desc:'Lihat dokumen kontrak pribadi',modul:'Dok. Staff',ip:'192.168.1.55'},
+  {user:'Jacky Pratama',role:'HRD',aksi:'edit',desc:'Edit BPJS TK — Arsat K.',modul:'Dok. HRD',ip:'192.168.1.15'},
+  {user:'Admin',role:'Admin',aksi:'hapus',desc:'Hapus data pengguna nonaktif',modul:'Pengguna',ip:'192.168.1.1'},
+];
+let liveIdx=0,liveTotal=46;
+setInterval(()=>{
+  const l=liveData[liveIdx%liveData.length];liveIdx++;liveTotal++;
+  const now=new Date();
+  const t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  logs.unshift({id:liveTotal,...l,waktu:t});
+  applyFilter();
+},5000);
+
+(function tick(){
+  const now=new Date(),pad=n=>n.toString().padStart(2,'0');
+  document.getElementById('clock').textContent=`${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} WIB`;
+  setTimeout(tick,1000);
+})();
+
+renderTable();
+</script>
+</body>
+</html>

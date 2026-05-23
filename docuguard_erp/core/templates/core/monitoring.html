@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Monitoring — DocuGuard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ── EXACT SAME VARIABLES AS DASHBOARD ADMIN ── */
+:root {
+  --bg-base:    #f4f5f7;
+  --bg-card:    #ffffff;
+  --bg-hover:   #f0f2f5;
+  --border:     #e4e7ec;
+  --border-mid: #dde1e8;
+  --text-primary:   #111827;
+  --text-secondary: #374151;
+  --text-muted:     #6b7280;
+  --text-dim:       #9ca3af;
+  --blue:   #2563eb;
+  --green:  #16a34a;
+  --red:    #dc2626;
+  --amber:  #d97706;
+  --shadow:    0 1px 3px rgba(0,0,0,.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.08);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Plus Jakarta Sans', 'DM Sans', sans-serif;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-size: 13px;
+  min-height: 100vh;
+}
+
+/* ── SIDEBAR (identical to admin) ── */
+.sidebar {
+  width: 210px;
+  min-height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  position: fixed;
+  top: 0; left: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  box-shadow: 2px 0 8px rgba(0,0,0,.04);
+}
+.brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 18px 16px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.brand-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 16px;
+  box-shadow: 0 2px 8px rgba(37,99,235,.3);
+}
+.brand-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.brand-sub  { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+
+.sb-section {
+  font-size: 9px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--text-dim);
+  padding: 14px 16px 5px;
+}
+.sb-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 16px;
+  color: var(--text-muted);
+  border-left: 2px solid transparent;
+  text-decoration: none;
+  font-size: 12px; font-weight: 500;
+  transition: all .15s;
+}
+.sb-item:hover { color: var(--text-secondary); background: var(--bg-hover); }
+.sb-item.active { color: var(--blue); background: #eff6ff; border-left-color: var(--blue); }
+.sb-item i { font-size: 15px; width: 16px; }
+
+.sb-bottom { margin-top: auto; border-top: 1px solid var(--border); }
+.sb-user { display: flex; align-items: center; gap: 9px; padding: 12px 14px; }
+.sb-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: #dbeafe; color: var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+}
+
+/* ── MAIN ── */
+.main { margin-left: 210px; display: flex; flex-direction: column; min-height: 100vh; }
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+  position: sticky; top: 0; z-index: 50;
+  box-shadow: var(--shadow);
+}
+.topbar h1 { font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 0; }
+.topbar p  { font-size: 11px; color: var(--text-muted); margin: 2px 0 0; }
+.date-chip {
+  font-size: 10px; color: var(--text-muted);
+  background: var(--bg-hover); border: 1px solid var(--border);
+  border-radius: 6px; padding: 5px 10px;
+  font-family: 'DM Mono', monospace;
+}
+.notif-btn {
+  position: relative; width: 32px; height: 32px; border-radius: 8px;
+  background: var(--bg-hover); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted); cursor: pointer; font-size: 15px;
+}
+.notif-badge {
+  position: absolute; top: -3px; right: -3px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--red); color: #fff;
+  font-size: 8px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--bg-card);
+}
+
+/* ── BODY ── */
+.body { padding: 24px; flex: 1; }
+
+/* ── STAT CARDS (identical to admin) ── */
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  position: relative; overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.stat-card::after {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  border-radius: 12px 12px 0 0;
+}
+.s-green::after { background: var(--green); }
+.s-red::after   { background: var(--red); }
+.s-amber::after { background: var(--amber); }
+.s-blue::after  { background: var(--blue); }
+
+.stat-label {
+  font-size: 10px; color: var(--text-muted); margin-bottom: 5px;
+  display: flex; align-items: center; gap: 5px; font-weight: 500;
+}
+.stat-val { font-size: 26px; font-weight: 700; line-height: 1; }
+.stat-sub { font-size: 10px; color: var(--text-dim); margin-top: 4px; }
+.v-green { color: var(--green); }
+.v-red   { color: var(--red); }
+.v-amber { color: var(--amber); }
+.v-blue  { color: var(--blue); }
+
+/* ── CARD BASE (identical to admin) ── */
+.dg-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-size: 12px; font-weight: 700;
+  color: var(--text-secondary);
+  display: flex; align-items: center; gap: 6px;
+}
+.card-title i { font-size: 14px; color: var(--blue); }
+.card-link { font-size: 10px; color: var(--blue); cursor: pointer; text-decoration: none; font-weight: 600; }
+
+/* ── PROGRESS BARS (identical to admin) ── */
+.bar-label { font-size: 10px; color: var(--text-muted); }
+.bar-val   { font-size: 10px; font-family: 'DM Mono', monospace; }
+.progress  { height: 5px; background: #eef1f5; border-radius: 4px; }
+.progress-bar { border-radius: 4px; transition: width .8s ease; }
+
+/* ── TABLE ── */
+.dg-table { width: 100%; border-collapse: collapse; }
+.dg-table th {
+  font-size: 10px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: .05em;
+  padding: 8px 12px; border-bottom: 1px solid var(--border-mid);
+  text-align: left; background: var(--bg-hover);
+}
+.dg-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px; color: var(--text-secondary);
+  vertical-align: middle;
+}
+.dg-table tr:last-child td { border-bottom: none; }
+.dg-table tr:hover td { background: var(--bg-hover); }
+.doc-name-cell { color: var(--text-primary); font-size: 12px; font-weight: 500; }
+.doc-sub       { font-size: 10px; color: var(--text-dim); margin-top: 1px; }
+
+/* ── PILLS (identical to admin) ── */
+.pill {
+  font-size: 9px; font-weight: 700;
+  padding: 3px 8px; border-radius: 20px;
+  white-space: nowrap;
+  font-family: 'DM Mono', monospace;
+}
+.pill-exp  { background: #fee2e2; color: var(--red); }
+.pill-warn { background: #fef3c7; color: var(--amber); }
+.pill-ok   { background: #dcfce7; color: var(--green); }
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  background: var(--bg-hover);
+  border-bottom: 1px solid var(--border);
+  border-radius: 12px 12px 0 0;
+}
+.filter-select {
+  background: var(--bg-card); border: 1px solid var(--border-mid);
+  color: var(--text-secondary); border-radius: 6px;
+  padding: 4px 10px; font-size: 11px;
+  font-family: 'DM Sans', sans-serif; outline: none;
+}
+.filter-select:focus { border-color: var(--blue); }
+.search-input {
+  background: var(--bg-card); border: 1px solid var(--border-mid);
+  color: var(--text-primary); border-radius: 6px;
+  padding: 4px 10px 4px 30px; font-size: 11px;
+  font-family: 'DM Sans', sans-serif; outline: none; width: 180px;
+}
+.search-input:focus { border-color: var(--blue); }
+.search-wrap { position: relative; }
+.search-wrap i {
+  position: absolute; left: 8px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted); font-size: 13px;
+  pointer-events: none;
+}
+
+/* ── DONUT ── */
+.donut-wrap {
+  position: relative; width: 120px; height: 120px; margin: 0 auto;
+}
+.donut-center {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.donut-val { font-size: 22px; font-weight: 700; color: var(--text-primary); line-height: 1; }
+.donut-sub { font-size: 10px; color: var(--text-muted); }
+.legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+/* ── TIMELINE ── */
+.timeline-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+}
+.timeline-item:last-child { border-bottom: none; }
+.tl-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  flex-shrink: 0; margin-top: 4px;
+}
+.tl-name { color: var(--text-primary); font-weight: 500; }
+.tl-meta { font-size: 10px; color: var(--text-dim); }
+.tl-days { font-size: 10px; font-family: 'DM Mono', monospace; white-space: nowrap; }
+
+.section-heading {
+  font-size: 9px; font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase; letter-spacing: .1em;
+  margin-bottom: 8px;
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="brand">
+    <div class="brand-icon"><i class="ti ti-shield-check"></i></div>
+    <div><div class="brand-name">DocuGuard</div><div class="brand-sub">ERP System</div></div>
+  </div>
+
+  <div class="sb-section">Utama</div>
+  <a href="{% url 'dashboard_admin' %}" class="sb-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+  <a href="{% url 'monitoring' %}" class="sb-item active"><i class="ti ti-activity"></i>Monitoring</a>
+  <a href="{% url 'log_aktivitas' %}" class="sb-item"><i class="ti ti-list-details"></i>Log Aktivitas</a>
+
+  <div class="sb-section">Manajemen</div>
+  <a href="{% url 'pengguna' %}" class="sb-item"><i class="ti ti-users"></i>Pengguna</a>
+  <a href="{% url 'dashboard_hrd' %}" class="sb-item"><i class="ti ti-folder"></i>Dok. HRD</a>
+  <a href="{% url 'dashboard_staff' %}" class="sb-item"><i class="ti ti-id"></i>Dok. Staff</a>
+  <a href="{% url 'kategori' %}" class="sb-item"><i class="ti ti-tags"></i>Kategori</a>
+
+  <div class="sb-section">Sistem</div>
+  <a href="{% url 'pengaturan' %}" class="sb-item"><i class="ti ti-settings"></i>Pengaturan</a>
+
+  <div class="sb-bottom">
+    <div class="sb-user">
+      <div class="sb-avatar">DA</div>
+      <div>
+        <div style="font-size:11px;color:var(--text-secondary);font-weight:500">Damai Alyndina</div>
+        <div style="font-size:10px;color:var(--text-dim)">Administrator</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div>
+      <h1>Dashboard Monitoring</h1>
+      <p>Pantau status seluruh dokumen sistem DocuGuard</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <div class="date-chip" id="clock">--:--:-- WIB</div>
+      <div class="notif-btn"><i class="ti ti-bell"></i><div class="notif-badge">3</div></div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- ROW 1: STAT CARDS -->
+    <div class="row g-2 mb-3">
+      <div class="col-3">
+        <div class="stat-card s-green">
+          <div class="stat-label"><i class="ti ti-file-check"></i>Total Dokumen Aktif</div>
+          <div class="stat-val v-green">142</div>
+          <div class="stat-sub">↑ 8 dokumen baru bulan ini</div>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="stat-card s-red">
+          <div class="stat-label"><i class="ti ti-file-x"></i>Expired</div>
+          <div class="stat-val v-red">17</div>
+          <div class="stat-sub">Perlu tindakan segera</div>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="stat-card s-amber">
+          <div class="stat-label"><i class="ti ti-alert-triangle"></i>Hampir Expired</div>
+          <div class="stat-val v-amber">24</div>
+          <div class="stat-sub">Dalam 30 hari ke depan</div>
+        </div>
+      </div>
+      <div class="col-3">
+        <div class="stat-card s-blue">
+          <div class="stat-label"><i class="ti ti-chart-pie"></i>Tingkat Kelengkapan</div>
+          <div class="stat-val v-blue">78%</div>
+          <div class="stat-sub">Dari total dokumen wajib</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 2: Progress per Kategori + Donut -->
+    <div class="row g-2 mb-3">
+
+      <!-- Progress -->
+      <div class="col-8">
+        <div class="dg-card h-100">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="card-title"><i class="ti ti-chart-bar"></i>Kelengkapan per Kategori</div>
+            <a href="#" class="card-link">Lihat Detail →</a>
+          </div>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="bar-label">Kontrak Kerja</span>
+              <span class="bar-val v-green">45 / 50</span>
+            </div>
+            <div class="progress"><div class="progress-bar bg-success" style="width:90%"></div></div>
+            <div class="d-flex justify-content-between mt-1">
+              <span style="font-size:9px;color:var(--text-dim)">45 aktif · 3 hampir expired · 2 expired</span>
+              <span style="font-size:9px;color:var(--green)">90%</span>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="bar-label">Sertifikat</span>
+              <span class="bar-val v-blue">30 / 40</span>
+            </div>
+            <div class="progress"><div class="progress-bar" style="width:75%;background:#3b82f6"></div></div>
+            <div class="d-flex justify-content-between mt-1">
+              <span style="font-size:9px;color:var(--text-dim)">30 aktif · 5 hampir expired · 5 expired</span>
+              <span style="font-size:9px;color:var(--blue)">75%</span>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="bar-label">BPJS</span>
+              <span class="bar-val v-blue">28 / 38</span>
+            </div>
+            <div class="progress"><div class="progress-bar" style="width:74%;background:#3b82f6"></div></div>
+            <div class="d-flex justify-content-between mt-1">
+              <span style="font-size:9px;color:var(--text-dim)">28 aktif · 4 hampir expired · 6 expired</span>
+              <span style="font-size:9px;color:var(--blue)">74%</span>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="bar-label">Identitas Staff</span>
+              <span class="bar-val v-amber">22 / 38</span>
+            </div>
+            <div class="progress"><div class="progress-bar bg-warning" style="width:58%"></div></div>
+            <div class="d-flex justify-content-between mt-1">
+              <span style="font-size:9px;color:var(--text-dim)">22 aktif · 8 hampir expired · 8 expired</span>
+              <span style="font-size:9px;color:var(--amber)">58%</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="bar-label">Medical Check</span>
+              <span class="bar-val v-red">17 / 38</span>
+            </div>
+            <div class="progress"><div class="progress-bar bg-danger" style="width:45%"></div></div>
+            <div class="d-flex justify-content-between mt-1">
+              <span style="font-size:9px;color:var(--text-dim)">17 aktif · 4 hampir expired · 17 expired</span>
+              <span style="font-size:9px;color:var(--red)">45%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Donut -->
+      <div class="col-4">
+        <div class="dg-card h-100">
+          <div class="card-title mb-3"><i class="ti ti-chart-donut"></i>Distribusi Status</div>
+          <div class="donut-wrap mb-3">
+            <canvas id="donutChart" width="120" height="120"></canvas>
+            <div class="donut-center">
+              <div class="donut-val">183</div>
+              <div class="donut-sub">total dok.</div>
+            </div>
+          </div>
+          <div class="d-flex flex-column gap-2">
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center gap-2">
+                <div class="legend-dot" style="background:var(--green)"></div>
+                <span style="font-size:11px;color:var(--text-secondary)">Aktif</span>
+              </div>
+              <span style="font-size:11px;color:var(--green);font-family:'DM Mono',monospace">142 (78%)</span>
+            </div>
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center gap-2">
+                <div class="legend-dot" style="background:var(--amber)"></div>
+                <span style="font-size:11px;color:var(--text-secondary)">Hampir Expired</span>
+              </div>
+              <span style="font-size:11px;color:var(--amber);font-family:'DM Mono',monospace">24 (13%)</span>
+            </div>
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center gap-2">
+                <div class="legend-dot" style="background:var(--red)"></div>
+                <span style="font-size:11px;color:var(--text-secondary)">Expired</span>
+              </div>
+              <span style="font-size:11px;color:var(--red);font-family:'DM Mono',monospace">17 (9%)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 3: Tabel Dokumen + Timeline -->
+    <div class="row g-2">
+
+      <!-- Tabel -->
+      <div class="col-8">
+        <div class="dg-card p-0">
+          <div class="filter-bar">
+            <div class="card-title" style="margin-right:auto"><i class="ti ti-table"></i>Daftar Dokumen</div>
+            <div class="search-wrap">
+              <i class="ti ti-search"></i>
+              <input class="search-input" type="text" placeholder="Cari dokumen...">
+            </div>
+            <select class="filter-select">
+              <option>Semua Status</option>
+              <option>Aktif</option>
+              <option>Hampir Expired</option>
+              <option>Expired</option>
+            </select>
+            <select class="filter-select">
+              <option>Semua Kategori</option>
+              <option>Kontrak Kerja</option>
+              <option>Sertifikat</option>
+              <option>BPJS</option>
+              <option>Identitas Staff</option>
+              <option>Medical Check</option>
+            </select>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="dg-table">
+              <thead>
+                <tr>
+                  <th>Nama Dokumen</th>
+                  <th>Pemilik</th>
+                  <th>Kategori</th>
+                  <th>Tgl Expired</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div class="doc-name-cell">Kontrak Kerja</div><div class="doc-sub">HRD-KK-001</div></td>
+                  <td>Budi Santoso</td>
+                  <td>Kontrak Kerja</td>
+                  <td style="font-family:'DM Mono',monospace;font-size:10px">01 Jan 2024</td>
+                  <td><span class="pill pill-exp">EXPIRED</span></td>
+                </tr>
+                <tr>
+                  <td><div class="doc-name-cell">BPJS Kesehatan</div><div class="doc-sub">HRD-BPJS-014</div></td>
+                  <td>Rina Wati</td>
+                  <td>BPJS</td>
+                  <td style="font-family:'DM Mono',monospace;font-size:10px">27 Mei 2026</td>
+                  <td><span class="pill pill-warn">5 hari</span></td>
+                </tr>
+                <tr>
+                  <td><div class="doc-name-cell">SIM B1</div><div class="doc-sub">STF-ID-022</div></td>
+                  <td>Ahmad Fauzi</td>
+                  <td>Identitas Staff</td>
+                  <td style="font-family:'DM Mono',monospace;font-size:10px">03 Jun 2026</td>
+                  <td><span class="pill pill-warn">12 hari</span></td>
+                </tr>
+                <tr>
+                  <td><div class="doc-name-cell">Sertifikat K3</div><div class="doc-sub">HRD-SERT-007</div></td>
+                  <td>Tim Produksi A</td>
+                  <td>Sertifikat</td>
+                  <td style="font-family:'DM Mono',monospace;font-size:10px">15 Mar 2024</td>
+                  <td><span class="pill pill-exp">EXPIRED</span></td>
+                </tr>
+                <tr>
+                  <td><div class="doc-name-cell">Paspor</div><div class="doc-sub">STF-ID-018</div></td>
+                  <td>Dewi Lestari</td>
+                  <td>Identitas Staff</td>
+                  <td style="font-family:'DM Mono',monospace;font-size:10px">12 Des 2027</td>
+                  <td><span class="pill pill-ok">AKTIF</span></td>
+                </tr>
+                <tr>
+                  <td><div class="doc-name-cell">Medical Check</div><div class="doc-sub">STF-MED-031</div></td>
+                  <td>Arsat Kurniawan</td>
+                  <td>Medical Check</td>
+                  <td style="font-family:'DM Mono',monospace;font-size:10px">09 Jun 2026</td>
+                  <td><span class="pill pill-warn">18 hari</span></td>
+                </tr>
+                <tr>
+                  <td><div class="doc-name-cell">Kontrak Kerja</div><div class="doc-sub">HRD-KK-008</div></td>
+                  <td>Siti Rahayu</td>
+                  <td>Kontrak Kerja</td>
+                  <td style="font-family:'DM Mono',monospace;font-size:10px">30 Nov 2027</td>
+                  <td><span class="pill pill-ok">AKTIF</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="d-flex align-items-center justify-content-between px-3 py-2"
+               style="border-top:1px solid var(--border)">
+            <span style="font-size:10px;color:var(--text-dim)">Menampilkan 7 dari 183 dokumen</span>
+            <nav>
+              <ul class="pagination pagination-sm mb-0"
+                  style="--bs-pagination-bg:var(--bg-hover);--bs-pagination-border-color:var(--border-mid);--bs-pagination-color:var(--text-secondary);--bs-pagination-active-bg:var(--blue);--bs-pagination-active-border-color:var(--blue);--bs-pagination-hover-bg:var(--bg-card);--bs-pagination-hover-color:var(--text-primary);--bs-pagination-disabled-color:var(--text-dim)">
+                <li class="page-item disabled"><a class="page-link" href="#">‹</a></li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><a class="page-link" href="#">›</a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline Expired -->
+      <div class="col-4">
+        <div class="dg-card h-100">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="card-title"><i class="ti ti-clock-exclamation"></i>Jadwal Expired</div>
+            <a href="#" class="card-link">Semua →</a>
+          </div>
+
+          <div class="section-heading">Sudah Expired</div>
+          <div class="timeline-item">
+            <div class="tl-dot" style="background:var(--red)"></div>
+            <div style="flex:1">
+              <div class="tl-name">Kontrak Kerja — Budi S.</div>
+              <div class="tl-meta">HRD · Kontrak Kerja</div>
+            </div>
+            <span class="tl-days v-red">01 Jan 2024</span>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-dot" style="background:var(--red)"></div>
+            <div style="flex:1">
+              <div class="tl-name">Sertifikat K3 — Tim A</div>
+              <div class="tl-meta">HRD · Sertifikat</div>
+            </div>
+            <span class="tl-days v-red">15 Mar 2024</span>
+          </div>
+
+          <div class="section-heading mt-3">Hampir Expired (30 hari)</div>
+          <div class="timeline-item">
+            <div class="tl-dot" style="background:var(--amber)"></div>
+            <div style="flex:1">
+              <div class="tl-name">BPJS TK — Rina Wati</div>
+              <div class="tl-meta">HRD · BPJS</div>
+            </div>
+            <span class="tl-days v-amber">5 hari</span>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-dot" style="background:var(--amber)"></div>
+            <div style="flex:1">
+              <div class="tl-name">SIM B1 — Ahmad F.</div>
+              <div class="tl-meta">Staff · Identitas</div>
+            </div>
+            <span class="tl-days v-amber">12 hari</span>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-dot" style="background:var(--amber)"></div>
+            <div style="flex:1">
+              <div class="tl-name">Medical Check — Arsat</div>
+              <div class="tl-meta">Staff · Medical</div>
+            </div>
+            <span class="tl-days v-amber">18 hari</span>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-dot" style="background:var(--amber)"></div>
+            <div style="flex:1">
+              <div class="tl-name">BPJS Kes. — Dodi M.</div>
+              <div class="tl-meta">HRD · BPJS</div>
+            </div>
+            <span class="tl-days v-amber">22 hari</span>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-dot" style="background:var(--amber)"></div>
+            <div style="flex:1">
+              <div class="tl-name">Kontrak — Hendra P.</div>
+              <div class="tl-meta">HRD · Kontrak Kerja</div>
+            </div>
+            <span class="tl-days v-amber">28 hari</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// Clock
+(function tick(){
+  const now = new Date(), pad = n => n.toString().padStart(2,'0');
+  document.getElementById('clock').textContent =
+    `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} WIB`;
+  setTimeout(tick, 1000);
+})();
+
+// Donut — warna sesuai CSS vars (light theme)
+const ctx = document.getElementById('donutChart').getContext('2d');
+new Chart(ctx, {
+  type: 'doughnut',
+  data: {
+    datasets: [{
+      data: [142, 24, 17],
+      backgroundColor: ['#16a34a', '#d97706', '#dc2626'],
+      borderColor: '#ffffff',
+      borderWidth: 3,
+      hoverOffset: 4
+    }]
+  },
+  options: {
+    cutout: '72%',
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => {
+            const labels = ['Aktif','Hampir Expired','Expired'];
+            return ` ${labels[ctx.dataIndex]}: ${ctx.raw} dokumen`;
+          }
+        },
+        backgroundColor: '#fff',
+        borderColor: '#e4e7ec',
+        borderWidth: 1,
+        titleColor: '#6b7280',
+        bodyColor: '#111827',
+        padding: 10
+      }
+    },
+    animation: { animateRotate: true, duration: 900 }
+  }
+});
+</script>
+</body>
+</html>

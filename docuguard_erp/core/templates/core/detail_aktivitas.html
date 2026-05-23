@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detail Aktivitas — DocuGuard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-base:#f4f5f7;
+  --bg-card:#ffffff;
+  --bg-hover:#f0f2f5;
+  --border:#e4e7ec;
+  --border-mid:#dde1e8;
+  --text-primary:#111827;
+  --text-secondary:#374151;
+  --text-muted:#6b7280;
+  --text-dim:#9ca3af;
+  --blue:#2563eb;
+  --green:#16a34a;
+  --red:#dc2626;
+  --amber:#d97706;
+  --shadow:0 1px 3px rgba(0,0,0,.08);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg-base);color:var(--text-primary);font-size:13px;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:210px;min-height:100vh;background:var(--bg-card);border-right:1px solid var(--border);position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;box-shadow:2px 0 8px rgba(0,0,0,.04)}
+.brand{display:flex;align-items:center;gap:10px;padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.brand-icon{width:32px;height:32px;border-radius:8px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;box-shadow:0 2px 8px rgba(37,99,235,.3)}
+.brand-name{font-size:13px;font-weight:700;color:var(--text-primary)}
+.brand-sub{font-size:10px;color:var(--text-muted);margin-top:1px}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);padding:14px 16px 5px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 16px;color:var(--text-muted);border-left:2px solid transparent;text-decoration:none;font-size:12px;font-weight:500;transition:all .15s}
+.sb-item:hover{color:var(--text-secondary);background:var(--bg-hover)}
+.sb-item.active{color:var(--blue);background:#eff6ff;border-left-color:var(--blue)}
+.sb-item i{font-size:15px;width:16px}
+.sb-bottom{margin-top:auto;border-top:1px solid var(--border)}
+.sb-user{display:flex;align-items:center;gap:9px;padding:12px 14px}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:#dbeafe;color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+
+/* MAIN */
+.main{margin-left:210px;display:flex;flex-direction:column;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--bg-card);position:sticky;top:0;z-index:50;box-shadow:var(--shadow)}
+.topbar h1{font-size:15px;font-weight:700;color:var(--text-primary);margin:0}
+.topbar p{font-size:11px;color:var(--text-muted);margin:2px 0 0}
+.date-chip{font-size:10px;color:var(--text-muted);background:var(--bg-hover);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-family:'DM Mono',monospace}
+.notif-btn{position:relative;width:32px;height:32px;border-radius:8px;background:var(--bg-hover);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-muted);cursor:pointer;font-size:15px}
+.notif-badge{position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:var(--red);color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg-card)}
+.body{padding:24px;flex:1}
+
+/* BREADCRUMB */
+.breadcrumb-dg{display:flex;align-items:center;gap:6px;margin-bottom:16px;font-size:11px;color:var(--text-dim)}
+.breadcrumb-dg a{color:var(--text-muted);text-decoration:none;font-weight:500}
+.breadcrumb-dg a:hover{color:var(--blue)}
+.breadcrumb-dg i{font-size:12px}
+
+/* DG-CARD */
+.dg-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+.card-title{font-size:12px;font-weight:700;color:var(--text-secondary);display:flex;align-items:center;gap:6px}
+.card-title i{font-size:14px;color:var(--blue)}
+
+/* HERO */
+.hero-icon{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.h-login {background:#dbeafe;color:var(--blue)}
+.h-logout{background:var(--bg-hover);color:var(--text-muted);border:1px solid var(--border)}
+.h-add   {background:#dcfce7;color:var(--green)}
+.h-edit  {background:#fef3c7;color:var(--amber)}
+.h-del   {background:#fee2e2;color:var(--red)}
+.h-view  {background:#f3e8ff;color:#7c3aed;border:1px solid #e9d5ff}
+
+/* ACT BADGE */
+.act-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;font-family:'DM Mono',monospace}
+.ab-login {background:#dbeafe;color:var(--blue)}
+.ab-logout{background:var(--bg-hover);color:var(--text-muted);border:1px solid var(--border)}
+.ab-tambah{background:#dcfce7;color:var(--green)}
+.ab-edit  {background:#fef3c7;color:var(--amber)}
+.ab-hapus {background:#fee2e2;color:var(--red)}
+.ab-lihat {background:#f3e8ff;color:#7c3aed}
+
+/* INFO ROWS */
+.info-row{display:flex;padding:9px 0;border-bottom:1px solid var(--border)}
+.info-row:last-child{border-bottom:none}
+.info-label{width:160px;font-size:11px;color:var(--text-muted);flex-shrink:0;display:flex;align-items:center;gap:6px;font-weight:500}
+.info-label i{font-size:13px;width:14px;color:var(--blue)}
+.info-val{font-size:11px;color:var(--text-primary);flex:1}
+.info-val.mono{font-family:'DM Mono',monospace;font-size:10px;color:var(--text-secondary)}
+
+/* USER MINI */
+.u-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.av-a{background:#dbeafe;color:var(--blue)}
+.av-h{background:#dcfce7;color:var(--green)}
+.av-s{background:#fef3c7;color:var(--amber)}
+
+/* ROLE CHIP */
+.role-chip{font-size:9px;padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace;font-weight:700}
+.rc-a{background:#dbeafe;color:var(--blue);border:1px solid #bfdbfe}
+.rc-h{background:#dcfce7;color:var(--green);border:1px solid #bbf7d0}
+.rc-s{background:#fef3c7;color:var(--amber);border:1px solid #fde68a}
+
+/* DIFF BOX */
+.diff-box{background:var(--bg-hover);border:1px solid var(--border-mid);border-radius:8px;padding:14px;font-family:'DM Mono',monospace;font-size:11px}
+.diff-row{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start}
+.diff-row:last-child{margin-bottom:0}
+.diff-field{width:130px;color:var(--text-muted);flex-shrink:0;font-size:10px;padding-top:2px;font-weight:500}
+.diff-old{flex:1;color:var(--red);background:#fee2e2;padding:3px 8px;border-radius:4px;text-decoration:line-through;font-size:10px;border:1px solid #fecaca}
+.diff-new{flex:1;color:var(--green);background:#dcfce7;padding:3px 8px;border-radius:4px;font-size:10px;border:1px solid #bbf7d0}
+.diff-arr{color:var(--text-dim);font-size:12px;flex-shrink:0;padding-top:3px}
+
+/* TIMELINE */
+.tl-item{display:flex;gap:10px;padding:7px 0;position:relative}
+.tl-line{position:absolute;left:11px;top:30px;bottom:-7px;width:1px;background:var(--border-mid)}
+.tl-item:last-child .tl-line{display:none}
+.tl-dot{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;position:relative;z-index:1}
+.td-in {background:#dbeafe;color:var(--blue)}
+.td-out{background:var(--bg-hover);color:var(--text-muted);border:1px solid var(--border)}
+.td-add{background:#dcfce7;color:var(--green)}
+.td-ed {background:#fef3c7;color:var(--amber)}
+.td-del{background:#fee2e2;color:var(--red)}
+.td-view{background:#f3e8ff;color:#7c3aed}
+.tl-act{font-size:11px;color:var(--text-primary);font-weight:500}
+.tl-sub{font-size:9px;color:var(--text-dim)}
+.tl-t  {font-size:9px;color:var(--text-dim);font-family:'DM Mono',monospace;margin-left:auto;white-space:nowrap;padding-top:2px}
+
+/* NAV BTN */
+.nav-btn{display:flex;align-items:center;gap:6px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-secondary);border-radius:8px;padding:6px 14px;font-size:11px;font-weight:500;text-decoration:none;cursor:pointer;transition:all .15s;box-shadow:var(--shadow)}
+.nav-btn:hover{border-color:var(--blue);color:var(--blue);background:#eff6ff}
+
+/* STATUS */
+.status-ok  {background:#dcfce7;color:var(--green);border:1px solid #bbf7d0;font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;font-family:'DM Mono',monospace}
+.status-warn{background:#fef3c7;color:var(--amber);border:1px solid #fde68a;font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;font-family:'DM Mono',monospace}
+
+/* SECTION LABEL */
+.sec-label{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px}
+
+/* BACK BTN */
+.back-btn{display:inline-flex;align-items:center;gap:5px;color:var(--text-muted);font-size:11px;font-weight:500;text-decoration:none;padding:4px 0;transition:color .15s}
+.back-btn:hover{color:var(--blue)}
+
+/* ACTION BTNS */
+.action-btn{display:flex;align-items:center;gap:7px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:11px;font-weight:500;color:var(--text-secondary);text-decoration:none;transition:all .15s;box-shadow:var(--shadow)}
+.action-btn:hover{border-color:var(--blue);color:var(--blue);background:#eff6ff}
+.action-btn-danger{display:flex;align-items:center;gap:7px;background:#fff5f5;border:1px solid #fecaca;border-radius:8px;padding:9px 12px;font-size:11px;font-weight:500;color:var(--red);text-decoration:none;transition:all .15s}
+.action-btn-danger:hover{background:#fee2e2;border-color:var(--red)}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="brand">
+    <div class="brand-icon"><i class="ti ti-shield-check"></i></div>
+    <div><div class="brand-name">DocuGuard</div><div class="brand-sub">ERP System</div></div>
+  </div>
+  <div class="sb-section">Utama</div>
+  <a href="#" class="sb-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+  <a href="#" class="sb-item"><i class="ti ti-activity"></i>Monitoring</a>
+  <a href="#" class="sb-item active"><i class="ti ti-list-details"></i>Log Aktivitas</a>
+  <div class="sb-section">Manajemen</div>
+  <a href="#" class="sb-item"><i class="ti ti-users"></i>Pengguna</a>
+  <a href="#" class="sb-item"><i class="ti ti-folder"></i>Dok. HRD</a>
+  <a href="#" class="sb-item"><i class="ti ti-id"></i>Dok. Staff</a>
+  <a href="#" class="sb-item"><i class="ti ti-tags"></i>Kategori</a>
+  <div class="sb-section">Sistem</div>
+  <a href="#" class="sb-item"><i class="ti ti-settings"></i>Pengaturan</a>
+  <div class="sb-bottom">
+    <div class="sb-user">
+      <div class="sb-avatar">DA</div>
+      <div>
+        <div style="font-size:11px;color:var(--text-secondary);font-weight:600">Damai Alyndina</div>
+        <div style="font-size:10px;color:var(--text-dim)">Administrator</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div><h1>Detail Aktivitas</h1><p>Informasi lengkap satu entri log aktivitas</p></div>
+    <div class="d-flex align-items-center gap-2">
+      <div class="date-chip" id="clock">--:--:-- WIB</div>
+      <div class="notif-btn"><i class="ti ti-bell"></i><div class="notif-badge">3</div></div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-dg">
+      <a href="{% url 'dashboard_admin' %}">Dashboard</a>
+      <i class="ti ti-chevron-right"></i>
+      <a href="{% url 'log_aktivitas' %}">Log Aktivitas</a>
+      <i class="ti ti-chevron-right"></i>
+      <span style="color:var(--text-secondary);font-weight:600">Detail #43</span>
+    </div>
+
+    <!-- Nav -->
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <a href="{% url 'log_aktivitas' %}" class="back-btn"><i class="ti ti-arrow-left" style="font-size:13px"></i>Kembali ke Daftar Log</a>
+      <div class="d-flex gap-2">
+        <a href="#" class="nav-btn"><i class="ti ti-chevron-left"></i>Sebelumnya</a>
+        <a href="#" class="nav-btn">Berikutnya<i class="ti ti-chevron-right"></i></a>
+      </div>
+    </div>
+
+    <div class="row g-3">
+
+      <!-- KIRI -->
+      <div class="col-8">
+
+        <!-- HERO CARD -->
+        <div class="dg-card mb-3">
+          <div class="d-flex align-items-center gap-3 mb-3 pb-3" style="border-bottom:1px solid var(--border)">
+            <div class="hero-icon h-edit"><i class="ti ti-edit"></i></div>
+            <div style="flex:1">
+              <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                <span style="font-size:15px;font-weight:700;color:var(--text-primary)">Edit Kontrak Kerja — Budi Santoso</span>
+                <span class="act-badge ab-edit">EDIT</span>
+              </div>
+              <div style="font-size:11px;color:var(--text-muted)">Log ID #43 · 22 Mei 2026, 09:50 WIB</div>
+            </div>
+            <span class="status-ok">Berhasil</span>
+          </div>
+
+          <div class="sec-label">Informasi Aktivitas</div>
+          <div>
+            <div class="info-row">
+              <div class="info-label"><i class="ti ti-hash"></i>ID Log</div>
+              <div class="info-val mono">#43</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label"><i class="ti ti-calendar"></i>Tanggal & Waktu</div>
+              <div class="info-val">22 Mei 2026 &nbsp;<span class="mono">09:50:34 WIB</span></div>
+            </div>
+            <div class="info-row">
+              <div class="info-label"><i class="ti ti-activity"></i>Jenis Aksi</div>
+              <div class="info-val"><span class="act-badge ab-edit">EDIT</span></div>
+            </div>
+            <div class="info-row">
+              <div class="info-label"><i class="ti ti-file-description"></i>Deskripsi</div>
+              <div class="info-val">Edit Kontrak Kerja milik <strong>Budi Santoso</strong> — perubahan tanggal berakhir kontrak</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label"><i class="ti ti-layout-grid"></i>Modul</div>
+              <div class="info-val">
+                <span style="font-size:10px;font-weight:600;background:var(--bg-hover);border:1px solid var(--border);color:var(--text-muted);border-radius:5px;padding:2px 9px">Dok. HRD</span>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-label"><i class="ti ti-link"></i>Objek Terkait</div>
+              <div class="info-val">
+                <a href="#" style="color:var(--blue);font-size:11px;font-weight:500;text-decoration:none;display:flex;align-items:center;gap:4px">
+                  <i class="ti ti-file" style="font-size:12px"></i> Kontrak Kerja — Budi Santoso (HRD-KK-001)
+                </a>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-label"><i class="ti ti-network"></i>IP Address</div>
+              <div class="info-val mono">192.168.1.15</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label"><i class="ti ti-device-laptop"></i>User Agent</div>
+              <div class="info-val mono" style="font-size:9px;color:var(--text-dim)">Mozilla/5.0 (Windows NT 10.0; Win64) Chrome/124.0</div>
+            </div>
+            <div class="info-row">
+              <div class="info-label"><i class="ti ti-map-pin"></i>Lokasi</div>
+              <div class="info-val" style="font-size:11px;color:var(--text-secondary);font-weight:500">Lokal · Jaringan Intranet</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DIFF / PERUBAHAN DATA -->
+        <div class="dg-card">
+          <div class="card-title mb-3"><i class="ti ti-git-diff"></i>Perubahan Data</div>
+          <div class="sec-label">Sebelum → Sesudah</div>
+          <div class="diff-box">
+            <div class="diff-row">
+              <span class="diff-field">tgl_berakhir</span>
+              <span class="diff-old">2024-01-01</span>
+              <span class="diff-arr"><i class="ti ti-arrow-right"></i></span>
+              <span class="diff-new">2026-12-31</span>
+            </div>
+            <div class="diff-row">
+              <span class="diff-field">status</span>
+              <span class="diff-old">expired</span>
+              <span class="diff-arr"><i class="ti ti-arrow-right"></i></span>
+              <span class="diff-new">aktif</span>
+            </div>
+            <div class="diff-row">
+              <span class="diff-field">keterangan</span>
+              <span class="diff-old">—</span>
+              <span class="diff-arr"><i class="ti ti-arrow-right"></i></span>
+              <span class="diff-new">Perpanjangan kontrak 2 tahun</span>
+            </div>
+            <div class="diff-row">
+              <span class="diff-field">updated_at</span>
+              <span class="diff-old">2024-01-01 00:00</span>
+              <span class="diff-arr"><i class="ti ti-arrow-right"></i></span>
+              <span class="diff-new">2026-05-22 09:50</span>
+            </div>
+          </div>
+          <div class="d-flex gap-3 mt-3">
+            <span style="font-size:10px;color:var(--text-dim);display:flex;align-items:center;gap:5px">
+              <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#fee2e2;border:1px solid #fecaca"></span>
+              Nilai lama (dihapus)
+            </span>
+            <span style="font-size:10px;color:var(--text-dim);display:flex;align-items:center;gap:5px">
+              <span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#dcfce7;border:1px solid #bbf7d0"></span>
+              Nilai baru (ditambahkan)
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- KANAN -->
+      <div class="col-4 d-flex flex-column gap-3">
+
+        <!-- Dilakukan Oleh -->
+        <div class="dg-card">
+          <div class="card-title mb-3"><i class="ti ti-user"></i>Dilakukan Oleh</div>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="u-av av-h" style="width:42px;height:42px;font-size:13px;border-radius:50%">JP</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary)">Jacky Pratama</div>
+              <div class="d-flex align-items-center gap-2 mt-1">
+                <span class="role-chip rc-h">HRD</span>
+                <span style="font-size:9px;color:var(--text-dim)">jacky@docuguard.id</span>
+              </div>
+            </div>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:10px">
+            <div class="info-row" style="padding:5px 0">
+              <div class="info-label" style="width:110px;font-size:10px"><i class="ti ti-login"></i>Login terakhir</div>
+              <div class="info-val mono" style="font-size:10px">08:05 WIB</div>
+            </div>
+            <div class="info-row" style="padding:5px 0">
+              <div class="info-label" style="width:110px;font-size:10px"><i class="ti ti-chart-bar"></i>Total aktivitas</div>
+              <div class="info-val mono" style="font-size:10px">32 hari ini</div>
+            </div>
+          </div>
+          <a href="#" style="display:flex;align-items:center;justify-content:center;gap:5px;margin-top:10px;font-size:10px;font-weight:600;color:var(--blue);text-decoration:none;padding:7px;background:#eff6ff;border-radius:7px;border:1px solid #bfdbfe">
+            <i class="ti ti-timeline" style="font-size:11px"></i> Lihat Riwayat Pengguna
+          </a>
+        </div>
+
+        <!-- Sesi yang Sama -->
+        <div class="dg-card" style="flex:1">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="card-title"><i class="ti ti-history"></i>Sesi yang Sama</div>
+            <span style="font-size:9px;color:var(--text-dim);font-family:'DM Mono',monospace;font-weight:500">08:05–09:58</span>
+          </div>
+          <div>
+            <div class="tl-item">
+              <div class="tl-line"></div>
+              <div class="tl-dot td-in"><i class="ti ti-login"></i></div>
+              <div style="flex:1">
+                <div class="tl-act">Login berhasil</div>
+                <div class="tl-sub">Auth</div>
+              </div>
+              <span class="tl-t">08:05</span>
+            </div>
+            <div class="tl-item">
+              <div class="tl-line"></div>
+              <div class="tl-dot td-view"><i class="ti ti-eye"></i></div>
+              <div style="flex:1">
+                <div class="tl-act">Lihat daftar dok. HRD</div>
+                <div class="tl-sub">Dok. HRD</div>
+              </div>
+              <span class="tl-t">08:10</span>
+            </div>
+            <div class="tl-item">
+              <div class="tl-line"></div>
+              <div class="tl-dot td-add"><i class="ti ti-plus"></i></div>
+              <div style="flex:1">
+                <div class="tl-act">Upload BPJS — Rina W.</div>
+                <div class="tl-sub">Dok. HRD</div>
+              </div>
+              <span class="tl-t">08:58</span>
+            </div>
+            <!-- Active item highlight -->
+            <div class="tl-item" style="background:#fffbeb;border-radius:8px;padding:6px;margin:0 -6px;border:1px solid #fde68a">
+              <div class="tl-line" style="left:17px"></div>
+              <div class="tl-dot td-ed"><i class="ti ti-edit"></i></div>
+              <div style="flex:1">
+                <div class="tl-act" style="color:var(--amber)">Edit Kontrak — Budi S.</div>
+                <div class="tl-sub">Dok. HRD · <span style="color:var(--amber);font-weight:600">Aktif ini</span></div>
+              </div>
+              <span class="tl-t">09:50</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aksi Admin -->
+        <div class="dg-card">
+          <div class="card-title mb-3"><i class="ti ti-tool"></i>Aksi Admin</div>
+          <div class="d-flex flex-column gap-2">
+            <a href="#" class="action-btn">
+              <i class="ti ti-file-download" style="color:var(--blue);font-size:15px"></i>Export Detail Ini
+            </a>
+            <a href="#" class="action-btn">
+              <i class="ti ti-printer" style="color:#7c3aed;font-size:15px"></i>Cetak Log
+            </a>
+            <a href="#" class="action-btn-danger">
+              <i class="ti ti-trash" style="font-size:15px"></i>Hapus Entri Log
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function tick(){
+  const now=new Date(),pad=n=>n.toString().padStart(2,'0');
+  document.getElementById('clock').textContent=`${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} WIB`;
+  setTimeout(tick,1000);
+})();
+</script>
+</body>
+</html>
