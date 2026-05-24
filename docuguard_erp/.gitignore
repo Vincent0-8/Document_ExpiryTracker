@@ -1,4 +1,7 @@
 __pycache__/
 *.pyc
 db.sqlite3
+docuguard_erp_db
 .env
+venv/
+media/

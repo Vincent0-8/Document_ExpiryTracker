@@ -1,870 +1,916 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Admin — DocuGuard</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg-base:#f4f5f7;
-  --bg-card:#ffffff;
-  --bg-hover:#f0f2f5;
-
-  --border:#e4e7ec;
-  --border-mid:#dde1e8;
-
-  --text-primary:#111827;
-  --text-secondary:#374151;
-  --text-muted:#6b7280;
-  --text-dim:#9ca3af;
-
-  --blue:#2563eb;
-  --green:#16a34a;
-  --red:#dc2626;
-  --amber:#d97706;
-
-  --shadow:0 1px 3px rgba(0,0,0,.08);
-  --shadow-md:0 4px 12px rgba(0,0,0,.08);
-}
-
-*{
-  box-sizing:border-box
-}
-
-body{
-  font-family:'Plus Jakarta Sans',sans-serif;
-  background:var(--bg-base);
-  color:var(--text-primary);
-  font-size:13px;
-  min-height:100vh
-}
-
-/* SIDEBAR */
-
-.sidebar{
-  width:210px;
-  min-height:100vh;
-  background:var(--bg-card);
-  border-right:1px solid var(--border);
-  position:fixed;
-  top:0;
-  left:0;
-  display:flex;
-  flex-direction:column;
-  z-index:100;
-  box-shadow:2px 0 8px rgba(0,0,0,.04)
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:18px 16px 14px;
-  border-bottom:1px solid var(--border)
-}
-
-.brand-icon{
-  width:32px;
-  height:32px;
-  border-radius:8px;
-  background:var(--blue);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  font-size:16px;
-  box-shadow:0 2px 8px rgba(37,99,235,.3)
-}
-
-.brand-name{
-  font-size:13px;
-  font-weight:700;
-  color:var(--text-primary)
-}
-
-.brand-sub{
-  font-size:10px;
-  color:var(--text-muted);
-  margin-top:1px
-}
-
-.sb-section{
-  font-size:9px;
-  font-weight:700;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  color:var(--text-dim);
-  padding:14px 16px 5px
-}
-
-.sb-item{
-  display:flex;
-  align-items:center;
-  gap:9px;
-  padding:8px 16px;
-  color:var(--text-muted);
-  border-left:2px solid transparent;
-  text-decoration:none;
-  font-size:12px;
-  font-weight:500;
-  transition:all .15s
-}
-
-.sb-item:hover{
-  color:var(--text-secondary);
-  background:var(--bg-hover)
-}
-
-.sb-item.active{
-  color:var(--blue);
-  background:#eff6ff;
-  border-left-color:var(--blue)
-}
-
-.sb-item i{
-  font-size:15px;
-  width:16px
-}
-
-.sb-bottom{
-  margin-top:auto;
-  border-top:1px solid var(--border)
-}
-
-.sb-user{
-  display:flex;
-  align-items:center;
-  gap:9px;
-  padding:12px 14px
-}
-
-.sb-avatar{
-  width:30px;
-  height:30px;
-  border-radius:50%;
-  background:#dbeafe;
-  color:var(--blue);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:10px;
-  font-weight:700
-}
-
-/* MAIN */
-
-.main{
-  margin-left:210px;
-  display:flex;
-  flex-direction:column;
-  min-height:100vh
-}
-
-.topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:14px 24px;
-  border-bottom:1px solid var(--border);
-  background:var(--bg-card);
-  position:sticky;
-  top:0;
-  z-index:50;
-  box-shadow:var(--shadow)
-}
-
-.topbar h1{
-  font-size:15px;
-  font-weight:700;
-  color:var(--text-primary);
-  margin:0
-}
-
-.topbar p{
-  font-size:11px;
-  color:var(--text-muted);
-  margin:2px 0 0
-}
-
-.date-chip{
-  font-size:10px;
-  color:var(--text-muted);
-  background:var(--bg-hover);
-  border:1px solid var(--border);
-  border-radius:6px;
-  padding:5px 10px;
-  font-family:'DM Mono',monospace
-}
-
-.notif-btn{
-  position:relative;
-  width:32px;
-  height:32px;
-  border-radius:8px;
-  background:var(--bg-hover);
-  border:1px solid var(--border);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:var(--text-muted);
-  cursor:pointer;
-  font-size:15px
-}
-
-.notif-badge{
-  position:absolute;
-  top:-3px;
-  right:-3px;
-  width:14px;
-  height:14px;
-  border-radius:50%;
-  background:var(--red);
-  color:#fff;
-  font-size:8px;
-  font-weight:700;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border:2px solid var(--bg-card)
-}
-
-.body{
-  padding:24px;
-  flex:1
-}
-
-/* STAT CARD */
-
-.stat-card{
-  background:var(--bg-card);
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:14px 16px;
-  position:relative;
-  overflow:hidden;
-  box-shadow:var(--shadow)
-}
-
-.stat-card::after{
-  content:'';
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  height:3px;
-  border-radius:12px 12px 0 0
-}
-
-.s-green::after{
-  background:var(--green)
-}
-
-.s-red::after{
-  background:var(--red)
-}
-
-.s-amber::after{
-  background:var(--amber)
-}
-
-.s-blue::after{
-  background:var(--blue)
-}
-
-.stat-label{
-  font-size:10px;
-  color:var(--text-muted);
-  margin-bottom:5px;
-  display:flex;
-  align-items:center;
-  gap:5px;
-  font-weight:500
-}
-
-.stat-val{
-  font-size:26px;
-  font-weight:700;
-  line-height:1
-}
-
-.stat-sub{
-  font-size:10px;
-  color:var(--text-dim);
-  margin-top:4px
-}
-
-.v-green{
-  color:var(--green)
-}
-
-.v-red{
-  color:var(--red)
-}
-
-.v-amber{
-  color:var(--amber)
-}
-
-.v-blue{
-  color:var(--blue)
-}
-
-/* CARD */
-
-.dg-card{
-  background:var(--bg-card);
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:16px;
-  box-shadow:var(--shadow)
-}
-
-.card-title{
-  font-size:12px;
-  font-weight:700;
-  color:var(--text-secondary);
-  display:flex;
-  align-items:center;
-  gap:6px
-}
-
-.card-title i{
-  font-size:14px;
-  color:var(--blue)
-}
-
-.card-link{
-  font-size:10px;
-  color:var(--blue);
-  cursor:pointer;
-  text-decoration:none;
-  font-weight:600
-}
-
-/* PROGRESS */
-
-.bar-label{
-  font-size:10px;
-  color:var(--text-muted)
-}
-
-.bar-val{
-  font-size:10px;
-  font-family:'DM Mono',monospace
-}
-
-.progress{
-  height:5px;
-  background:#eef1f5;
-  border-radius:4px
-}
-
-.progress-bar{
-  border-radius:4px;
-  transition:width .8s ease
-}
-
-/* DOC */
-
-.doc-row{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:8px 0;
-  border-bottom:1px solid var(--border)
-}
-
-.doc-row:last-child{
-  border-bottom:none
-}
-
-.doc-icon{
-  width:28px;
-  height:28px;
-  border-radius:7px;
-  background:var(--bg-hover);
-  border:1px solid var(--border);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:var(--text-muted);
-  font-size:12px;
-  flex-shrink:0
-}
-
-.doc-name{
-  font-size:11px;
-  color:var(--text-primary);
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  font-weight:500
-}
-
-.doc-cat{
-  font-size:9px;
-  color:var(--text-dim)
-}
-
-.pill{
-  font-size:9px;
-  font-weight:700;
-  padding:3px 8px;
-  border-radius:20px;
-  white-space:nowrap;
-  font-family:'DM Mono',monospace
-}
-
-.pill-exp{
-  background:#fee2e2;
-  color:var(--red)
-}
-
-.pill-warn{
-  background:#fef3c7;
-  color:var(--amber)
-}
-
-.pill-ok{
-  background:#dcfce7;
-  color:var(--green)
-}
-
-/* QUICK ACTION */
-
-.qa-btn{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  background:var(--bg-card);
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:14px 8px;
-  cursor:pointer;
-  text-decoration:none;
-  transition:all .2s;
-  flex:1;
-  box-shadow:var(--shadow)
-}
-
-.qa-btn:hover{
-  border-color:var(--blue);
-  background:#eff6ff;
-  transform:translateY(-2px)
-}
-
-.qa-btn i{
-  font-size:20px
-}
-
-.qa-label{
-  font-size:9px;
-  color:var(--text-secondary);
-  text-align:center;
-  line-height:1.4;
-  font-weight:500
-}
-
-/* LOG */
-
-.log-item{
-  display:flex;
-  align-items:flex-start;
-  gap:8px;
-  padding:8px 0;
-  border-bottom:1px solid var(--border)
-}
-
-.log-item:last-child{
-  border-bottom:none
-}
-
-.log-dot{
-  width:28px;
-  height:28px;
-  border-radius:7px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:12px;
-  flex-shrink:0
-}
-
-.ld-in{
-  background:#dbeafe;
-  color:var(--blue)
-}
-
-.ld-add{
-  background:#dcfce7;
-  color:var(--green)
-}
-
-.ld-ed{
-  background:#fef3c7;
-  color:var(--amber)
-}
-
-.ld-del{
-  background:#fee2e2;
-  color:var(--red)
-}
-
-.ld-out{
-  background:var(--bg-hover);
-  color:var(--text-muted)
-}
-
-.log-desc{
-  font-size:11px;
-  color:var(--text-primary);
-  margin-bottom:1px;
-  font-weight:500
-}
-
-.log-sub{
-  font-size:9px;
-  color:var(--text-dim)
-}
-
-.live-badge{
-  display:flex;
-  align-items:center;
-  gap:4px;
-  font-size:9px;
-  color:var(--green);
-  font-family:'DM Mono',monospace;
-  font-weight:600
-}
-
-.live-dot{
-  width:5px;
-  height:5px;
-  border-radius:50%;
-  background:var(--green);
-  animation:pulse 1.4s infinite
-}
-
-@keyframes pulse{
-  0%,100%{
-    opacity:1
-  }
-  50%{
-    opacity:.3
-  }
-}
-
-/* MINI TREND */
-
-.mini-bar{
-  display:flex;
-  align-items:flex-end;
-  gap:4px;
-  height:32px
-}
-
-.mb-col{
-  border-radius:3px 3px 0 0;
-  min-width:8px;
-  flex:1;
-  cursor:pointer;
-  transition:filter .15s
-}
-
-.mb-col:hover{
-  filter:brightness(1.1)
-}
-
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin — DocuGuard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #f4f5f7;
+      --bg-card: #ffffff;
+      --bg-hover: #f0f2f5;
+
+      --border: #e4e7ec;
+      --border-mid: #dde1e8;
+
+      --text-primary: #111827;
+      --text-secondary: #374151;
+      --text-muted: #6b7280;
+      --text-dim: #9ca3af;
+
+      --blue: #2563eb;
+      --green: #16a34a;
+      --red: #dc2626;
+      --amber: #d97706;
+
+      --shadow: 0 1px 3px rgba(0, 0, 0, .08);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, .08);
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-size: 13px;
+      min-height: 100vh
+    }
+
+    /* SIDEBAR */
+
+    .sidebar {
+      width: 210px;
+      min-height: 100vh;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, .04)
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 16px 14px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 16px;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, .3)
+    }
+
+    .brand-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary)
+    }
+
+    .brand-sub {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 1px
+    }
+
+    .sb-section {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding: 14px 16px 5px
+    }
+
+    .sb-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 16px;
+      color: var(--text-muted);
+      border-left: 2px solid transparent;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all .15s
+    }
+
+    .sb-item:hover {
+      color: var(--text-secondary);
+      background: var(--bg-hover)
+    }
+
+    .sb-item.active {
+      color: var(--blue);
+      background: #eff6ff;
+      border-left-color: var(--blue)
+    }
+
+    .sb-item i {
+      font-size: 15px;
+      width: 16px
+    }
+
+    .sb-bottom {
+      margin-top: auto;
+      border-top: 1px solid var(--border)
+    }
+
+    .sb-user {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 12px 14px
+    }
+
+    .sb-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #dbeafe;
+      color: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700
+    }
+
+    /* MAIN */
+
+    .main {
+      margin-left: 210px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-card);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow)
+    }
+
+    .topbar h1 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0
+    }
+
+    .topbar p {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin: 2px 0 0
+    }
+
+    .date-chip {
+      font-size: 10px;
+      color: var(--text-muted);
+      background: var(--bg-hover);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-family: 'DM Mono', monospace
+    }
+
+    .notif-btn {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--bg-hover);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 15px
+    }
+
+    .notif-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--red);
+      color: #fff;
+      font-size: 8px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--bg-card)
+    }
+
+    .body {
+      padding: 24px;
+      flex: 1
+    }
+
+    /* STAT CARD */
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow)
+    }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      border-radius: 12px 12px 0 0
+    }
+
+    .s-green::after {
+      background: var(--green)
+    }
+
+    .s-red::after {
+      background: var(--red)
+    }
+
+    .s-amber::after {
+      background: var(--amber)
+    }
+
+    .s-blue::after {
+      background: var(--blue)
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500
+    }
+
+    .stat-val {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1
+    }
+
+    .stat-sub {
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 4px
+    }
+
+    .v-green {
+      color: var(--green)
+    }
+
+    .v-red {
+      color: var(--red)
+    }
+
+    .v-amber {
+      color: var(--amber)
+    }
+
+    .v-blue {
+      color: var(--blue)
+    }
+
+    /* CARD */
+
+    .dg-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: var(--shadow)
+    }
+
+    .card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .card-title i {
+      font-size: 14px;
+      color: var(--blue)
+    }
+
+    .card-link {
+      font-size: 10px;
+      color: var(--blue);
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 600
+    }
+
+    /* PROGRESS */
+
+    .bar-label {
+      font-size: 10px;
+      color: var(--text-muted)
+    }
+
+    .bar-val {
+      font-size: 10px;
+      font-family: 'DM Mono', monospace
+    }
+
+    .progress {
+      height: 5px;
+      background: #eef1f5;
+      border-radius: 4px
+    }
+
+    .progress-bar {
+      border-radius: 4px;
+      transition: width .8s ease
+    }
+
+    /* DOC */
+
+    .doc-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .doc-row:last-child {
+      border-bottom: none
+    }
+
+    .doc-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: var(--bg-hover);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 12px;
+      flex-shrink: 0
+    }
+
+    .doc-name {
+      font-size: 11px;
+      color: var(--text-primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 500
+    }
+
+    .doc-cat {
+      font-size: 9px;
+      color: var(--text-dim)
+    }
+
+    .pill {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+      white-space: nowrap;
+      font-family: 'DM Mono', monospace
+    }
+
+    .pill-exp {
+      background: #fee2e2;
+      color: var(--red)
+    }
+
+    .pill-warn {
+      background: #fef3c7;
+      color: var(--amber)
+    }
+
+    .pill-ok {
+      background: #dcfce7;
+      color: var(--green)
+    }
+
+    /* QUICK ACTION */
+
+    .qa-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .2s;
+      flex: 1;
+      box-shadow: var(--shadow)
+    }
+
+    .qa-btn:hover {
+      border-color: var(--blue);
+      background: #eff6ff;
+      transform: translateY(-2px)
+    }
+
+    .qa-btn i {
+      font-size: 20px
+    }
+
+    .qa-label {
+      font-size: 9px;
+      color: var(--text-secondary);
+      text-align: center;
+      line-height: 1.4;
+      font-weight: 500
+    }
+
+    /* LOG */
+
+    .log-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .log-item:last-child {
+      border-bottom: none
+    }
+
+    .log-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0
+    }
+
+    .ld-in {
+      background: #dbeafe;
+      color: var(--blue)
+    }
+
+    .ld-add {
+      background: #dcfce7;
+      color: var(--green)
+    }
+
+    .ld-ed {
+      background: #fef3c7;
+      color: var(--amber)
+    }
+
+    .ld-del {
+      background: #fee2e2;
+      color: var(--red)
+    }
+
+    .ld-out {
+      background: var(--bg-hover);
+      color: var(--text-muted)
+    }
+
+    .log-desc {
+      font-size: 11px;
+      color: var(--text-primary);
+      margin-bottom: 1px;
+      font-weight: 500
+    }
+
+    .log-sub {
+      font-size: 9px;
+      color: var(--text-dim)
+    }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 9px;
+      color: var(--green);
+      font-family: 'DM Mono', monospace;
+      font-weight: 600
+    }
+
+    .live-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 1.4s infinite
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .3
+      }
+    }
+
+    /* MINI TREND */
+
+    .mini-bar {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 32px
+    }
+
+    .mb-col {
+      border-radius: 3px 3px 0 0;
+      min-width: 8px;
+      flex: 1;
+      cursor: pointer;
+      transition: filter .15s
+    }
+
+    .mb-col:hover {
+      filter: brightness(1.1)
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-  <div class="brand">
-    <div class="brand-icon"><i class="ti ti-shield-check"></i></div>
-    <div><div class="brand-name">DocuGuard</div><div class="brand-sub">ERP System</div></div>
-  </div>
-  <div class="sb-section">Utama</div>
-  <a href="{% url 'dashboard_admin' %}" class="sb-item active"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
-  <a href="{% url 'monitoring' %}" class="sb-item">
-    <i class="ti ti-activity"></i>Monitoring
-</a>
-  <a href="{% url 'log_aktivitas' %}" class="sb-item"><i class="ti ti-list-details"></i>Log Aktivitas</a>
-  <div class="sb-section">Manajemen</div>
-  <a href="{% url 'pengguna' %}" class="sb-item"><i class="ti ti-users"></i>Pengguna</a>
-  <a href="{% url 'dashboard_hrd' %}" class="sb-item"><i class="ti ti-folder"></i>Dok. HRD</a>
-  <a href="{% url 'dashboard_staff' %}" class="sb-item"><i class="ti ti-id"></i>Dok. Staff</a>
-  <a href="{% url 'kategori' %}" class="sb-item"><i class="ti ti-tags"></i>Kategori</a>
-  <div class="sb-section">Sistem</div>
-  <a href="{% url 'pengaturan' %}" class="sb-item"><i class="ti ti-settings"></i>Pengaturan</a>
-  <div class="sb-bottom">
-    <div class="sb-user">
-      <div class="sb-avatar">DA</div>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="brand">
+      <div class="brand-icon"><i class="ti ti-shield-check"></i></div>
       <div>
-        <div style="font-size:11px;color:var(--text-secondary);font-weight:500">Damai Alyndina</div>
-        <div style="font-size:10px;color:var(--text-dim)">Administrator</div>
+        <div class="brand-name">DocuGuard</div>
+        <div class="brand-sub">ERP System</div>
+      </div>
+    </div>
+    <div class="sb-section">Utama</div>
+    <a href="{% url 'dashboard_admin' %}" class="sb-item active"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+    <a href="{% url 'monitoring' %}" class="sb-item">
+      <i class="ti ti-activity"></i>Monitoring
+    </a>
+    <a href="{% url 'log_aktivitas' %}" class="sb-item"><i class="ti ti-list-details"></i>Log Aktivitas</a>
+    <div class="sb-section">Manajemen</div>
+    <a href="{% url 'pengguna' %}" class="sb-item"><i class="ti ti-users"></i>Pengguna</a>
+    <a href="{% url 'dashboard_hrd' %}" class="sb-item"><i class="ti ti-folder"></i>Dok. HRD</a>
+    <a href="{% url 'dashboard_staff' %}" class="sb-item"><i class="ti ti-id"></i>Dok. Staff</a>
+    <a href="{% url 'kategori_list' %}" class="sb-item"><i class="ti ti-tags"></i>Kategori</a>
+    <div class="sb-section">Sistem</div>
+    <a href="{% url 'pengaturan' %}" class="sb-item"><i class="ti ti-settings"></i>Pengaturan</a>
+    <div class="sb-bottom">
+      <div class="sb-user">
+        <div class="sb-avatar">DA</div>
+        <div>
+          <div style="font-size:11px;color:var(--text-secondary);font-weight:500">Damai Alyndina</div>
+          <div style="font-size:10px;color:var(--text-dim)">Administrator</div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- MAIN -->
-<div class="main">
-  <div class="topbar">
-    <div><h1>Dashboard Admin</h1><p>Ringkasan sistem DocuGuard ERP</p></div>
-    <div class="d-flex align-items-center gap-2">
-      <div class="date-chip" id="clock">--:--:-- WIB</div>
-      <div class="notif-btn"><i class="ti ti-bell"></i><div class="notif-badge">3</div></div>
-    </div>
-  </div>
-
-  <div class="body">
-
-    <!-- ROW 1: STAT CARDS -->
-    <div class="row g-2 mb-3">
-      <div class="col-3"><div class="stat-card s-green">
-        <div class="stat-label"><i class="ti ti-file-check"></i>Dokumen Aktif</div>
-        <div class="stat-val v-green">142</div>
-        <div class="stat-sub">↑ 8 dokumen baru bulan ini</div>
-      </div></div>
-      <div class="col-3"><div class="stat-card s-red">
-        <div class="stat-label"><i class="ti ti-file-x"></i>Expired</div>
-        <div class="stat-val v-red">17</div>
-        <div class="stat-sub">Perlu tindakan segera</div>
-      </div></div>
-      <div class="col-3"><div class="stat-card s-amber">
-        <div class="stat-label"><i class="ti ti-alert-triangle"></i>Hampir Expired</div>
-        <div class="stat-val v-amber">24</div>
-        <div class="stat-sub">Dalam 30 hari ke depan</div>
-      </div></div>
-      <div class="col-3"><div class="stat-card s-blue">
-        <div class="stat-label"><i class="ti ti-users"></i>Pengguna Aktif</div>
-        <div class="stat-val v-blue">38</div>
-        <div class="stat-sub">Admin · HRD · Staff</div>
-      </div></div>
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <h1>Dashboard Admin</h1>
+        <p>Ringkasan sistem DocuGuard ERP</p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <div class="date-chip" id="clock">--:--:-- WIB</div>
+        <div class="notif-btn"><i class="ti ti-bell"></i>
+          <div class="notif-badge">3</div>
+        </div>
+      </div>
     </div>
 
-    <!-- ROW 2: Monitoring + Perlu Perhatian + Aksi Cepat -->
-    <div class="row g-2 mb-3">
+    <div class="body">
 
-      <!-- Monitoring Dokumen -->
-      <div class="col-5">
-        <div class="dg-card h-100">
-          <div class="d-flex align-items-center justify-content-between mb-3">
-            <div class="card-title"><i class="ti ti-chart-bar"></i>Monitoring Dokumen</div>
-            <a href="#" class="card-link">Detail →</a>
+      <!-- ROW 1: STAT CARDS -->
+      <div class="row g-2 mb-3">
+        <div class="col-3">
+          <div class="stat-card s-green">
+            <div class="stat-label"><i class="ti ti-file-check"></i>Dokumen Aktif</div>
+            <div class="stat-val v-green">142</div>
+            <div class="stat-sub">↑ 8 dokumen baru bulan ini</div>
           </div>
-          <div class="mb-3">
-            <div class="d-flex justify-content-between mb-1"><span class="bar-label">Kontrak Kerja</span><span class="bar-val v-green">45/50</span></div>
-            <div class="progress"><div class="progress-bar bg-success" style="width:90%"></div></div>
+        </div>
+        <div class="col-3">
+          <div class="stat-card s-red">
+            <div class="stat-label"><i class="ti ti-file-x"></i>Expired</div>
+            <div class="stat-val v-red">17</div>
+            <div class="stat-sub">Perlu tindakan segera</div>
           </div>
-          <div class="mb-3">
-            <div class="d-flex justify-content-between mb-1"><span class="bar-label">Sertifikat</span><span class="bar-val v-blue">30/40</span></div>
-            <div class="progress"><div class="progress-bar" style="width:75%;background:#3b82f6"></div></div>
+        </div>
+        <div class="col-3">
+          <div class="stat-card s-amber">
+            <div class="stat-label"><i class="ti ti-alert-triangle"></i>Hampir Expired</div>
+            <div class="stat-val v-amber">24</div>
+            <div class="stat-sub">Dalam 30 hari ke depan</div>
           </div>
-          <div class="mb-3">
-            <div class="d-flex justify-content-between mb-1"><span class="bar-label">BPJS</span><span class="bar-val v-blue">28/38</span></div>
-            <div class="progress"><div class="progress-bar" style="width:74%;background:#3b82f6"></div></div>
-          </div>
-          <div class="mb-3">
-            <div class="d-flex justify-content-between mb-1"><span class="bar-label">Identitas Staff</span><span class="bar-val v-amber">22/38</span></div>
-            <div class="progress"><div class="progress-bar bg-warning" style="width:58%"></div></div>
-          </div>
-          <div class="mb-3">
-            <div class="d-flex justify-content-between mb-1"><span class="bar-label">Medical Check</span><span class="bar-val v-red">17/38</span></div>
-            <div class="progress"><div class="progress-bar bg-danger" style="width:45%"></div></div>
-          </div>
-          <!-- Tren Upload -->
-          <div class="mt-2 pt-3" style="border-top:1px solid var(--border)">
-            <div style="font-size:9px;color:var(--text-dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Tren Upload 7 Hari</div>
-            <div class="mini-bar" id="trendBar"></div>
-            <div class="d-flex justify-content-between mt-1">
-              <span style="font-size:8px;color:var(--text-dim)">Sen</span><span style="font-size:8px;color:var(--text-dim)">Sel</span>
-              <span style="font-size:8px;color:var(--text-dim)">Rab</span><span style="font-size:8px;color:var(--text-dim)">Kam</span>
-              <span style="font-size:8px;color:var(--text-dim)">Jum</span><span style="font-size:8px;color:var(--text-dim)">Sab</span>
-              <span style="font-size:8px;color:var(--text-dim)">Min</span>
-            </div>
+        </div>
+        <div class="col-3">
+          <div class="stat-card s-blue">
+            <div class="stat-label"><i class="ti ti-users"></i>Pengguna Aktif</div>
+            <div class="stat-val v-blue">38</div>
+            <div class="stat-sub">Admin · HRD · Staff</div>
           </div>
         </div>
       </div>
 
-      <!-- Perlu Perhatian + Aksi Cepat (stack kanan) -->
-      <div class="col-7 d-flex flex-column gap-2">
+      <!-- ROW 2: Monitoring + Perlu Perhatian + Aksi Cepat -->
+      <div class="row g-2 mb-3">
 
-        <!-- Perlu Perhatian -->
-        <div class="dg-card" style="flex:1">
-          <div class="d-flex align-items-center justify-content-between mb-2">
-            <div class="card-title"><i class="ti ti-file-alert"></i>Perlu Perhatian</div>
-            <a href="#" class="card-link">Semua →</a>
-          </div>
-          <div class="doc-row">
-            <div class="doc-icon"><i class="ti ti-file"></i></div>
-            <div style="flex:1;min-width:0">
-              <div class="doc-name">Kontrak Kerja — Budi Santoso</div>
-              <div class="doc-cat">HRD · Kontrak Kerja</div>
+        <!-- Monitoring Dokumen -->
+        <div class="col-5">
+          <div class="dg-card h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <div class="card-title"><i class="ti ti-chart-bar"></i>Monitoring Dokumen</div>
+              <a href="#" class="card-link">Detail →</a>
             </div>
-            <span class="pill pill-exp">EXPIRED</span>
-          </div>
-          <div class="doc-row">
-            <div class="doc-icon"><i class="ti ti-file"></i></div>
-            <div style="flex:1;min-width:0">
-              <div class="doc-name">BPJS TK — Rina Wati</div>
-              <div class="doc-cat">HRD · BPJS</div>
+            <div class="mb-3">
+              <div class="d-flex justify-content-between mb-1"><span class="bar-label">Kontrak Kerja</span><span
+                  class="bar-val v-green">45/50</span></div>
+              <div class="progress">
+                <div class="progress-bar bg-success" style="width:90%"></div>
+              </div>
             </div>
-            <span class="pill pill-warn">5 hari</span>
-          </div>
-          <div class="doc-row">
-            <div class="doc-icon"><i class="ti ti-id"></i></div>
-            <div style="flex:1;min-width:0">
-              <div class="doc-name">SIM B1 — Ahmad Fauzi</div>
-              <div class="doc-cat">Staff · Identitas</div>
+            <div class="mb-3">
+              <div class="d-flex justify-content-between mb-1"><span class="bar-label">Sertifikat</span><span
+                  class="bar-val v-blue">30/40</span></div>
+              <div class="progress">
+                <div class="progress-bar" style="width:75%;background:#3b82f6"></div>
+              </div>
             </div>
-            <span class="pill pill-warn">12 hari</span>
-          </div>
-          <div class="doc-row">
-            <div class="doc-icon"><i class="ti ti-file-certificate"></i></div>
-            <div style="flex:1;min-width:0">
-              <div class="doc-name">Sertifikat K3 — Tim A</div>
-              <div class="doc-cat">HRD · Sertifikat</div>
+            <div class="mb-3">
+              <div class="d-flex justify-content-between mb-1"><span class="bar-label">BPJS</span><span
+                  class="bar-val v-blue">28/38</span></div>
+              <div class="progress">
+                <div class="progress-bar" style="width:74%;background:#3b82f6"></div>
+              </div>
             </div>
-            <span class="pill pill-exp">EXPIRED</span>
-          </div>
-          <div class="doc-row">
-            <div class="doc-icon"><i class="ti ti-file"></i></div>
-            <div style="flex:1;min-width:0">
-              <div class="doc-name">Medical Check — Arsat K.</div>
-              <div class="doc-cat">Staff · Medical</div>
+            <div class="mb-3">
+              <div class="d-flex justify-content-between mb-1"><span class="bar-label">Identitas Staff</span><span
+                  class="bar-val v-amber">22/38</span></div>
+              <div class="progress">
+                <div class="progress-bar bg-warning" style="width:58%"></div>
+              </div>
             </div>
-            <span class="pill pill-warn">18 hari</span>
+            <div class="mb-3">
+              <div class="d-flex justify-content-between mb-1"><span class="bar-label">Medical Check</span><span
+                  class="bar-val v-red">17/38</span></div>
+              <div class="progress">
+                <div class="progress-bar bg-danger" style="width:45%"></div>
+              </div>
+            </div>
+            <!-- Tren Upload -->
+            <div class="mt-2 pt-3" style="border-top:1px solid var(--border)">
+              <div
+                style="font-size:9px;color:var(--text-dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">
+                Tren Upload 7 Hari</div>
+              <div class="mini-bar" id="trendBar"></div>
+              <div class="d-flex justify-content-between mt-1">
+                <span style="font-size:8px;color:var(--text-dim)">Sen</span><span
+                  style="font-size:8px;color:var(--text-dim)">Sel</span>
+                <span style="font-size:8px;color:var(--text-dim)">Rab</span><span
+                  style="font-size:8px;color:var(--text-dim)">Kam</span>
+                <span style="font-size:8px;color:var(--text-dim)">Jum</span><span
+                  style="font-size:8px;color:var(--text-dim)">Sab</span>
+                <span style="font-size:8px;color:var(--text-dim)">Min</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Aksi Cepat -->
-        <div class="dg-card">
-          <div class="card-title mb-2"><i class="ti ti-bolt"></i>Aksi Cepat</div>
-          <div class="d-flex gap-2">
-            <a href="#" class="qa-btn">
-              <i class="ti ti-user-plus" style="color:#60a5fa"></i>
-              <span class="qa-label">Tambah<br>Pengguna</span>
-            </a>
-            <a href="#" class="qa-btn">
-              <i class="ti ti-file-plus" style="color:#4ade80"></i>
-              <span class="qa-label">Upload<br>Dokumen</span>
-            </a>
-            <a href="#" class="qa-btn">
-              <i class="ti ti-tags" style="color:#fbbf24"></i>
-              <span class="qa-label">Kelola<br>Kategori</span>
-            </a>
-            <a href="#" class="qa-btn">
-              <i class="ti ti-file-spreadsheet" style="color:#a855f7"></i>
-              <span class="qa-label">Export<br>Laporan</span>
-            </a>
-            <a href="#" class="qa-btn">
-              <i class="ti ti-settings" style="color:#f87171"></i>
-              <span class="qa-label">Pengaturan<br>Sistem</span>
-            </a>
-          </div>
-        </div>
+        <!-- Perlu Perhatian + Aksi Cepat (stack kanan) -->
+        <div class="col-7 d-flex flex-column gap-2">
 
+          <!-- Perlu Perhatian -->
+          <div class="dg-card" style="flex:1">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <div class="card-title"><i class="ti ti-file-alert"></i>Perlu Perhatian</div>
+              <a href="#" class="card-link">Semua →</a>
+            </div>
+            <div class="doc-row">
+              <div class="doc-icon"><i class="ti ti-file"></i></div>
+              <div style="flex:1;min-width:0">
+                <div class="doc-name">Kontrak Kerja — Budi Santoso</div>
+                <div class="doc-cat">HRD · Kontrak Kerja</div>
+              </div>
+              <span class="pill pill-exp">EXPIRED</span>
+            </div>
+            <div class="doc-row">
+              <div class="doc-icon"><i class="ti ti-file"></i></div>
+              <div style="flex:1;min-width:0">
+                <div class="doc-name">BPJS TK — Rina Wati</div>
+                <div class="doc-cat">HRD · BPJS</div>
+              </div>
+              <span class="pill pill-warn">5 hari</span>
+            </div>
+            <div class="doc-row">
+              <div class="doc-icon"><i class="ti ti-id"></i></div>
+              <div style="flex:1;min-width:0">
+                <div class="doc-name">SIM B1 — Ahmad Fauzi</div>
+                <div class="doc-cat">Staff · Identitas</div>
+              </div>
+              <span class="pill pill-warn">12 hari</span>
+            </div>
+            <div class="doc-row">
+              <div class="doc-icon"><i class="ti ti-file-certificate"></i></div>
+              <div style="flex:1;min-width:0">
+                <div class="doc-name">Sertifikat K3 — Tim A</div>
+                <div class="doc-cat">HRD · Sertifikat</div>
+              </div>
+              <span class="pill pill-exp">EXPIRED</span>
+            </div>
+            <div class="doc-row">
+              <div class="doc-icon"><i class="ti ti-file"></i></div>
+              <div style="flex:1;min-width:0">
+                <div class="doc-name">Medical Check — Arsat K.</div>
+                <div class="doc-cat">Staff · Medical</div>
+              </div>
+              <span class="pill pill-warn">18 hari</span>
+            </div>
+          </div>
+
+          <!-- Aksi Cepat -->
+          <div class="dg-card">
+            <div class="card-title mb-2"><i class="ti ti-bolt"></i>Aksi Cepat</div>
+            <div class="d-flex gap-2">
+              <a href="#" class="qa-btn">
+                <i class="ti ti-user-plus" style="color:#60a5fa"></i>
+                <span class="qa-label">Tambah<br>Pengguna</span>
+              </a>
+              <a href="#" class="qa-btn">
+                <i class="ti ti-file-plus" style="color:#4ade80"></i>
+                <span class="qa-label">Upload<br>Dokumen</span>
+              </a>
+              <a href="#" class="qa-btn">
+                <i class="ti ti-tags" style="color:#fbbf24"></i>
+                <span class="qa-label">Kelola<br>Kategori</span>
+              </a>
+              <a href="#" class="qa-btn">
+                <i class="ti ti-file-spreadsheet" style="color:#a855f7"></i>
+                <span class="qa-label">Export<br>Laporan</span>
+              </a>
+              <a href="#" class="qa-btn">
+                <i class="ti ti-settings" style="color:#f87171"></i>
+                <span class="qa-label">Pengaturan<br>Sistem</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
       </div>
-    </div>
 
-    <!-- ROW 3: Log Aktivitas 2 kolom -->
-    <div class="dg-card p-0">
-      <div class="d-flex align-items-center justify-content-between px-3 py-2"
-           style="border-bottom:1px solid var(--border-mid);background:var(--bg-hover);border-radius:10px 10px 0 0">
-        <div class="card-title"><i class="ti ti-activity"></i>Log Aktivitas Terbaru</div>
-        <div class="d-flex align-items-center gap-3">
-          <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+      <!-- ROW 3: Log Aktivitas 2 kolom -->
+      <div class="dg-card p-0">
+        <div class="d-flex align-items-center justify-content-between px-3 py-2"
+          style="border-bottom:1px solid var(--border-mid);background:var(--bg-hover);border-radius:10px 10px 0 0">
+          <div class="card-title"><i class="ti ti-activity"></i>Log Aktivitas Terbaru</div>
+          <div class="d-flex align-items-center gap-3">
+            <div class="live-badge">
+              <div class="live-dot"></div>LIVE
+            </div>
+            <a href="#" class="card-link">Lihat semua →</a>
+          </div>
+        </div>
+        <div class="row g-0" id="logGrid" style="padding:4px 0"></div>
+        <div class="px-3 py-2 d-flex justify-content-between align-items-center"
+          style="border-top:1px solid var(--border)">
+          <span style="font-size:10px;color:var(--text-dim);font-family:'DM Mono',monospace" id="logCount">46 aktivitas
+            hari ini</span>
           <a href="#" class="card-link">Lihat semua →</a>
         </div>
       </div>
-      <div class="row g-0" id="logGrid" style="padding:4px 0"></div>
-      <div class="px-3 py-2 d-flex justify-content-between align-items-center"
-           style="border-top:1px solid var(--border)">
-        <span style="font-size:10px;color:var(--text-dim);font-family:'DM Mono',monospace" id="logCount">46 aktivitas hari ini</span>
-        <a href="#" class="card-link">Lihat semua →</a>
-      </div>
+
     </div>
-
   </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-// Clock
-(function tick(){
-  const now=new Date(),pad=n=>n.toString().padStart(2,'0');
-  document.getElementById('clock').textContent=`${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} WIB`;
-  setTimeout(tick,1000);
-})();
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Clock
+    (function tick() {
+      const now = new Date(), pad = n => n.toString().padStart(2, '0');
+      document.getElementById('clock').textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} WIB`;
+      setTimeout(tick, 1000);
+    })();
 
-// Tren bar
-const trendData=[3,7,5,9,6,4,8];
-const maxV=Math.max(...trendData);
-const barEl=document.getElementById('trendBar');
-trendData.forEach((v,i)=>{
-  const col=document.createElement('div');
-  col.className='mb-col';
-  col.style.height=Math.round((v/maxV)*100)+'%';
-  col.style.background=i===6?'#3b82f6':'#232330';
-  col.title=`${['Sen','Sel','Rab','Kam','Jum','Sab','Min'][i]}: ${v} dok`;
-  barEl.appendChild(col);
-});
+    // Tren bar
+    const trendData = [3, 7, 5, 9, 6, 4, 8];
+    const maxV = Math.max(...trendData);
+    const barEl = document.getElementById('trendBar');
+    trendData.forEach((v, i) => {
+      const col = document.createElement('div');
+      col.className = 'mb-col';
+      col.style.height = Math.round((v / maxV) * 100) + '%';
+      col.style.background = i === 6 ? '#3b82f6' : '#232330';
+      col.title = `${['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'][i]}: ${v} dok`;
+      barEl.appendChild(col);
+    });
 
-// Log data
-const logData=[
-  {cls:'ld-add',icon:'ti-plus',  desc:'Damai tambah pengguna',   sub:'Admin · 10:02'},
-  {cls:'ld-del',icon:'ti-trash', desc:'Admin hapus kategori',     sub:'Admin · 10:00'},
-  {cls:'ld-out',icon:'ti-logout',desc:'Julianto logout',          sub:'Admin · 09:58'},
-  {cls:'ld-ed', icon:'ti-edit',  desc:'Jacky edit Kontrak HRD',  sub:'HRD · 09:50'},
-  {cls:'ld-in', icon:'ti-login', desc:'Vincent berhasil login',   sub:'Staff · 09:45'},
-  {cls:'ld-add',icon:'ti-plus',  desc:'Arsat tambah kategori',    sub:'Admin · 09:40'},
-  {cls:'ld-add',icon:'ti-plus',  desc:'Damai tambah pengguna',    sub:'Admin · 09:35'},
-  {cls:'ld-del',icon:'ti-trash', desc:'Admin hapus kategori',     sub:'Admin · 09:30'},
-];
+    // Log data
+    const logData = [
+      { cls: 'ld-add', icon: 'ti-plus', desc: 'Damai tambah pengguna', sub: 'Admin · 10:02' },
+      { cls: 'ld-del', icon: 'ti-trash', desc: 'Admin hapus kategori', sub: 'Admin · 10:00' },
+      { cls: 'ld-out', icon: 'ti-logout', desc: 'Julianto logout', sub: 'Admin · 09:58' },
+      { cls: 'ld-ed', icon: 'ti-edit', desc: 'Jacky edit Kontrak HRD', sub: 'HRD · 09:50' },
+      { cls: 'ld-in', icon: 'ti-login', desc: 'Vincent berhasil login', sub: 'Staff · 09:45' },
+      { cls: 'ld-add', icon: 'ti-plus', desc: 'Arsat tambah kategori', sub: 'Admin · 09:40' },
+      { cls: 'ld-add', icon: 'ti-plus', desc: 'Damai tambah pengguna', sub: 'Admin · 09:35' },
+      { cls: 'ld-del', icon: 'ti-trash', desc: 'Admin hapus kategori', sub: 'Admin · 09:30' },
+    ];
 
-function renderLog(data){
-  const grid=document.getElementById('logGrid');
-  grid.innerHTML=`
-    <div class="col-6 px-3">${data.slice(0,4).map(l=>`
+    function renderLog(data) {
+      const grid = document.getElementById('logGrid');
+      grid.innerHTML = `
+    <div class="col-6 px-3">${data.slice(0, 4).map(l => `
       <div class="log-item">
         <div class="log-dot ${l.cls}"><i class="ti ${l.icon}"></i></div>
         <div><div class="log-desc">${l.desc}</div><div class="log-sub">${l.sub}</div></div>
       </div>`).join('')}
     </div>
-    <div class="col-6 px-3" style="border-left:1px solid var(--border)">${data.slice(4,8).map(l=>`
+    <div class="col-6 px-3" style="border-left:1px solid var(--border)">${data.slice(4, 8).map(l => `
       <div class="log-item">
         <div class="log-dot ${l.cls}"><i class="ti ${l.icon}"></i></div>
         <div><div class="log-desc">${l.desc}</div><div class="log-sub">${l.sub}</div></div>
       </div>`).join('')}
     </div>`;
-}
-renderLog(logData);
+    }
+    renderLog(logData);
 
-// Live feed
-const liveFeed=[
-  {cls:'ld-in', icon:'ti-login', desc:'Rina Wati login',           sub:'HRD'},
-  {cls:'ld-ed', icon:'ti-edit',  desc:'Siti edit BPJS TK',         sub:'HRD'},
-  {cls:'ld-add',icon:'ti-plus',  desc:'Jacky upload sertifikat',   sub:'HRD'},
-  {cls:'ld-out',icon:'ti-logout',desc:'Hendra logout',             sub:'Staff'},
-];
-let li=0,total=46;
-setInterval(()=>{
-  const l=liveFeed[li%liveFeed.length]; li++; total++;
-  const t=new Date();
-  const ts=t.getHours().toString().padStart(2,'0')+':'+t.getMinutes().toString().padStart(2,'0');
-  logData.unshift({...l, sub:`${l.sub} · ${ts}`});
-  if(logData.length>8) logData.pop();
-  renderLog(logData);
-  document.getElementById('logCount').textContent=`${total} aktivitas hari ini`;
-},3000);
-</script>
+    // Live feed
+    const liveFeed = [
+      { cls: 'ld-in', icon: 'ti-login', desc: 'Rina Wati login', sub: 'HRD' },
+      { cls: 'ld-ed', icon: 'ti-edit', desc: 'Siti edit BPJS TK', sub: 'HRD' },
+      { cls: 'ld-add', icon: 'ti-plus', desc: 'Jacky upload sertifikat', sub: 'HRD' },
+      { cls: 'ld-out', icon: 'ti-logout', desc: 'Hendra logout', sub: 'Staff' },
+    ];
+    let li = 0, total = 46;
+    setInterval(() => {
+      const l = liveFeed[li % liveFeed.length]; li++; total++;
+      const t = new Date();
+      const ts = t.getHours().toString().padStart(2, '0') + ':' + t.getMinutes().toString().padStart(2, '0');
+      logData.unshift({ ...l, sub: `${l.sub} · ${ts}` });
+      if (logData.length > 8) logData.pop();
+      renderLog(logData);
+      document.getElementById('logCount').textContent = `${total} aktivitas hari ini`;
+    }, 3000);
+  </script>
 </body>
+
 </html>

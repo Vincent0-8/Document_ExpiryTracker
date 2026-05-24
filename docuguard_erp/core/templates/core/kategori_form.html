@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ judul }} — DocuGuard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #f4f5f7;
+            --bg-card: #ffffff;
+            --bg-hover: #f0f2f5;
+            --border: #e4e7ec;
+            --border-mid: #dde1e8;
+            --text-primary: #111827;
+            --text-secondary: #374151;
+            --text-muted: #6b7280;
+            --text-dim: #9ca3af;
+            --blue: #2563eb;
+            --green: #16a34a;
+            --red: #dc2626;
+            --amber: #d97706;
+            --shadow: 0 1px 3px rgba(0, 0, 0, .08);
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            font-size: 13px;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 210px;
+            min-height: 100vh;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, .04);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 18px 16px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, .3);
+        }
+
+        .brand-name {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .brand-sub {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        .sb-section {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            padding: 14px 16px 5px;
+        }
+
+        .sb-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 16px;
+            color: var(--text-muted);
+            border-left: 2px solid transparent;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all .15s;
+        }
+
+        .sb-item:hover {
+            color: var(--text-secondary);
+            background: var(--bg-hover);
+        }
+
+        .sb-item.active {
+            color: var(--blue);
+            background: #eff6ff;
+            border-left-color: var(--blue);
+        }
+
+        .sb-item i {
+            font-size: 15px;
+            width: 16px;
+        }
+
+        .sb-bottom {
+            margin-top: auto;
+            border-top: 1px solid var(--border);
+        }
+
+        .sb-user {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 12px 14px;
+        }
+
+        .sb-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #dbeafe;
+            color: var(--blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .main {
+            margin-left: 210px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: var(--shadow);
+        }
+
+        .topbar h1 {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .topbar p {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin: 2px 0 0;
+        }
+
+        .body {
+            padding: 24px;
+            flex: 1;
+        }
+
+        /* FORM CARD */
+        .form-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            max-width: 600px;
+        }
+
+        .form-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-hover);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .form-card-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: var(--blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .form-card-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .form-card-sub {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .form-body {
+            padding: 20px;
+        }
+
+        /* FORM FIELDS */
+        .field-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .field-input {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            font-size: 12px;
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color .15s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .field-input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
+        }
+
+        .field-input.is-invalid {
+            border-color: var(--red);
+        }
+
+        select.field-input {
+            cursor: pointer;
+        }
+
+        textarea.field-input {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .field-hint {
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        .error-msg {
+            font-size: 10px;
+            color: var(--red);
+            margin-top: 4px;
+        }
+
+        /* KODE PREVIEW */
+        .kode-preview {
+            display: inline-block;
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 3px 8px;
+            color: var(--blue);
+            margin-top: 4px;
+        }
+
+        /* URGENCY RADIO */
+        .urgency-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .urgency-opt {
+            display: none;
+        }
+
+        .urgency-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .15s;
+        }
+
+        .urgency-label:hover {
+            border-color: var(--border-mid);
+            background: var(--bg-hover);
+        }
+
+        .urgency-opt:checked+.urgency-label.tinggi {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            color: var(--red);
+        }
+
+        .urgency-opt:checked+.urgency-label.sedang {
+            background: #fef3c7;
+            border-color: #fcd34d;
+            color: var(--amber);
+        }
+
+        .urgency-opt:checked+.urgency-label.rendah {
+            background: #dcfce7;
+            border-color: #86efac;
+            color: var(--green);
+        }
+
+        /* BUTTONS */
+        .btn-submit {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 20px;
+            border-radius: 8px;
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .btn-submit:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-cancel {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 16px;
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all .15s;
+        }
+
+        .btn-cancel:hover {
+            background: var(--bg-hover);
+            color: var(--text-secondary);
+        }
+
+        /* BREADCRUMB */
+        .breadcrumb-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-bottom: 16px;
+        }
+
+        .breadcrumb-wrap a {
+            color: var(--text-dim);
+            text-decoration: none;
+        }
+
+        .breadcrumb-wrap a:hover {
+            color: var(--blue);
+        }
+
+        .breadcrumb-wrap i {
+            font-size: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="brand">
+            <div class="brand-icon"><i class="ti ti-shield-check"></i></div>
+            <div>
+                <div class="brand-name">DocuGuard</div>
+                <div class="brand-sub">ERP System</div>
+            </div>
+        </div>
+        <div class="sb-section">Utama</div>
+        <a href="{% url 'dashboard_admin' %}" class="sb-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+        <a href="{% url 'monitoring' %}" class="sb-item"><i class="ti ti-activity"></i>Monitoring</a>
+        <a href="{% url 'log_aktivitas' %}" class="sb-item"><i class="ti ti-list-details"></i>Log Aktivitas</a>
+        <div class="sb-section">Manajemen</div>
+        <a href="{% url 'pengguna' %}" class="sb-item"><i class="ti ti-users"></i>Pengguna</a>
+        <a href="{% url 'dashboard_hrd' %}" class="sb-item"><i class="ti ti-folder"></i>Dok. HRD</a>
+        <a href="{% url 'dashboard_staff' %}" class="sb-item"><i class="ti ti-id"></i>Dok. Staff</a>
+        <a href="{% url 'kategori_list' %}" class="sb-item active"><i class="ti ti-tags"></i>Kategori</a>
+        <div class="sb-section">Sistem</div>
+        <a href="{% url 'pengaturan' %}" class="sb-item"><i class="ti ti-settings"></i>Pengaturan</a>
+        <div class="sb-bottom">
+            <div class="sb-user">
+                <div class="sb-avatar">AD</div>
+                <div>
+                    <div style="font-size:11px;color:var(--text-secondary);font-weight:500">
+                        {{ request.user.get_full_name|default:request.user.username }}
+                    </div>
+                    <div style="font-size:10px;color:var(--text-dim)">Administrator</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+        <div class="topbar">
+            <div>
+                <h1>{{ judul }}</h1>
+                <p>Manajemen Kategori Dokumen</p>
+            </div>
+        </div>
+
+        <div class="body">
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb-wrap">
+                <a href="{% url 'dashboard_admin' %}">Dashboard</a>
+                <i class="ti ti-chevron-right"></i>
+                <a href="{% url 'kategori_list' %}">Kategori</a>
+                <i class="ti ti-chevron-right"></i>
+                <span style="color:var(--text-secondary)">{{ judul }}</span>
+            </div>
+
+            <div class="form-card">
+                <div class="form-card-header">
+                    <div class="form-card-icon">
+                        <i class="ti {% if object %}ti-edit{% else %}ti-plus{% endif %}"></i>
+                    </div>
+                    <div>
+                        <div class="form-card-title">{{ judul }}</div>
+                        <div class="form-card-sub">
+                            {% if object %}Edit data kategori yang sudah ada{% else %}Isi data untuk menambahkan
+                            kategori baru{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Kode Kategori -->
+                        <div class="mb-3">
+                            <div class="field-label">Kode Kategori <span style="color:var(--red)">*</span></div>
+                            <input type="text" name="kode_kategori" id="kodeInput"
+                                class="field-input {% if form.kode_kategori.errors %}is-invalid{% endif %}"
+                                value="{{ form.kode_kategori.value|default:'' }}" placeholder="Contoh: KTR, BPJS, SERT"
+                                maxlength="10" style="text-transform:uppercase">
+                            <div class="field-hint">Maks. 10 karakter, harus unik. Preview: <span class="kode-preview"
+                                    id="kodePreview">—</span></div>
+                            {% for err in form.kode_kategori.errors %}
+                            <div class="error-msg"><i class="ti ti-alert-circle"></i> {{ err }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Nama Kategori -->
+                        <div class="mb-3">
+                            <div class="field-label">Nama Kategori <span style="color:var(--red)">*</span></div>
+                            <input type="text" name="nama_kategori"
+                                class="field-input {% if form.nama_kategori.errors %}is-invalid{% endif %}"
+                                value="{{ form.nama_kategori.value|default:'' }}"
+                                placeholder="Contoh: Kontrak Kerja, Sertifikat, BPJS" maxlength="50">
+                            {% for err in form.nama_kategori.errors %}
+                            <div class="error-msg"><i class="ti ti-alert-circle"></i> {{ err }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Level Urgensi -->
+                        <div class="mb-3">
+                            <div class="field-label">Level Urgensi <span style="color:var(--red)">*</span></div>
+                            <div class="urgency-group">
+                                <input type="radio" name="level_urgensi" id="u-tinggi" value="Tinggi"
+                                    class="urgency-opt" {% if form.level_urgensi.value=='Tinggi' %}checked{% endif %}>
+                                <label for="u-tinggi" class="urgency-label tinggi">
+                                    <i class="ti ti-flame"></i> Tinggi
+                                </label>
+
+                                <input type="radio" name="level_urgensi" id="u-sedang" value="Sedang"
+                                    class="urgency-opt" {% if form.level_urgensi.value=='Sedang' %}checked{% endif %}>
+                                <label for="u-sedang" class="urgency-label sedang">
+                                    <i class="ti ti-alert-triangle"></i> Sedang
+                                </label>
+
+                                <input type="radio" name="level_urgensi" id="u-rendah" value="Rendah"
+                                    class="urgency-opt" {% if form.level_urgensi.value=='Rendah' %}checked{% endif %}>
+                                <label for="u-rendah" class="urgency-label rendah">
+                                    <i class="ti ti-circle-check"></i> Rendah
+                                </label>
+                            </div>
+                            {% for err in form.level_urgensi.errors %}
+                            <div class="error-msg mt-2"><i class="ti ti-alert-circle"></i> {{ err }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Deskripsi -->
+                        <div class="mb-4">
+                            <div class="field-label">Deskripsi <span style="color:var(--red)">*</span></div>
+                            <textarea name="deskripsi"
+                                class="field-input {% if form.deskripsi.errors %}is-invalid{% endif %}"
+                                placeholder="Jelaskan jenis dokumen yang masuk ke kategori ini..."
+                                rows="3">{{ form.deskripsi.value|default:'' }}</textarea>
+                            {% for err in form.deskripsi.errors %}
+                            <div class="error-msg"><i class="ti ti-alert-circle"></i> {{ err }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="submit" class="btn-submit">
+                                <i class="ti {% if object %}ti-device-floppy{% else %}ti-plus{% endif %}"></i>
+                                {{ tombol }}
+                            </button>
+                            <a href="{% url 'kategori_list' %}" class="btn-cancel">
+                                <i class="ti ti-x"></i> Batal
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Kode preview & auto uppercase
+        const kodeInput = document.getElementById('kodeInput');
+        const kodePreview = document.getElementById('kodePreview');
+
+        function updatePreview() {
+            const val = kodeInput.value.toUpperCase().trim();
+            kodeInput.value = val;
+            kodePreview.textContent = val || '—';
+        }
+        kodeInput.addEventListener('input', updatePreview);
+        updatePreview(); // run on load for edit mode
+    </script>
+</body>
+
+</html>

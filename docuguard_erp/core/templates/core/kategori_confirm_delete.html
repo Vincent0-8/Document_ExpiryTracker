@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hapus Kategori — DocuGuard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #f4f5f7;
+            --bg-card: #ffffff;
+            --bg-hover: #f0f2f5;
+            --border: #e4e7ec;
+            --border-mid: #dde1e8;
+            --text-primary: #111827;
+            --text-secondary: #374151;
+            --text-muted: #6b7280;
+            --text-dim: #9ca3af;
+            --blue: #2563eb;
+            --green: #16a34a;
+            --red: #dc2626;
+            --amber: #d97706;
+            --shadow: 0 1px 3px rgba(0, 0, 0, .08);
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            font-size: 13px;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 210px;
+            min-height: 100vh;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, .04);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 18px 16px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, .3);
+        }
+
+        .brand-name {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .brand-sub {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        .sb-section {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            padding: 14px 16px 5px;
+        }
+
+        .sb-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 16px;
+            color: var(--text-muted);
+            border-left: 2px solid transparent;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all .15s;
+        }
+
+        .sb-item:hover {
+            color: var(--text-secondary);
+            background: var(--bg-hover);
+        }
+
+        .sb-item.active {
+            color: var(--blue);
+            background: #eff6ff;
+            border-left-color: var(--blue);
+        }
+
+        .sb-item i {
+            font-size: 15px;
+            width: 16px;
+        }
+
+        .sb-bottom {
+            margin-top: auto;
+            border-top: 1px solid var(--border);
+        }
+
+        .sb-user {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 12px 14px;
+        }
+
+        .sb-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #dbeafe;
+            color: var(--blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .main {
+            margin-left: 210px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: var(--shadow);
+        }
+
+        .topbar h1 {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .topbar p {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin: 2px 0 0;
+        }
+
+        .body {
+            padding: 24px;
+            flex: 1;
+        }
+
+        .breadcrumb-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-bottom: 16px;
+        }
+
+        .breadcrumb-wrap a {
+            color: var(--text-dim);
+            text-decoration: none;
+        }
+
+        .breadcrumb-wrap a:hover {
+            color: var(--blue);
+        }
+
+        /* DELETE CARD */
+        .del-card {
+            background: var(--bg-card);
+            border: 1px solid #fca5a5;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            max-width: 480px;
+            overflow: hidden;
+        }
+
+        .del-header {
+            background: #fef2f2;
+            border-bottom: 1px solid #fca5a5;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .del-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--red);
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .del-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--red);
+        }
+
+        .del-sub {
+            font-size: 11px;
+            color: #b91c1c;
+            margin-top: 2px;
+        }
+
+        .del-body {
+            padding: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            gap: 10px;
+            padding: 10px 12px;
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .info-label {
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .info-val {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .kode-chip {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 3px 7px;
+            color: var(--blue);
+        }
+
+        .pill {
+            font-size: 9px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 20px;
+            white-space: nowrap;
+            font-family: 'DM Mono', monospace;
+        }
+
+        .pill-tinggi {
+            background: #fee2e2;
+            color: var(--red);
+        }
+
+        .pill-sedang {
+            background: #fef3c7;
+            color: var(--amber);
+        }
+
+        .pill-rendah {
+            background: #dcfce7;
+            color: var(--green);
+        }
+
+        .warn-box {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            padding: 10px 12px;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .warn-box i {
+            color: var(--amber);
+            font-size: 15px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .warn-box p {
+            font-size: 11px;
+            color: #92400e;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .btn-hapus {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 20px;
+            border-radius: 8px;
+            background: var(--red);
+            color: #fff;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .btn-hapus:hover {
+            background: #b91c1c;
+        }
+
+        .btn-cancel {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 16px;
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all .15s;
+        }
+
+        .btn-cancel:hover {
+            background: var(--bg-hover);
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="brand">
+            <div class="brand-icon"><i class="ti ti-shield-check"></i></div>
+            <div>
+                <div class="brand-name">DocuGuard</div>
+                <div class="brand-sub">ERP System</div>
+            </div>
+        </div>
+        <div class="sb-section">Utama</div>
+        <a href="{% url 'dashboard_admin' %}" class="sb-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+        <a href="{% url 'monitoring' %}" class="sb-item"><i class="ti ti-activity"></i>Monitoring</a>
+        <a href="{% url 'log_aktivitas' %}" class="sb-item"><i class="ti ti-list-details"></i>Log Aktivitas</a>
+        <div class="sb-section">Manajemen</div>
+        <a href="{% url 'pengguna' %}" class="sb-item"><i class="ti ti-users"></i>Pengguna</a>
+        <a href="{% url 'dashboard_hrd' %}" class="sb-item"><i class="ti ti-folder"></i>Dok. HRD</a>
+        <a href="{% url 'dashboard_staff' %}" class="sb-item"><i class="ti ti-id"></i>Dok. Staff</a>
+        <a href="{% url 'kategori_list' %}" class="sb-item active"><i class="ti ti-tags"></i>Kategori</a>
+        <div class="sb-section">Sistem</div>
+        <a href="{% url 'pengaturan' %}" class="sb-item"><i class="ti ti-settings"></i>Pengaturan</a>
+        <div class="sb-bottom">
+            <div class="sb-user">
+                <div class="sb-avatar">AD</div>
+                <div>
+                    <div style="font-size:11px;color:var(--text-secondary);font-weight:500">{{
+                        request.user.get_full_name|default:request.user.username }}</div>
+                    <div style="font-size:10px;color:var(--text-dim)">Administrator</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <div>
+                <h1>Hapus Kategori</h1>
+                <p>Konfirmasi penghapusan data kategori</p>
+            </div>
+        </div>
+        <div class="body">
+            <div class="breadcrumb-wrap">
+                <a href="{% url 'dashboard_admin' %}">Dashboard</a>
+                <i class="ti ti-chevron-right"></i>
+                <a href="{% url 'kategori_list' %}">Kategori</a>
+                <i class="ti ti-chevron-right"></i>
+                <span style="color:var(--red)">Hapus</span>
+            </div>
+
+            <div class="del-card">
+                <div class="del-header">
+                    <div class="del-icon"><i class="ti ti-trash"></i></div>
+                    <div>
+                        <div class="del-title">Konfirmasi Hapus</div>
+                        <div class="del-sub">Tindakan ini tidak bisa dibatalkan</div>
+                    </div>
+                </div>
+                <div class="del-body">
+
+                    <!-- Info kategori yang mau dihapus -->
+                    <div class="info-row mb-2">
+                        <div style="flex:1">
+                            <div class="info-label">Kode</div>
+                            <div class="info-val"><span class="kode-chip">{{ object.kode_kategori }}</span></div>
+                        </div>
+                        <div style="flex:2">
+                            <div class="info-label">Nama Kategori</div>
+                            <div class="info-val">{{ object.nama_kategori }}</div>
+                        </div>
+                        <div style="flex:1">
+                            <div class="info-label">Urgensi</div>
+                            <div class="info-val">
+                                {% if object.level_urgensi|lower == 'tinggi' %}
+                                <span class="pill pill-tinggi">TINGGI</span>
+                                {% elif object.level_urgensi|lower == 'sedang' %}
+                                <span class="pill pill-sedang">SEDANG</span>
+                                {% else %}
+                                <span class="pill pill-rendah">RENDAH</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="warn-box">
+                        <i class="ti ti-alert-triangle"></i>
+                        <p>Menghapus kategori <strong>{{ object.nama_kategori }}</strong> akan permanen. Pastikan tidak
+                            ada dokumen yang masih menggunakan kategori ini sebelum melanjutkan.</p>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="submit" class="btn-hapus">
+                                <i class="ti ti-trash"></i> Ya, Hapus Sekarang
+                            </button>
+                            <a href="{% url 'kategori_list' %}" class="btn-cancel">
+                                <i class="ti ti-arrow-left"></i> Batal
+                            </a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
