@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Staff — DocuGuard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-base:#f4f5f7;
+  --bg-card:#ffffff;
+  --bg-hover:#f0f2f5;
+  --border:#e4e7ec;
+  --border-mid:#dde1e8;
+  --text-primary:#111827;
+  --text-secondary:#374151;
+  --text-muted:#6b7280;
+  --text-dim:#9ca3af;
+  --blue:#2563eb;
+  --green:#16a34a;
+  --red:#dc2626;
+  --amber:#d97706;
+  --shadow:0 1px 3px rgba(0,0,0,.08);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg-base);color:var(--text-primary);font-size:13px;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:210px;min-height:100vh;background:var(--bg-card);border-right:1px solid var(--border);position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;box-shadow:2px 0 8px rgba(0,0,0,.04)}
+.brand{display:flex;align-items:center;gap:10px;padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.brand-icon{width:32px;height:32px;border-radius:8px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;box-shadow:0 2px 8px rgba(37,99,235,.3)}
+.brand-name{font-size:13px;font-weight:700;color:var(--text-primary)}
+.brand-sub{font-size:10px;color:var(--text-muted);margin-top:1px}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);padding:14px 16px 5px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 16px;color:var(--text-muted);border-left:2px solid transparent;text-decoration:none;font-size:12px;font-weight:500;transition:all .15s}
+.sb-item:hover{color:var(--text-secondary);background:var(--bg-hover)}
+.sb-item.active{color:var(--blue);background:#eff6ff;border-left-color:var(--blue)}
+.sb-item i{font-size:15px;width:16px}
+.sb-bottom{margin-top:auto;border-top:1px solid var(--border)}
+.sb-user{display:flex;align-items:center;gap:9px;padding:12px 14px}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:#fef3c7;color:var(--amber);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+
+/* MAIN */
+.main{margin-left:210px;display:flex;flex-direction:column;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--bg-card);position:sticky;top:0;z-index:50;box-shadow:var(--shadow)}
+.topbar h1{font-size:15px;font-weight:700;color:var(--text-primary);margin:0}
+.topbar p{font-size:11px;color:var(--text-muted);margin:2px 0 0}
+.date-chip{font-size:10px;color:var(--text-muted);background:var(--bg-hover);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-family:'DM Mono',monospace}
+.notif-btn{position:relative;width:32px;height:32px;border-radius:8px;background:var(--bg-hover);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-muted);cursor:pointer;font-size:15px}
+.notif-badge{position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:var(--red);color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg-card)}
+.body{padding:24px;flex:1}
+
+/* WELCOME BANNER */
+.welcome-banner{background:linear-gradient(135deg,#b45309,#d97706,#f59e0b);border-radius:14px;padding:24px 28px;color:#fff;margin-bottom:20px;position:relative;overflow:hidden}
+.welcome-banner::after{content:'';position:absolute;right:-30px;top:-30px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.07)}
+.welcome-banner::before{content:'';position:absolute;right:60px;bottom:-40px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.05)}
+.wb-greeting{font-size:18px;font-weight:700;margin-bottom:4px}
+.wb-sub{font-size:12px;opacity:.8;margin-bottom:16px}
+.wb-chips{display:flex;gap:8px;flex-wrap:wrap}
+.wb-chip{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:500;display:flex;align-items:center;gap:5px;backdrop-filter:blur(4px)}
+
+/* STAT CARD */
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
+.s-green::after{background:var(--green)}
+.s-red::after{background:var(--red)}
+.s-amber::after{background:var(--amber)}
+.s-blue::after{background:var(--blue)}
+.stat-label{font-size:10px;color:var(--text-muted);margin-bottom:5px;display:flex;align-items:center;gap:5px;font-weight:500}
+.stat-val{font-size:26px;font-weight:700;line-height:1}
+.stat-sub{font-size:10px;color:var(--text-dim);margin-top:4px}
+.v-green{color:var(--green)}.v-red{color:var(--red)}.v-amber{color:var(--amber)}.v-blue{color:var(--blue)}
+
+/* CARD */
+.dg-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+.card-title{font-size:12px;font-weight:700;color:var(--text-secondary);display:flex;align-items:center;gap:6px}
+.card-title i{font-size:14px;color:var(--blue)}
+.card-link{font-size:10px;color:var(--blue);cursor:pointer;text-decoration:none;font-weight:600}
+
+/* DOC ROW */
+.doc-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)}
+.doc-row:last-child{border-bottom:none}
+.doc-icon{width:28px;height:28px;border-radius:7px;background:var(--bg-hover);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:12px;flex-shrink:0}
+.doc-name{font-size:11px;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.doc-cat{font-size:9px;color:var(--text-dim)}
+
+/* PILL */
+.pill{font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;font-family:'DM Mono',monospace}
+.pill-exp{background:#fee2e2;color:var(--red)}
+.pill-warn{background:#fef3c7;color:var(--amber)}
+.pill-ok{background:#dcfce7;color:var(--green)}
+
+/* QUICK ACTION */
+.qa-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px 8px;cursor:pointer;text-decoration:none;transition:all .2s;flex:1;box-shadow:var(--shadow)}
+.qa-btn:hover{border-color:var(--blue);background:#eff6ff;transform:translateY(-2px)}
+.qa-btn i{font-size:20px}
+.qa-label{font-size:9px;color:var(--text-secondary);text-align:center;line-height:1.4;font-weight:500}
+
+/* LIVE */
+.live-badge{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--green);font-family:'DM Mono',monospace;font-weight:600}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:32px 16px;color:var(--text-dim)}
+.empty-state i{font-size:32px;margin-bottom:8px;display:block}
+.empty-state p{font-size:11px;margin:0}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="brand">
+    <div class="brand-icon"><i class="ti ti-shield-check"></i></div>
+    <div><div class="brand-name">DocuGuard</div><div class="brand-sub">ERP System</div></div>
+  </div>
+  <div class="sb-section">Utama</div>
+  <a href="{% url 'dashboard_utama' %}" class="sb-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+  <a href="{% url 'monitoring' %}" class="sb-item"><i class="ti ti-activity"></i>Monitoring</a>
+  <a href="{% url 'log_aktivitas' %}" class="sb-item"><i class="ti ti-list-details"></i>Log Aktivitas</a>
+  <div class="sb-section">Manajemen</div>
+  <a href="{% url 'pengguna' %}" class="sb-item"><i class="ti ti-users"></i>Pengguna</a>
+  <a href="{% url 'dashboard_hrd' %}" class="sb-item"><i class="ti ti-folder"></i>Dok. HRD</a>
+  <a href="{% url 'dashboard_staff' %}" class="sb-item active"><i class="ti ti-id"></i>Dok. Staff</a>
+  <a href="{% url 'doc_staff' %}" class="sb-item"><i class="ti ti-list"></i>Daftar Dok. Staff</a>
+  <a href="{% url 'kategori_list' %}" class="sb-item"><i class="ti ti-tags"></i>Kategori</a>
+  <div class="sb-section">Sistem</div>
+  <a href="{% url 'pengaturan' %}" class="sb-item"><i class="ti ti-settings"></i>Pengaturan</a>
+  <div class="sb-bottom">
+    <div class="sb-user">
+      <div class="sb-avatar">
+        {% if pegawai %}{{ pegawai.nama_lengkap|slice:":2"|upper }}{% else %}{{ request.user.username|slice:":2"|upper }}{% endif %}
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text-secondary);font-weight:500">
+          {% if pegawai %}{{ pegawai.nama_lengkap }}{% else %}{{ request.user.username }}{% endif %}
+        </div>
+        <div style="font-size:10px;color:var(--text-dim)">
+          {% if pegawai %}{{ pegawai.grup_pengguna }}{% else %}Staff{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <h1>Dashboard Staff</h1>
+      <p>Manajemen dokumen karyawan — DocuGuard ERP</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <div class="date-chip" id="clock">--:--:-- WIB</div>
+      {% if hampir_expired > 0 %}
+      <div class="notif-btn">
+        <i class="ti ti-bell"></i>
+        <div class="notif-badge">{{ hampir_expired }}</div>
+      </div>
+      {% else %}
+      <div class="notif-btn"><i class="ti ti-bell"></i></div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- Welcome Banner -->
+    <div class="welcome-banner">
+      <div class="wb-greeting">
+        Selamat datang, {% if pegawai %}{{ pegawai.nama_lengkap }}{% else %}{{ request.user.username }}{% endif %} 👋
+      </div>
+      <div class="wb-sub">
+        {% if is_admin %}Anda login sebagai Administrator — menampilkan seluruh dokumen staff.
+        {% else %}Anda login sebagai Staff — menampilkan dokumen milik Anda.{% endif %}
+      </div>
+      <div class="wb-chips">
+        <div class="wb-chip"><i class="ti ti-clock" style="font-size:11px"></i><span id="bannerClock">--:--</span> WIB</div>
+        <div class="wb-chip"><i class="ti ti-file-description" style="font-size:11px"></i>{{ total_dokumen }} Dokumen</div>
+        <div class="wb-chip"><i class="ti ti-shield-check" style="font-size:11px"></i>Sesi aktif</div>
+      </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="row g-2 mb-3">
+      <div class="col-3"><div class="stat-card s-blue">
+        <div class="stat-label"><i class="ti ti-files"></i>Total Dokumen</div>
+        <div class="stat-val v-blue">{{ total_dokumen }}</div>
+        <div class="stat-sub">Seluruh dokumen {% if is_admin %}staff{% else %}milik Anda{% endif %}</div>
+      </div></div>
+      <div class="col-3"><div class="stat-card s-green">
+        <div class="stat-label"><i class="ti ti-file-check"></i>Aktif</div>
+        <div class="stat-val v-green">{{ dokumen_aktif }}</div>
+        <div class="stat-sub">Dokumen masih berlaku</div>
+      </div></div>
+      <div class="col-3"><div class="stat-card s-amber">
+        <div class="stat-label"><i class="ti ti-alert-triangle"></i>Hampir Expired</div>
+        <div class="stat-val v-amber">{{ hampir_expired }}</div>
+        <div class="stat-sub">Dalam 14 hari ke depan</div>
+      </div></div>
+      <div class="col-3"><div class="stat-card s-red">
+        <div class="stat-label"><i class="ti ti-file-x"></i>Expired</div>
+        <div class="stat-val v-red">{{ dokumen_expired }}</div>
+        <div class="stat-sub">Perlu tindakan segera</div>
+      </div></div>
+    </div>
+
+    <!-- ROW: Notifikasi + Aksi Cepat -->
+    <div class="row g-3">
+
+      <!-- Notifikasi Dokumen Hampir Expired -->
+      <div class="col-8">
+        <div class="dg-card h-100">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="card-title"><i class="ti ti-bell-ringing"></i>Notifikasi Dokumen Mendekati Expired</div>
+            <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+          </div>
+
+          {% if notifikasi_expired %}
+            {% for dok in notifikasi_expired %}
+            {% with sisa=dok.hitung_sisa_hari %}
+            <div class="doc-row">
+              <div class="doc-icon"><i class="ti ti-id"></i></div>
+              <div style="flex:1;min-width:0">
+                <div class="doc-name">{{ dok.judul_dokumen }}</div>
+                <div class="doc-cat">
+                  {{ dok.jenis_dokumen }} · Berlaku s/d {{ dok.tanggal_kedaluwarsa|date:"d M Y" }}
+                  {% if is_admin %} · {{ dok.pemilik.nama_lengkap }}{% endif %}
+                </div>
+              </div>
+              {% if sisa <= 0 %}
+                <span class="pill pill-exp">EXPIRED</span>
+              {% else %}
+                <span class="pill pill-warn">{{ sisa }} hari</span>
+              {% endif %}
+              <a href="{% url 'doc_staff_detail' dok.pk %}"
+                 style="font-size:10px;color:var(--blue);text-decoration:none;font-weight:600;white-space:nowrap;margin-left:8px">
+                Detail →
+              </a>
+            </div>
+            {% endwith %}
+            {% endfor %}
+          {% else %}
+            <div class="empty-state">
+              <i class="ti ti-circle-check" style="color:var(--green)"></i>
+              <p>Semua dokumen Anda masih aman.<br>Tidak ada dokumen yang mendekati masa expired.</p>
+            </div>
+          {% endif %}
+
+          <a href="{% url 'doc_staff' %}"
+             style="display:block;text-align:center;margin-top:12px;font-size:10px;color:var(--blue);font-weight:600;text-decoration:none;padding:6px;background:#eff6ff;border-radius:7px">
+            Lihat semua dokumen →
+          </a>
+        </div>
+      </div>
+
+      <!-- Aksi Cepat -->
+      <div class="col-4 d-flex flex-column gap-3">
+        <div class="dg-card">
+          <div class="card-title mb-3"><i class="ti ti-bolt"></i>Aksi Cepat</div>
+          <div class="d-flex gap-2">
+            <a href="{% url 'doc_staff' %}" class="qa-btn">
+              <i class="ti ti-files" style="color:#60a5fa"></i>
+              <span class="qa-label">Daftar<br>Dokumen</span>
+            </a>
+            <a href="{% url 'dashboard_utama' %}" class="qa-btn">
+              <i class="ti ti-layout-dashboard" style="color:#4ade80"></i>
+              <span class="qa-label">Dashboard<br>Utama</span>
+            </a>
+            <a href="{% url 'pengaturan' %}" class="qa-btn">
+              <i class="ti ti-settings" style="color:#f87171"></i>
+              <span class="qa-label">Pengaturan<br>Akun</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Ringkasan Jenis Dokumen -->
+        <div class="dg-card" style="flex:1">
+          <div class="card-title mb-3"><i class="ti ti-chart-pie"></i>Jenis Dokumen</div>
+          {% for jenis, label in jenis_choices %}
+          {% endfor %}
+          <div style="font-size:11px;color:var(--text-muted)">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="ti ti-id-badge" style="color:var(--blue)"></i>
+              <span>KTP / SIM / Paspor</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="ti ti-certificate" style="color:var(--green)"></i>
+              <span>Sertifikat Kerja</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="ti ti-id" style="color:var(--amber)"></i>
+              <span>Kartu Identitas Karyawan</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <i class="ti ti-file-text" style="color:var(--text-muted)"></i>
+              <span>Surat Izin Kerja & Lainnya</span>
+            </div>
+          </div>
+          <a href="{% url 'doc_staff' %}"
+             style="display:block;text-align:center;margin-top:12px;font-size:10px;color:var(--blue);font-weight:600;text-decoration:none;padding:6px;background:#eff6ff;border-radius:7px">
+            Lihat semua →
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function tick(){
+  const now=new Date(),pad=n=>n.toString().padStart(2,'0');
+  const t=`${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} WIB`;
+  document.getElementById('clock').textContent=t;
+  const bc=document.getElementById('bannerClock');
+  if(bc) bc.textContent=`${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  setTimeout(tick,1000);
+})();
+</script>
+</body>
+</html>

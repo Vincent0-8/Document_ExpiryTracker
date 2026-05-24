@@ -32,6 +32,11 @@ urlpatterns = [
     # ── Placeholder untuk scope anggota lain ────────────────────────────────
     path('pengguna/',   views.pengguna,   name='pengguna'),
     path('doc_hrd/',    views.doc_hrd,    name='doc_hrd'),
-    path('doc_staff/',  views.doc_staff,  name='doc_staff'),
     path('pengaturan/', views.pengaturan, name='pengaturan'),
+
+    # ── Dokumen Staff (scope: Vincent) ───────────────────────────────────────
+    path('doc_staff/',
+         views.DokumenStaffListView.as_view(),   name='doc_staff'),
+    path('doc_staff/<int:pk>/',
+         views.DokumenStaffDetailView.as_view(), name='doc_staff_detail'),
 ]

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daftar Dokumen Staff — DocuGuard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-base:#f4f5f7;--bg-card:#ffffff;--bg-hover:#f0f2f5;
+  --border:#e4e7ec;--border-mid:#dde1e8;
+  --text-primary:#111827;--text-secondary:#374151;--text-muted:#6b7280;--text-dim:#9ca3af;
+  --blue:#2563eb;--green:#16a34a;--red:#dc2626;--amber:#d97706;
+  --shadow:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 12px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg-base);color:var(--text-primary);font-size:13px;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:210px;min-height:100vh;background:var(--bg-card);border-right:1px solid var(--border);position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;box-shadow:2px 0 8px rgba(0,0,0,.04)}
+.brand{display:flex;align-items:center;gap:10px;padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.brand-icon{width:32px;height:32px;border-radius:8px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;box-shadow:0 2px 8px rgba(37,99,235,.3)}
+.brand-name{font-size:13px;font-weight:700;color:var(--text-primary)}
+.brand-sub{font-size:10px;color:var(--text-muted);margin-top:1px}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);padding:14px 16px 5px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 16px;color:var(--text-muted);border-left:2px solid transparent;text-decoration:none;font-size:12px;font-weight:500;transition:all .15s}
+.sb-item:hover{color:var(--text-secondary);background:var(--bg-hover)}
+.sb-item.active{color:var(--blue);background:#eff6ff;border-left-color:var(--blue)}
+.sb-item i{font-size:15px;width:16px}
+.sb-bottom{margin-top:auto;border-top:1px solid var(--border)}
+.sb-user{display:flex;align-items:center;gap:9px;padding:12px 14px}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:#fef3c7;color:var(--amber);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+
+/* MAIN */
+.main{margin-left:210px;display:flex;flex-direction:column;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--bg-card);position:sticky;top:0;z-index:50;box-shadow:var(--shadow)}
+.topbar h1{font-size:15px;font-weight:700;color:var(--text-primary);margin:0}
+.topbar p{font-size:11px;color:var(--text-muted);margin:2px 0 0}
+.date-chip{font-size:10px;color:var(--text-muted);background:var(--bg-hover);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-family:'DM Mono',monospace}
+.body{padding:24px;flex:1}
+
+/* FILTER BAR */
+.filter-bar{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;min-width:200px}
+.search-wrap i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:14px}
+.search-input{width:100%;padding:7px 10px 7px 32px;border:1px solid var(--border);border-radius:7px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg-hover);color:var(--text-primary);outline:none;transition:border .15s}
+.search-input:focus{border-color:var(--blue);background:#fff}
+.filter-select{padding:7px 12px;border:1px solid var(--border);border-radius:7px;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg-hover);color:var(--text-primary);outline:none;cursor:pointer}
+.filter-select:focus{border-color:var(--blue)}
+.btn-filter{padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;border:none;cursor:pointer;transition:all .15s}
+.btn-primary-sm{background:var(--blue);color:#fff}
+.btn-primary-sm:hover{background:#1d4ed8}
+.btn-reset{background:var(--bg-hover);color:var(--text-muted);border:1px solid var(--border)}
+.btn-reset:hover{background:var(--border)}
+
+/* TABLE */
+.dg-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:0;box-shadow:var(--shadow);overflow:hidden}
+.tbl-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--bg-hover)}
+.tbl-title{font-size:12px;font-weight:700;color:var(--text-secondary);display:flex;align-items:center;gap:6px}
+.tbl-title i{font-size:14px;color:var(--blue)}
+.tbl-count{font-size:10px;color:var(--text-dim);font-family:'DM Mono',monospace}
+table{width:100%;border-collapse:collapse}
+thead th{font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;padding:10px 16px;background:var(--bg-hover);border-bottom:1px solid var(--border);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--bg-hover)}
+tbody td{padding:11px 16px;vertical-align:middle}
+.td-ref{font-size:10px;color:var(--text-dim);font-family:'DM Mono',monospace;white-space:nowrap}
+.td-name{font-size:12px;font-weight:500;color:var(--text-primary)}
+.td-sub{font-size:10px;color:var(--text-muted);margin-top:1px}
+.td-date{font-size:11px;color:var(--text-secondary);font-family:'DM Mono',monospace;white-space:nowrap}
+
+/* PILL / BADGE */
+.pill{font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;font-family:'DM Mono',monospace;display:inline-block}
+.pill-ok{background:#dcfce7;color:var(--green)}
+.pill-warn{background:#fef3c7;color:var(--amber)}
+.pill-exp{background:#fee2e2;color:var(--red)}
+
+/* SISA HARI CHIP */
+.sisa-chip{font-size:10px;font-family:'DM Mono',monospace;padding:2px 8px;border-radius:5px;font-weight:600;display:inline-block}
+.sisa-ok{background:#dcfce7;color:var(--green)}
+.sisa-warn{background:#fef3c7;color:var(--amber)}
+.sisa-exp{background:#fee2e2;color:var(--red)}
+
+/* ACTION BUTTON */
+.btn-detail{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;color:var(--blue);background:#eff6ff;border:1px solid #bfdbfe;text-decoration:none;transition:all .15s}
+.btn-detail:hover{background:#dbeafe;color:#1d4ed8}
+.btn-back{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;color:var(--text-muted);background:var(--bg-hover);border:1px solid var(--border);text-decoration:none;transition:all .15s}
+.btn-back:hover{color:var(--text-secondary);border-color:var(--border-mid)}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:48px 16px;color:var(--text-dim)}
+.empty-state i{font-size:40px;margin-bottom:10px;display:block}
+.empty-state h3{font-size:14px;color:var(--text-muted);font-weight:600;margin-bottom:4px}
+.empty-state p{font-size:11px;margin:0}
+
+/* PAGINATION */
+.paging-wrap{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--border)}
+.paging-info{font-size:10px;color:var(--text-dim);font-family:'DM Mono',monospace}
+.paging-links{display:flex;gap:4px}
+.pg-btn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:500;color:var(--text-muted);background:var(--bg-hover);border:1px solid var(--border);text-decoration:none;transition:all .15s}
+.pg-btn:hover{color:var(--blue);border-color:var(--blue)}
+.pg-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="brand">
+    <div class="brand-icon"><i class="ti ti-shield-check"></i></div>
+    <div><div class="brand-name">DocuGuard</div><div class="brand-sub">ERP System</div></div>
+  </div>
+  <div class="sb-section">Utama</div>
+  <a href="{% url 'dashboard_utama' %}" class="sb-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+  <a href="{% url 'monitoring' %}" class="sb-item"><i class="ti ti-activity"></i>Monitoring</a>
+  <a href="{% url 'log_aktivitas' %}" class="sb-item"><i class="ti ti-list-details"></i>Log Aktivitas</a>
+  <div class="sb-section">Manajemen</div>
+  <a href="{% url 'pengguna' %}" class="sb-item"><i class="ti ti-users"></i>Pengguna</a>
+  <a href="{% url 'dashboard_hrd' %}" class="sb-item"><i class="ti ti-folder"></i>Dok. HRD</a>
+  <a href="{% url 'dashboard_staff' %}" class="sb-item"><i class="ti ti-id"></i>Dok. Staff</a>
+  <a href="{% url 'doc_staff' %}" class="sb-item active"><i class="ti ti-list"></i>Daftar Dok. Staff</a>
+  <a href="{% url 'kategori_list' %}" class="sb-item"><i class="ti ti-tags"></i>Kategori</a>
+  <div class="sb-section">Sistem</div>
+  <a href="{% url 'pengaturan' %}" class="sb-item"><i class="ti ti-settings"></i>Pengaturan</a>
+  <div class="sb-bottom">
+    <div class="sb-user">
+      <div class="sb-avatar">
+        {% if request.user.pegawai %}{{ request.user.pegawai.nama_lengkap|slice:":2"|upper }}{% else %}{{ request.user.username|slice:":2"|upper }}{% endif %}
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text-secondary);font-weight:500">
+          {% if request.user.pegawai %}{{ request.user.pegawai.nama_lengkap }}{% else %}{{ request.user.username }}{% endif %}
+        </div>
+        <div style="font-size:10px;color:var(--text-dim)">
+          {% if request.user.pegawai %}{{ request.user.pegawai.grup_pengguna }}{% else %}Staff{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <h1>Daftar Dokumen Staff</h1>
+      <p>Kelola dan pantau seluruh dokumen karyawan</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <a href="{% url 'dashboard_staff' %}" class="btn-back"><i class="ti ti-arrow-left"></i>Dashboard</a>
+      <div class="date-chip" id="clock">--:--:-- WIB</div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- FILTER BAR -->
+    <form method="get" class="filter-bar">
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input type="text" name="q" class="search-input" placeholder="Cari judul atau nomor referensi..." value="{{ q }}">
+      </div>
+      <select name="jenis" class="filter-select">
+        <option value="">Semua Jenis</option>
+        {% for val, label in jenis_choices %}
+        <option value="{{ val }}" {% if jenis_filter == val %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn-filter btn-primary-sm"><i class="ti ti-filter" style="margin-right:4px"></i>Filter</button>
+      <a href="{% url 'doc_staff' %}" class="btn-filter btn-reset">Reset</a>
+    </form>
+
+    <!-- TABLE -->
+    <div class="dg-card">
+      <div class="tbl-header">
+        <div class="tbl-title"><i class="ti ti-files"></i>Dokumen Staff</div>
+        <div class="tbl-count">
+          {% if page_obj %}{{ page_obj.paginator.count }}{% else %}{{ dokumens|length }}{% endif %} dokumen ditemukan
+        </div>
+      </div>
+
+      {% if dokumens %}
+      <table>
+        <thead>
+          <tr>
+            <th>No. Referensi</th>
+            <th>Judul Dokumen</th>
+            <th>Jenis</th>
+            {% if request.user.is_superuser or request.user.pegawai.grup_pengguna == 'Admin' %}<th>Pemilik</th>{% endif %}
+            <th>Berlaku s/d</th>
+            <th>Sisa Hari</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for dok in dokumens %}
+          {% with sisa=dok.hitung_sisa_hari %}
+          <tr>
+            <td><span class="td-ref">{{ dok.nomor_referensi }}</span></td>
+            <td>
+              <div class="td-name">{{ dok.judul_dokumen }}</div>
+              {% if dok.kategori %}<div class="td-sub">{{ dok.kategori.nama_kategori }}</div>{% endif %}
+            </td>
+            <td>
+              <span class="pill pill-ok" style="background:#eff6ff;color:var(--blue)">{{ dok.jenis_dokumen }}</span>
+            </td>
+            {% if request.user.is_superuser or request.user.pegawai.grup_pengguna == 'Admin' %}
+            <td><span class="td-date">{{ dok.pemilik.nama_lengkap }}</span></td>
+            {% endif %}
+            <td><span class="td-date">{{ dok.tanggal_kedaluwarsa|date:"d M Y" }}</span></td>
+            <td>
+              {% if sisa <= 0 %}
+                <span class="sisa-chip sisa-exp">Expired</span>
+              {% elif sisa <= 14 %}
+                <span class="sisa-chip sisa-warn">{{ sisa }} hari</span>
+              {% else %}
+                <span class="sisa-chip sisa-ok">{{ sisa }} hari</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if dok.status_dokumen == 'Aktif' %}
+                <span class="pill pill-ok">AKTIF</span>
+              {% elif dok.status_dokumen == 'Kedaluwarsa' %}
+                <span class="pill pill-exp">EXPIRED</span>
+              {% else %}
+                <span class="pill" style="background:var(--bg-hover);color:var(--text-muted)">{{ dok.status_dokumen }}</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'doc_staff_detail' dok.pk %}" class="btn-detail">
+                <i class="ti ti-eye"></i>Detail
+              </a>
+            </td>
+          </tr>
+          {% endwith %}
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <!-- PAGINATION -->
+      {% if is_paginated %}
+      <div class="paging-wrap">
+        <div class="paging-info">
+          Halaman {{ page_obj.number }} dari {{ page_obj.paginator.num_pages }}
+        </div>
+        <div class="paging-links">
+          {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if jenis_filter %}&jenis={{ jenis_filter }}{% endif %}" class="pg-btn">← Sebelumnya</a>
+          {% endif %}
+          {% for num in page_obj.paginator.page_range %}
+          <a href="?page={{ num }}{% if q %}&q={{ q }}{% endif %}{% if jenis_filter %}&jenis={{ jenis_filter }}{% endif %}"
+             class="pg-btn {% if num == page_obj.number %}active{% endif %}">{{ num }}</a>
+          {% endfor %}
+          {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if jenis_filter %}&jenis={{ jenis_filter }}{% endif %}" class="pg-btn">Berikutnya →</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% else %}
+      <div class="empty-state">
+        <i class="ti ti-file-off"></i>
+        <h3>Tidak ada dokumen ditemukan</h3>
+        <p>
+          {% if q or jenis_filter %}
+            Tidak ada hasil untuk filter yang dipilih. Coba ubah kata kunci pencarian.
+          {% else %}
+            Belum ada dokumen staff yang tersimpan di sistem.
+          {% endif %}
+        </p>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function tick(){
+  const now=new Date(),pad=n=>n.toString().padStart(2,'0');
+  document.getElementById('clock').textContent=`${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} WIB`;
+  setTimeout(tick,1000);
+})();
+</script>
+</body>
+</html>

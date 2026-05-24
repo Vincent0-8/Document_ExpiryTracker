@@ -1,10 +1,12 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.utils import timezone
-from .models import LogAktivitas, Kategori, DokumenHRD, DokumenStaff
+from django.db.models import Q
+from django.http import Http404
+from .models import LogAktivitas, Kategori, DokumenHRD, DokumenStaff, Pegawai
 
 
 # ─── HELPER: catat log otomatis ──────────────────────────────────────────────
@@ -102,7 +104,40 @@ def dashboard_hrd(request):
 
 @login_required
 def dashboard_staff(request):
-    return render(request, 'core/dashboard_staff.html')
+    hari_ini         = timezone.now().date()
+    batas_peringatan = hari_ini + timezone.timedelta(days=14)
+
+    try:
+        pegawai  = request.user.pegawai
+        is_admin = pegawai.grup_pengguna == 'Admin'
+    except Exception:
+        pegawai  = None
+        is_admin = request.user.is_superuser
+
+    if is_admin:
+        qs = DokumenStaff.objects.all()
+    elif pegawai:
+        qs = DokumenStaff.objects.filter(pemilik=pegawai)
+    else:
+        qs = DokumenStaff.objects.none()
+
+    context = {
+        'total_dokumen'     : qs.count(),
+        'dokumen_aktif'     : qs.filter(status_dokumen='Aktif').count(),
+        'dokumen_expired'   : qs.filter(status_dokumen='Kedaluwarsa').count(),
+        'hampir_expired'    : qs.filter(
+            status_dokumen='Aktif',
+            tanggal_kedaluwarsa__lte=batas_peringatan,
+            tanggal_kedaluwarsa__gte=hari_ini,
+        ).count(),
+        'notifikasi_expired': qs.filter(
+            status_dokumen='Aktif',
+            tanggal_kedaluwarsa__lte=batas_peringatan,
+        ).order_by('tanggal_kedaluwarsa')[:5],
+        'pegawai'           : pegawai,
+        'is_admin'          : is_admin,
+    }
+    return render(request, 'core/dashboard_staff.html', context)
 
 
 def pengguna(request):
@@ -111,11 +146,81 @@ def pengguna(request):
 def doc_hrd(request):
     return render(request, 'core/doc_hrd.html')
 
-def doc_staff(request):
-    return render(request, 'core/doc_staff.html')
-
 def pengaturan(request):
     return render(request, 'core/pengaturan.html')
+
+
+# ─── DOKUMEN STAFF (scope: Vincent) ─────────────────────────────────────────
+class DokumenStaffListView(LoginRequiredMixin, ListView):
+    model               = DokumenStaff
+    template_name       = 'core/dokumen_staff_list.html'
+    context_object_name = 'dokumens'
+    paginate_by         = 10
+
+    def get_queryset(self):
+        try:
+            pegawai  = self.request.user.pegawai
+            is_admin = pegawai.grup_pengguna == 'Admin'
+        except Exception:
+            pegawai  = None
+            is_admin = self.request.user.is_superuser
+
+        if is_admin:
+            qs = DokumenStaff.objects.all()
+        elif pegawai:
+            qs = DokumenStaff.objects.filter(pemilik=pegawai)
+        else:
+            qs = DokumenStaff.objects.none()
+
+        q = self.request.GET.get('q', '').strip()
+        if q:
+            qs = qs.filter(
+                Q(judul_dokumen__icontains=q) |
+                Q(nomor_referensi__icontains=q)
+            )
+
+        jenis = self.request.GET.get('jenis', '').strip()
+        if jenis:
+            qs = qs.filter(jenis_dokumen=jenis)
+
+        return qs.order_by('tanggal_kedaluwarsa')
+
+    def get_context_data(self, **kwargs):
+        ctx          = super().get_context_data(**kwargs)
+        hari_ini     = timezone.now().date()
+        ctx['hari_ini']    = hari_ini
+        ctx['batas_warn']  = hari_ini + timezone.timedelta(days=14)
+        ctx['q']           = self.request.GET.get('q', '')
+        ctx['jenis_filter']= self.request.GET.get('jenis', '')
+        ctx['jenis_choices']= DokumenStaff.JENIS_CHOICES
+        return ctx
+
+
+class DokumenStaffDetailView(LoginRequiredMixin, DetailView):
+    model               = DokumenStaff
+    template_name       = 'core/dokumen_staff_detail.html'
+    context_object_name = 'dokumen'
+
+    def get_object(self, queryset=None):
+        obj = get_object_or_404(DokumenStaff, pk=self.kwargs['pk'])
+
+        try:
+            pegawai  = self.request.user.pegawai
+            is_admin = pegawai.grup_pengguna == 'Admin'
+        except Exception:
+            pegawai  = None
+            is_admin = self.request.user.is_superuser
+
+        if not is_admin and obj.pemilik != pegawai:
+            raise Http404("Dokumen tidak ditemukan atau Anda tidak memiliki akses.")
+
+        return obj
+
+    def get_context_data(self, **kwargs):
+        ctx          = super().get_context_data(**kwargs)
+        ctx['hari_ini']   = timezone.now().date()
+        ctx['sisa_hari']  = self.object.hitung_sisa_hari()
+        return ctx
 
 
 # ─── KATEGORI (scope: Arsat) ─────────────────────────────────────────────────
