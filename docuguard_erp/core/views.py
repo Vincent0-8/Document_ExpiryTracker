@@ -1,14 +1,37 @@
-# Create your views here.
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
-from .models import LogAktivitas, Kategori
+from django.utils import timezone
+from .models import LogAktivitas, Kategori, DokumenHRD, DokumenStaff
 
 
-# ─── Mixin: hanya Admin yang boleh akses ────────────────────────────────────
+# ─── HELPER: catat log otomatis ──────────────────────────────────────────────
+def catat_log(request, jenis_aksi, referensi='', keterangan=''):
+    """
+    Panggil fungsi ini setiap ada aksi penting.
+    Contoh: catat_log(request, 'Tambah Dokumen', 'HRD-001', 'Tambah kontrak Julianto')
+    """
+    try:
+        pegawai = request.user.pegawai
+        nama    = pegawai.nama_lengkap
+    except Exception:
+        pegawai = None
+        nama    = request.user.username
+
+    LogAktivitas.objects.create(
+        pegawai           = pegawai,
+        nama_pegawai      = nama,
+        jenis_aksi        = jenis_aksi,
+        referensi_dokumen = referensi,
+        keterangan        = keterangan,
+    )
+
+
+# ─── MIXIN: hanya Admin ──────────────────────────────────────────────────────
 class AdminOnlyMixin(LoginRequiredMixin, UserPassesTestMixin):
-    """Hanya user dengan grup_pengguna='Admin' yang bisa akses view ini."""
+    """Hanya user dengan grup_pengguna='Admin' yang bisa akses."""
 
     def test_func(self):
         try:
@@ -19,8 +42,10 @@ class AdminOnlyMixin(LoginRequiredMixin, UserPassesTestMixin):
     def handle_no_permission(self):
         return redirect('dashboard_utama')
 
+
+# ─── MIXIN: Admin atau HRD ───────────────────────────────────────────────────
 class AdminOrHRDMixin(LoginRequiredMixin, UserPassesTestMixin):
-    """Hanya Admin dan HRD yang bisa akses."""
+    """Hanya Admin dan HRD yang bisa akses. Dipakai oleh Jacky (DokumenHRD)."""
 
     def test_func(self):
         try:
@@ -30,22 +55,55 @@ class AdminOrHRDMixin(LoginRequiredMixin, UserPassesTestMixin):
 
     def handle_no_permission(self):
         return redirect('dashboard_utama')
-    
-# ─── Dashboard views ─────────────────────────────────────────────────────────
-def dashboard_admin(request):
-    return render(request, 'core/dashboard_admin.html')
 
-def monitoring(request):
-    return render(request, 'core/monitoring.html')
 
+# ─── DASHBOARD (scope: Damai) ─────────────────────────────────────────────────
+@login_required
 def dashboard_utama(request):
     return render(request, 'core/dashboard_utama.html')
 
+
+@login_required
+def dashboard_admin(request):
+    hari_ini = timezone.now().date()
+    context  = {
+        'hrd_aktif'      : DokumenHRD.objects.filter(status_dokumen='Aktif').count(),
+        'hrd_expired'    : DokumenHRD.objects.filter(status_dokumen='Kedaluwarsa').count(),
+        'hrd_mau_expired': DokumenHRD.objects.filter(
+            status_dokumen='Aktif',
+            tanggal_kedaluwarsa__lte=hari_ini + timezone.timedelta(days=30)
+        ).count(),
+        'staff_aktif'    : DokumenStaff.objects.filter(status_dokumen='Aktif').count(),
+        'staff_expired'  : DokumenStaff.objects.filter(status_dokumen='Kedaluwarsa').count(),
+        'log_terbaru'    : LogAktivitas.objects.all()[:5],
+    }
+    return render(request, 'core/dashboard_admin.html', context)
+
+
+@login_required
+def monitoring(request):
+    hari_ini = timezone.now().date()
+    batas    = hari_ini + timezone.timedelta(days=30)
+    context  = {
+        'dokumen_hrd_expired'    : DokumenHRD.objects.filter(
+            tanggal_kedaluwarsa__lt=hari_ini),
+        'dokumen_hrd_mau_expired': DokumenHRD.objects.filter(
+            tanggal_kedaluwarsa__range=(hari_ini, batas)),
+        'dokumen_staff_expired'  : DokumenStaff.objects.filter(
+            tanggal_kedaluwarsa__lt=hari_ini),
+    }
+    return render(request, 'core/monitoring.html', context)
+
+
+@login_required
 def dashboard_hrd(request):
     return render(request, 'core/dashboard_hrd.html')
 
+
+@login_required
 def dashboard_staff(request):
     return render(request, 'core/dashboard_staff.html')
+
 
 def pengguna(request):
     return render(request, 'core/pengguna.html')
@@ -60,87 +118,88 @@ def pengaturan(request):
     return render(request, 'core/pengaturan.html')
 
 
-# ─── CRUD Kategori (CBV — scope Arsat) ───────────────────────────────────────
+# ─── KATEGORI (scope: Arsat) ─────────────────────────────────────────────────
 class KategoriListView(AdminOnlyMixin, ListView):
-    model = Kategori
-    template_name = 'core/kategori_list.html'
-    context_object_name = 'kategoris'
-    ordering = ['nama_kategori']
+    model                = Kategori
+    template_name        = 'core/kategori_list.html'
+    context_object_name  = 'kategoris'
+    ordering             = ['nama_kategori']
 
 
 class KategoriDetailView(AdminOnlyMixin, DetailView):
-    model = Kategori
-    template_name = 'core/kategori_detail.html'
+    model               = Kategori
+    template_name       = 'core/kategori_detail.html'
     context_object_name = 'kategori'
 
 
 class KategoriCreateView(AdminOnlyMixin, CreateView):
-    model = Kategori
-    fields = ['kode_kategori', 'nama_kategori', 'level_urgensi', 'deskripsi']
+    model         = Kategori
+    fields        = ['kode_kategori', 'nama_kategori', 'level_urgensi', 'deskripsi']
     template_name = 'core/kategori_form.html'
-    success_url = reverse_lazy('kategori_list')
+    success_url   = reverse_lazy('kategori_list')
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['judul'] = 'Tambah Kategori'
+        ctx['judul']  = 'Tambah Kategori'
         ctx['tombol'] = 'Simpan'
         return ctx
 
     def form_valid(self, form):
-        # kode_kategori otomatis jadi huruf kapital semua
+        # kode_kategori otomatis jadi huruf kapital
         form.instance.kode_kategori = form.instance.kode_kategori.upper()
         return super().form_valid(form)
 
+
 class KategoriUpdateView(AdminOnlyMixin, UpdateView):
-    model = Kategori
-    fields = ['kode_kategori', 'nama_kategori', 'level_urgensi', 'deskripsi']
+    model         = Kategori
+    fields        = ['kode_kategori', 'nama_kategori', 'level_urgensi', 'deskripsi']
     template_name = 'core/kategori_form.html'
-    success_url = reverse_lazy('kategori_list')
+    success_url   = reverse_lazy('kategori_list')
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['judul'] = 'Edit Kategori'
+        ctx['judul']  = 'Edit Kategori'
         ctx['tombol'] = 'Update'
         return ctx
 
     def form_valid(self, form):
         form.instance.kode_kategori = form.instance.kode_kategori.upper()
         return super().form_valid(form)
-    
+
+
 class KategoriDeleteView(AdminOnlyMixin, DeleteView):
-    model = Kategori
+    model         = Kategori
     template_name = 'core/kategori_confirm_delete.html'
-    success_url = reverse_lazy('kategori_list')
+    success_url   = reverse_lazy('kategori_list')
 
 
-# ─── Log Aktivitas (CBV — scope Damai, diperbaiki Arsat) ────────────────────
+# ─── LOG AKTIVITAS (scope: Damai) ────────────────────────────────────────────
 class LogAktivitasListView(AdminOnlyMixin, ListView):
-    model = LogAktivitas
-    template_name = 'core/log_aktivitas.html'
+    model               = LogAktivitas
+    template_name       = 'core/log_aktivitas.html'
     context_object_name = 'logs'
-    ordering = ['-waktu_catatan']
-    paginate_by = 20
+    ordering            = ['-waktu_catatan']
+    paginate_by         = 20
 
 
 class DetailAktivitasView(AdminOnlyMixin, DetailView):
-    model = LogAktivitas
-    template_name = 'core/detail_aktivitas.html'
+    model               = LogAktivitas
+    template_name       = 'core/detail_aktivitas.html'
     context_object_name = 'log'
-    pk_url_kwarg = 'pk'
+    pk_url_kwarg        = 'pk'
 
 
 class RiwayatUserListView(AdminOnlyMixin, ListView):
-    model = LogAktivitas
-    template_name = 'core/riwayat_user.html'
+    model               = LogAktivitas
+    template_name       = 'core/riwayat_user.html'
     context_object_name = 'riwayat'
-    ordering = ['-waktu_catatan']
-    paginate_by = 20
+    paginate_by         = 20
 
     def get_queryset(self):
-        # filter berdasarkan nama pegawai dari query param
-        # contoh URL: /log_aktivitas/riwayat/?nama=Julianto
+        # Filter by nama_pegawai dari query param
+        # Contoh URL: /log_aktivitas/riwayat/?nama=Julianto
         nama = self.request.GET.get('nama')
-        qs = LogAktivitas.objects.all().order_by('-waktu_catatan')
+        qs   = LogAktivitas.objects.all().order_by('-waktu_catatan')
         if nama:
             qs = qs.filter(nama_pegawai__icontains=nama)
         return qs

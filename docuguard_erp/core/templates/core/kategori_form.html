@@ -515,21 +515,23 @@
                         <!-- Level Urgensi -->
                         <div class="mb-3">
                             <div class="field-label">Level Urgensi <span style="color:var(--red)">*</span></div>
+                            {% if object %}
+                            {% endif %}
                             <div class="urgency-group">
                                 <input type="radio" name="level_urgensi" id="u-tinggi" value="Tinggi"
-                                    class="urgency-opt" {% if form.level_urgensi.value=='Tinggi' %}checked{% endif %}>
+                                    class="urgency-opt" {% if form.level_urgensi.value == 'Tinggi' %}checked{% endif %}>
                                 <label for="u-tinggi" class="urgency-label tinggi">
                                     <i class="ti ti-flame"></i> Tinggi
                                 </label>
 
                                 <input type="radio" name="level_urgensi" id="u-sedang" value="Sedang"
-                                    class="urgency-opt" {% if form.level_urgensi.value=='Sedang' %}checked{% endif %}>
+                                    class="urgency-opt" {% if form.level_urgensi.value == 'Sedang' %}checked{% endif %}>
                                 <label for="u-sedang" class="urgency-label sedang">
                                     <i class="ti ti-alert-triangle"></i> Sedang
                                 </label>
 
                                 <input type="radio" name="level_urgensi" id="u-rendah" value="Rendah"
-                                    class="urgency-opt" {% if form.level_urgensi.value=='Rendah' %}checked{% endif %}>
+                                    class="urgency-opt" {% if form.level_urgensi.value == 'Rendah' %}checked{% endif %}>
                                 <label for="u-rendah" class="urgency-label rendah">
                                     <i class="ti ti-circle-check"></i> Rendah
                                 </label>
