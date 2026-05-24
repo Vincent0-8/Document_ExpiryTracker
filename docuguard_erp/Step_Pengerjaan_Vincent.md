@@ -1,6 +1,7 @@
-# 📋 Step-by-Step Pengerjaan Jobdesk Vincent
+# Step-by-Step Pengerjaan Jobdesk Vincent
 
 ## Design System Yang Akan Dipakai (HARUS SAMA PERSIS)
+
 > Wajib konsisten dengan template teman-teman agar tidak kelihatan berbeda gaya.
 
 - **CSS Framework**: Bootstrap 5.3.3 (CDN)
@@ -16,9 +17,10 @@
 
 ---
 
-## 📌 FASE 1: Backend (Views & URLs)
+## FASE 1: Backend (Views & URLs)
 
 ### Step 1 — Update `views.py`
+
 **File:** `core/views.py`
 
 Tambahkan 2 view baru:
@@ -41,9 +43,11 @@ Tambahkan 2 view baru:
 ---
 
 ### Step 2 — Update `urls.py`
+
 **File:** `core/urls.py`
 
 Tambahkan 2 URL baru (menggantikan placeholder):
+
 ```python
 path('doc_staff/',         DokumenStaffListView.as_view(),   name='doc_staff'),
 path('doc_staff/<int:pk>/', DokumenStaffDetailView.as_view(), name='doc_staff_detail'),
@@ -51,14 +55,16 @@ path('doc_staff/<int:pk>/', DokumenStaffDetailView.as_view(), name='doc_staff_de
 
 ---
 
-## 📌 FASE 2: Frontend (Templates HTML)
+## FASE 2: Frontend (Templates HTML)
 
 Semua template menggunakan style yang SAMA PERSIS dengan `dashboard_utama.html` (sidebar, topbar, card, warna, font).
 
 ### Step 3 — Update `dashboard_staff.html`
+
 **File:** `core/templates/core/dashboard_staff.html`
 
 Halaman ini adalah **Dashboard khusus Staff/Karyawan**. Konten:
+
 - Welcome banner (nama user yang login)
 - 4 stat card: Total Dokumen, Aktif, Expired, Hampir Expired
 - Tabel notifikasi: dokumen yang akan expired dalam 14 hari
@@ -67,9 +73,11 @@ Halaman ini adalah **Dashboard khusus Staff/Karyawan**. Konten:
 ---
 
 ### Step 4 — Buat `dokumen_staff_list.html` (BARU)
+
 **File:** `core/templates/core/dokumen_staff_list.html`
 
 Halaman **Daftar Dokumen Staff**. Konten:
+
 - Search bar + dropdown filter jenis dokumen (KTP, SIM, Paspor, dll)
 - Tabel responsif: No. Referensi, Judul, Jenis, Berlaku s/d, Sisa Hari, Status, Aksi
 - Badge status berwarna: Hijau (Aktif), Oranye (< 14 hari), Merah (Expired)
@@ -78,9 +86,11 @@ Halaman **Daftar Dokumen Staff**. Konten:
 ---
 
 ### Step 5 — Buat `dokumen_staff_detail.html` (BARU)
+
 **File:** `core/templates/core/dokumen_staff_detail.html`
 
 Halaman **Detail Dokumen Staff**. Konten:
+
 - Kartu info lengkap: Nomor Referensi, Judul, Jenis, Kategori, Pemilik
 - Progress bar / countdown sisa hari masa berlaku
 - Tombol download file lampiran
@@ -88,39 +98,42 @@ Halaman **Detail Dokumen Staff**. Konten:
 
 ---
 
-## 📌 FASE 3: Data Dummy (Opsional, untuk Pengujian)
+## FASE 3: Data Dummy (Opsional, untuk Pengujian)
 
 ### Step 6 — Buat Management Command `seed_dummy_data.py` (BARU)
+
 **File:** `core/management/commands/seed_dummy_data.py`
 
 Command yang dijalankan dengan:
+
 ```bash
 python manage.py seed_dummy_data
 ```
 
 Akan membuat data dummy:
+
 - Kategori dokumen (KTP, SIM, Paspor, dll)
 - Dokumen Staff dengan variasi status (Aktif, Hampir Expired, Expired)
 - Semua dokumen dimiliki oleh user `vincent`
 
 ---
 
-## 📌 FASE 4: Pengujian (Wajib Dilakukan Sebelum Push)
+## FASE 4: Pengujian (Wajib Dilakukan Sebelum Push)
 
 ### Step 7 — Pengujian Manual
 
 Lakukan uji akses berikut di browser setelah semua kode selesai:
 
-| Pengujian | URL | Hasil yang Diharapkan |
-|---|---|---|
-| Dashboard Staff | `/dashboard_staff/` | Muncul stat card dan notifikasi dokumen |
-| Daftar Dokumen | `/doc_staff/` | Hanya muncul dokumen milik vincent |
-| Detail Dokumen | `/doc_staff/1/` | Muncul detail + sisa hari |
-| Keamanan URL | `/doc_staff/<id_orang_lain>/` | Redirect, tidak bisa diakses |
+| Pengujian       | URL                           | Hasil yang Diharapkan                   |
+| --------------- | ----------------------------- | --------------------------------------- |
+| Dashboard Staff | `/dashboard_staff/`           | Muncul stat card dan notifikasi dokumen |
+| Daftar Dokumen  | `/doc_staff/`                 | Hanya muncul dokumen milik vincent      |
+| Detail Dokumen  | `/doc_staff/1/`               | Muncul detail + sisa hari               |
+| Keamanan URL    | `/doc_staff/<id_orang_lain>/` | Redirect, tidak bisa diakses            |
 
 ---
 
-## 📌 FASE 5: Push ke GitHub
+## FASE 5: Push ke GitHub
 
 ### Step 8 — Commit & Push ke Branch vincent
 
@@ -137,7 +150,7 @@ Setelah push berhasil, **beritahu Arsat atau Damai** untuk melakukan Merge/Pull 
 
 ---
 
-## ✅ Ringkasan Urutan Eksekusi
+## Ringkasan Urutan Eksekusi
 
 ```
 Step 1 → Update views.py (backend logic)

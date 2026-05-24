@@ -157,12 +157,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg-base);color:
     <div class="d-flex align-items-center gap-2">
       <div class="date-chip" id="clock">--:--:-- WIB</div>
       {% if hampir_expired > 0 %}
-      <div class="notif-btn">
+      <a href="#notif-section" class="notif-btn" style="text-decoration: none;">
         <i class="ti ti-bell"></i>
         <div class="notif-badge">{{ hampir_expired }}</div>
-      </div>
+      </a>
       {% else %}
-      <div class="notif-btn"><i class="ti ti-bell"></i></div>
+      <a href="#notif-section" class="notif-btn" style="text-decoration: none;"><i class="ti ti-bell"></i></a>
       {% endif %}
     </div>
   </div>
@@ -213,7 +213,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg-base);color:
     <div class="row g-3">
 
       <!-- Notifikasi Dokumen Hampir Expired -->
-      <div class="col-8">
+      <div class="col-8" id="notif-section">
         <div class="dg-card h-100">
           <div class="d-flex align-items-center justify-content-between mb-2">
             <div class="card-title"><i class="ti ti-bell-ringing"></i>Notifikasi Dokumen Mendekati Expired</div>
