@@ -1,0 +1,56 @@
+{% extends 'authentication/base.html' %}
+
+{% block title %}Hapus Pengguna — DocuGuard ERP{% endblock %}
+{% block page_title %}Hapus Pengguna{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                    <strong>Konfirmasi Hapus Pengguna</strong>
+                </div>
+            </div>
+            <div class="card-body p-4 text-center">
+                <div class="mb-3">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center fw-bold text-white mb-3"
+                         style="width:64px;height:64px;font-size:1.5rem;
+                         background:{% if user_obj.role == 'admin' %}#dc2626{% elif user_obj.role == 'hrd' %}#7c3aed{% else %}#059669{% endif %};">
+                        {{ user_obj.first_name|first|upper|default:user_obj.username|first|upper }}
+                    </div>
+                    <h5 class="fw-bold mb-1">{{ user_obj.get_full_name|default:user_obj.username }}</h5>
+                    <p class="text-muted mb-0" style="font-size:0.875rem;">
+                        @{{ user_obj.username }} &bull;
+                        <span class="badge {% if user_obj.role == 'admin' %}badge-admin{% elif user_obj.role == 'hrd' %}badge-hrd{% else %}badge-staff{% endif %}">
+                            {{ user_obj.get_role_display }}
+                        </span>
+                    </p>
+                </div>
+
+                <div class="alert alert-danger py-2 text-start" style="font-size:0.85rem;">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>Perhatian!</strong> Tindakan ini tidak dapat dibatalkan. Seluruh data pengguna ini akan dihapus permanen dari sistem.
+                </div>
+
+                <p class="text-muted" style="font-size:0.875rem;">
+                    Apakah Anda yakin ingin menghapus pengguna <strong>{{ user_obj.username }}</strong>?
+                </p>
+
+                <div class="d-flex gap-2 justify-content-center mt-3">
+                    <a href="{% url 'authentication:user_list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>Batal
+                    </a>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash-fill me-2"></i>Ya, Hapus Pengguna
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

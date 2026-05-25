@@ -1,0 +1,115 @@
+{% extends 'authentication/base.html' %}
+
+{% block title %}{{ judul }} — DocuGuard ERP{% endblock %}
+{% block page_title %}{{ judul }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header d-flex align-items-center gap-2 py-3" style="background:#f9fafb;border-bottom:1px solid #e5e7eb;">
+                <div class="rounded d-flex align-items-center justify-content-center" style="width:34px;height:34px;background:#3b82f6;">
+                    <i class="bi bi-tag-fill text-white" style="font-size:.9rem;"></i>
+                </div>
+                <div>
+                    <div class="fw-semibold" style="font-size:.9rem;">{{ judul }}</div>
+                    <div class="text-muted" style="font-size:.75rem;">Isi semua field yang diperlukan</div>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Kode Kategori -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;">
+                            Kode Kategori <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" name="kode_kategori" id="kodeInput"
+                            class="form-control form-control-sm {% if form.kode_kategori.errors %}is-invalid{% endif %}"
+                            value="{{ form.kode_kategori.value|default:'' }}"
+                            placeholder="Contoh: KTR, BPJS, SERT"
+                            style="text-transform:uppercase;font-family:monospace;letter-spacing:.05em;">
+                        <div class="form-text text-muted" style="font-size:.75rem;">Kode unik 2–10 karakter, akan otomatis huruf kapital.</div>
+                        {% for err in form.kode_kategori.errors %}
+                        <div class="invalid-feedback">{{ err }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Nama Kategori -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;">
+                            Nama Kategori <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" name="nama_kategori"
+                            class="form-control form-control-sm {% if form.nama_kategori.errors %}is-invalid{% endif %}"
+                            value="{{ form.nama_kategori.value|default:'' }}"
+                            placeholder="Contoh: Dokumen Kontrak">
+                        {% for err in form.nama_kategori.errors %}
+                        <div class="invalid-feedback">{{ err }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Level Urgensi -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;">
+                            Level Urgensi <span class="text-danger">*</span>
+                        </label>
+                        <div class="d-flex gap-2 flex-wrap">
+                            {% for val, label in form.level_urgensi.field.choices %}
+                            <div>
+                                <input type="radio" class="btn-check" name="level_urgensi"
+                                    id="urgensi-{{ val|lower }}" value="{{ val }}"
+                                    {% if form.level_urgensi.value == val %}checked{% endif %}>
+                                <label class="btn btn-sm btn-outline-secondary" for="urgensi-{{ val|lower }}"
+                                    style="font-size:.8rem;font-weight:600;">
+                                    {% if val == 'Kritis' %}🔴{% elif val == 'Tinggi' %}🟡{% elif val == 'Sedang' %}🔵{% else %}🟢{% endif %}
+                                    {{ label }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% for err in form.level_urgensi.errors %}
+                        <div class="text-danger" style="font-size:.8rem;">{{ err }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Deskripsi -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;">
+                            Deskripsi
+                        </label>
+                        <textarea name="deskripsi" rows="3"
+                            class="form-control form-control-sm {% if form.deskripsi.errors %}is-invalid{% endif %}"
+                            placeholder="Deskripsi singkat kategori ini...">{{ form.deskripsi.value|default:'' }}</textarea>
+                        {% for err in form.deskripsi.errors %}
+                        <div class="invalid-feedback">{{ err }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Tombol -->
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary btn-sm px-4">
+                            <i class="bi bi-check-lg me-1"></i> {{ tombol }}
+                        </button>
+                        <a href="{% url 'kategori_list' %}" class="btn btn-outline-secondary btn-sm px-4">
+                            <i class="bi bi-arrow-left me-1"></i> Batal
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-uppercase kode kategori
+    document.getElementById('kodeInput').addEventListener('input', function () {
+        const pos = this.selectionStart;
+        this.value = this.value.toUpperCase();
+        this.setSelectionRange(pos, pos);
+    });
+</script>
+{% endblock %}

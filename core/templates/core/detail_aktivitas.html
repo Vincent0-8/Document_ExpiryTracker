@@ -1,0 +1,59 @@
+{% extends 'authentication/base.html' %}
+
+{% block title %}Detail Aktivitas — DocuGuard ERP{% endblock %}
+{% block page_title %}Detail Aktivitas{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header d-flex align-items-center gap-2 py-3"
+                style="background:#f9fafb;border-bottom:1px solid #e5e7eb;">
+                <div class="rounded d-flex align-items-center justify-content-center"
+                    style="width:34px;height:34px;background:#3b82f6;">
+                    <i class="bi bi-clock-history text-white" style="font-size:.9rem;"></i>
+                </div>
+                <div>
+                    <div class="fw-semibold" style="font-size:.9rem;">Log #{{ log.pk }}</div>
+                    <div class="text-muted" style="font-size:.75rem;">{{ log.waktu_catatan|date:"d M Y, H:i:s" }}</div>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted" style="font-size:.8rem;">Jenis Aksi</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-primary" style="font-size:.8rem;">{{ log.jenis_aksi }}</span>
+                    </dd>
+
+                    <dt class="col-sm-4 text-muted" style="font-size:.8rem;">Pengguna</dt>
+                    <dd class="col-sm-8 fw-semibold">{{ log.nama_pegawai }}</dd>
+
+                    <dt class="col-sm-4 text-muted" style="font-size:.8rem;">Referensi Dokumen</dt>
+                    <dd class="col-sm-8">
+                        {% if log.referensi_dokumen %}
+                        <code style="background:#f3f4f6;padding:2px 8px;border-radius:4px;font-size:.85rem;">
+                            {{ log.referensi_dokumen }}
+                        </code>
+                        {% else %}
+                        <span class="text-muted">—</span>
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-4 text-muted" style="font-size:.8rem;">Keterangan</dt>
+                    <dd class="col-sm-8" style="font-size:.9rem;">{{ log.keterangan|default:"—" }}</dd>
+
+                    <dt class="col-sm-4 text-muted" style="font-size:.8rem;">Waktu Catatan</dt>
+                    <dd class="col-sm-8 text-muted" style="font-size:.85rem;">
+                        {{ log.waktu_catatan|date:"d M Y, H:i:s" }}
+                    </dd>
+                </dl>
+            </div>
+            <div class="card-footer bg-transparent py-3" style="border-top:1px solid #e5e7eb;">
+                <a href="{% url 'log_aktivitas' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Kembali ke Log
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

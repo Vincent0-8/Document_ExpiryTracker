@@ -1,0 +1,212 @@
+{% extends 'authentication/base.html' %}
+
+{% block title %}Daftar Kategori — DocuGuard ERP{% endblock %}
+{% block page_title %}Manajemen Kategori{% endblock %}
+
+{% block extra_css %}
+<style>
+    .kode-chip {
+        font-family: 'Courier New', monospace;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 5px;
+        padding: 3px 8px;
+        color: #1d4ed8;
+    }
+    .pill {
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+        white-space: nowrap;
+    }
+    .pill-kritis  { background:#fee2e2; color:#dc2626; }
+    .pill-tinggi  { background:#fef3c7; color:#d97706; }
+    .pill-sedang  { background:#dbeafe; color:#1d4ed8; }
+    .pill-rendah  { background:#dcfce7; color:#16a34a; }
+    .action-btn {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 30px; height: 30px; border-radius: 7px;
+        border: 1px solid #e5e7eb; background: #fff;
+        color: #6b7280; text-decoration: none; transition: all .15s;
+    }
+    .action-btn:hover { border-color: #93c5fd; background: #eff6ff; color: #1d4ed8; }
+    .action-btn.del:hover { border-color: #fca5a5; background: #fef2f2; color: #dc2626; }
+    .search-input {
+        padding: 0.4rem 0.75rem 0.4rem 2rem;
+        border: 1px solid #e5e7eb; border-radius: 8px;
+        font-size: 0.85rem; outline: none; width: 220px;
+        transition: border-color .15s;
+    }
+    .search-input:focus { border-color: #3b82f6; box-shadow: none; }
+    .search-wrap { position: relative; }
+    .search-wrap i { position:absolute; left:8px; top:50%; transform:translateY(-50%); color:#9ca3af; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Total Kategori</div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#eff6ff;">
+                        <i class="bi bi-tag-fill text-primary"></i>
+                    </div>
+                </div>
+                <div class="fw-bold" style="font-size:2rem;">{{ kategoris|length }}</div>
+                <div class="text-muted" style="font-size:.75rem;">Semua kategori</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Urgensi Kritis</div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#fee2e2;">
+                        <i class="bi bi-exclamation-triangle-fill" style="color:#dc2626;"></i>
+                    </div>
+                </div>
+                <div class="fw-bold" style="font-size:2rem;color:#dc2626;">
+                    {% with count=0 %}
+                    {% for k in kategoris %}{% if k.level_urgensi == 'Kritis' %}{% with count=count|add:1 %}{% endwith %}{% endif %}{% endfor %}
+                    {{ kategoris|dictsort:"level_urgensi"|length }}
+                    {% endwith %}
+                </div>
+                <div class="text-muted" style="font-size:.75rem;">Level kritis</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Urgensi Tinggi</div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#fef3c7;">
+                        <i class="bi bi-exclamation-circle-fill" style="color:#d97706;"></i>
+                    </div>
+                </div>
+                <div class="fw-bold" style="font-size:2rem;color:#d97706;">—</div>
+                <div class="text-muted" style="font-size:.75rem;">Level tinggi</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Urgensi Rendah</div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#dcfce7;">
+                        <i class="bi bi-check-circle-fill" style="color:#16a34a;"></i>
+                    </div>
+                </div>
+                <div class="fw-bold" style="font-size:2rem;color:#16a34a;">—</div>
+                <div class="text-muted" style="font-size:.75rem;">Level rendah</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table Card -->
+<div class="card">
+    <div class="card-body p-0">
+        <!-- Toolbar -->
+        <div class="d-flex align-items-center justify-content-between p-3" style="border-bottom:1px solid #e5e7eb;background:#f9fafb;border-radius:12px 12px 0 0;">
+            <div class="d-flex align-items-center gap-2">
+                <div class="search-wrap">
+                    <i class="bi bi-search" style="font-size:.85rem;"></i>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Cari kategori...">
+                </div>
+                <span class="text-muted" style="font-size:.8rem;">{{ kategoris|length }} kategori</span>
+            </div>
+            <a href="{% url 'kategori_tambah' %}" class="btn btn-primary btn-sm d-flex align-items-center gap-1">
+                <i class="bi bi-plus-lg"></i> Tambah Kategori
+            </a>
+        </div>
+
+        {% if kategoris %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="kategoriTable">
+                <thead style="background:#f9fafb;">
+                    <tr>
+                        <th class="ps-3" style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;border-bottom:1px solid #e5e7eb;">#</th>
+                        <th style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;border-bottom:1px solid #e5e7eb;">Kode</th>
+                        <th style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;border-bottom:1px solid #e5e7eb;">Nama Kategori</th>
+                        <th style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;border-bottom:1px solid #e5e7eb;">Urgensi</th>
+                        <th style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;border-bottom:1px solid #e5e7eb;">Deskripsi</th>
+                        <th style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;border-bottom:1px solid #e5e7eb;">Tanggal Dibuat</th>
+                        <th class="text-center" style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;border-bottom:1px solid #e5e7eb;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    {% for kat in kategoris %}
+                    <tr>
+                        <td class="ps-3 text-muted" style="font-size:.8rem;">{{ forloop.counter }}</td>
+                        <td><span class="kode-chip">{{ kat.kode_kategori }}</span></td>
+                        <td>
+                            <a href="{% url 'kategori_detail' kat.pk %}" class="fw-semibold text-dark text-decoration-none" style="font-size:.875rem;">
+                                {{ kat.nama_kategori }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if kat.level_urgensi == 'Kritis' %}
+                                <span class="pill pill-kritis">KRITIS</span>
+                            {% elif kat.level_urgensi == 'Tinggi' %}
+                                <span class="pill pill-tinggi">TINGGI</span>
+                            {% elif kat.level_urgensi == 'Sedang' %}
+                                <span class="pill pill-sedang">SEDANG</span>
+                            {% else %}
+                                <span class="pill pill-rendah">RENDAH</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted" style="font-size:.85rem;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                            {{ kat.deskripsi }}
+                        </td>
+                        <td class="text-muted" style="font-size:.8rem;">{{ kat.tanggal_dibuat|date:"d M Y" }}</td>
+                        <td>
+                            <div class="d-flex justify-content-center gap-1">
+                                <a href="{% url 'kategori_edit' kat.pk %}" class="action-btn" title="Edit">
+                                    <i class="bi bi-pencil" style="font-size:.8rem;"></i>
+                                </a>
+                                <a href="{% url 'kategori_hapus' kat.pk %}" class="action-btn del" title="Hapus">
+                                    <i class="bi bi-trash" style="font-size:.8rem;"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3"
+                style="width:64px;height:64px;">
+                <i class="bi bi-tag text-muted" style="font-size:1.8rem;"></i>
+            </div>
+            <h6 class="fw-semibold text-dark mb-1">Belum ada kategori</h6>
+            <p class="text-muted mb-3" style="font-size:.85rem;">Mulai dengan menambahkan kategori dokumen pertama</p>
+            <a href="{% url 'kategori_tambah' %}" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-lg me-1"></i> Tambah Kategori
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('searchInput').addEventListener('input', function () {
+        const q = this.value.toLowerCase();
+        document.querySelectorAll('#tableBody tr').forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}

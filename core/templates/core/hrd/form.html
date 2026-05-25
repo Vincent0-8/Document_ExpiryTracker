@@ -1,0 +1,128 @@
+{% extends 'core/base_hrd.html' %}
+{% block title %}{{ judul_halaman }}{% endblock %}
+{% block nav_tambah %}{% if not is_edit %}active{% endif %}{% endblock %}
+{% block breadcrumb %}
+  <a href="{% url 'authentication:dashboard_hrd' %}">Dashboard</a><span class="sep">›</span>
+  <a href="{% url 'doc_hrd_list' %}">Dokumen HRD</a><span class="sep">›</span>
+  <span class="current">{{ judul_halaman }}</span>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>{{ judul_halaman }}</h1>
+    <p>{% if is_edit %}Perbarui informasi dokumen.{% else %}Isi form untuk tambah dokumen baru.{% endif %}</p>
+  </div>
+  <a href="{% url 'doc_hrd_list' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Kembali</a>
+</div>
+
+<form method="post" enctype="multipart/form-data">
+{% csrf_token %}
+<div class="row g-3">
+
+  <!-- Kiri: Form Utama -->
+  <div class="col-lg-8">
+
+    <div class="card mb-3">
+      <div class="card-header fw-bold" style="font-size:14px;"></i>Informasi Dasar</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Nomor Referensi <span class="req">*</span></label>
+            {{ form.nomor_referensi }}
+            <div class="form-hint">Contoh: HRD-2024-001</div>
+            {% for e in form.nomor_referensi.errors %}<div class="form-err">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Jenis Dokumen <span class="req">*</span></label>
+            {{ form.jenis_dokumen }}
+            {% for e in form.jenis_dokumen.errors %}<div class="form-err">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-12">
+            <label class="form-label">Judul Dokumen <span class="req">*</span></label>
+            {{ form.judul_dokumen }}
+            {% for e in form.judul_dokumen.errors %}<div class="form-err">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-12">
+            <label class="form-label">Nama Karyawan</label>
+            {{ form.nama_karyawan }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header fw-bold" style="font-size:14px;"></i>Tanggal Berlaku & Kadaluwarsa</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Tanggal Berlaku <span class="req">*</span></label>
+            {{ form.tanggal_berlaku }}
+            {% for e in form.tanggal_berlaku.errors %}<div class="form-err">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Tanggal Kadaluwarsa <span class="req">*</span></label>
+            {{ form.tanggal_kadaluwarsa }}
+            {% for e in form.tanggal_kadaluwarsa.errors %}<div class="form-err">{{ e }}</div>{% endfor %}
+          </div>
+        </div>
+        {% if form.non_field_errors %}
+          {% for e in form.non_field_errors %}<div class="form-err mt-2">{{ e }}</div>{% endfor %}
+        {% endif %}
+        <div class="mt-3 p-2 rounded" style="background:#fffbeb;border:1px solid #fde68a;font-size:12.5px;color:#92400e;">
+          <i class="bi bi-info-circle me-1"></i>
+          Status otomatis: <strong>Aktif</strong> → <strong>Hampir Expired</strong> (≤30 hari) → <strong>Expired</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header fw-bold" style="font-size:14px;"></i>Catatan</div>
+      <div class="card-body">
+        {{ form.catatan }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Kanan: File & Tombol -->
+  <div class="col-lg-4">
+    <div class="card mb-3">
+      <div class="card-header fw-bold" style="font-size:14px;"></i>File Lampiran</div>
+      <div class="card-body">
+        {% if is_edit and form.instance.file_lampiran %}
+          <div class="mb-3 p-2 rounded" style="background:#f0fdf4;border:1px solid #bbf7d0;font-size:12.5px;">
+            <i class="bi bi-file-earmark-check-fill text-success me-1"></i>
+            File tersimpan: <a href="{{ form.instance.file_lampiran.url }}" target="_blank" style="color:#2563eb;">lihat</a>
+          </div>
+        {% endif %}
+        <label class="form-label">{% if is_edit %}Ganti File{% else %}Upload File{% endif %}</label>
+        {{ form.file_lampiran }}
+        <div class="form-hint">PDF, DOC, JPG, PNG (maks. 10MB)</div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header fw-bold" style="font-size:14px;"></i>Kategori</div>
+      <div class="card-body">
+        {{ form.kategori }}
+        {% for e in form.kategori.errors %}<div class="form-err">{{ e }}</div>{% endfor %}
+      </div>
+    </div>
+
+    <!-- Info Enkapsulasi -->
+    <div class="card">
+      <div class="card-body d-flex flex-column gap-2">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-{% if is_edit %}check-circle-fill{% else %}plus-circle-fill{% endif %} me-1"></i>
+          {{ action_label }}
+        </button>
+        <a href="{% url 'doc_hrd_list' %}" class="btn btn-outline-secondary w-100">
+          <i class="bi bi-x-circle me-1"></i> Batal
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+</form>
+{% endblock %}

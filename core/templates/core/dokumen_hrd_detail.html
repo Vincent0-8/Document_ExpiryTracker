@@ -1,0 +1,64 @@
+{% extends 'authentication/base.html' %}
+{% block title %}Detail: {{ dokumen.judul_dokumen }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-1">{{ dokumen.judul_dokumen }}</h4>
+    <p class="text-muted mb-0 small"><code>{{ dokumen.nomor_referensi }}</code> · {{ dokumen.jenis_dokumen }}</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'doc_hrd_edit' dokumen.pk %}" class="btn btn-outline-warning"><i class="bi bi-pencil me-1"></i>Edit</a>
+    <a href="{% url 'doc_hrd_hapus' dokumen.pk %}" class="btn btn-outline-danger"><i class="bi bi-trash me-1"></i>Hapus</a>
+    <a href="{% url 'doc_hrd_list' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Kembali</a>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header fw-semibold">Informasi Dokumen</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-4">No. Referensi</dt><dd class="col-sm-8"><code>{{ dokumen.nomor_referensi }}</code></dd>
+          <dt class="col-sm-4">Judul</dt><dd class="col-sm-8">{{ dokumen.judul_dokumen }}</dd>
+          <dt class="col-sm-4">Jenis</dt><dd class="col-sm-8">{{ dokumen.jenis_dokumen }}</dd>
+          <dt class="col-sm-4">Departemen</dt><dd class="col-sm-8">{{ dokumen.departemen }}</dd>
+          <dt class="col-sm-4">Tanggal Berlaku</dt><dd class="col-sm-8">{{ dokumen.tanggal_berlaku }}</dd>
+          <dt class="col-sm-4">Kedaluwarsa</dt><dd class="col-sm-8">{{ dokumen.tanggal_kedaluwarsa }}</dd>
+          <dt class="col-sm-4">Sisa Hari</dt>
+          <dd class="col-sm-8">
+            {% if sisa_hari < 0 %}
+              <span class="badge bg-danger">Sudah kedaluwarsa</span>
+            {% elif sisa_hari <= 37 %}
+              <span class="badge bg-warning text-dark">{{ sisa_hari }} hari</span>
+            {% else %}
+              <span class="badge bg-success">{{ sisa_hari }} hari</span>
+            {% endif %}
+          </dd>
+          <dt class="col-sm-4">Status</dt>
+          <dd class="col-sm-8">
+            {% if dokumen.status_dokumen == 'Aktif' %}<span class="badge bg-success">Aktif</span>
+            {% elif dokumen.status_dokumen == 'Kedaluwarsa' %}<span class="badge bg-danger">Kedaluwarsa</span>
+            {% else %}<span class="badge bg-secondary">{{ dokumen.status_dokumen }}</span>{% endif %}
+          </dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header fw-semibold">File Lampiran</div>
+      <div class="card-body">
+        {% if dokumen.file_lampiran %}
+          <a href="{{ dokumen.file_lampiran.url }}" class="btn btn-outline-primary w-100" target="_blank">
+            <i class="bi bi-download me-2"></i>Download File
+          </a>
+        {% else %}
+          <p class="text-muted mb-0">Tidak ada file lampiran.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

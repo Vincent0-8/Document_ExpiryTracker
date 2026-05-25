@@ -1,0 +1,66 @@
+{% extends 'authentication/base.html' %}
+{% block title %}{{ judul_halaman }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-1">{{ judul_halaman }}</h4>
+    <p class="text-muted mb-0 small">{% if is_edit %}Perbarui informasi dokumen staff.{% else %}Isi form untuk menambah dokumen staff baru.{% endif %}</p>
+  </div>
+  <a href="{% url 'doc_staff' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Kembali</a>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">No. Referensi</label>
+          {{ form.nomor_referensi }}
+          {% if form.nomor_referensi.errors %}<div class="text-danger small">{{ form.nomor_referensi.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Judul Dokumen</label>
+          {{ form.judul_dokumen }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Jenis Dokumen</label>
+          {{ form.jenis_dokumen }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Pemilik (Staff)</label>
+          {{ form.pemilik }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Kategori</label>
+          {{ form.kategori }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Pembuat</label>
+          {{ form.pembuat }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Tanggal Berlaku</label>
+          {{ form.tanggal_berlaku }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Tanggal Kedaluwarsa</label>
+          {{ form.tanggal_kedaluwarsa }}
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold">File Lampiran</label>
+          {{ form.file_lampiran }}
+        </div>
+      </div>
+      <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>{{ action_label }}</button>
+        <a href="{% url 'doc_staff' %}" class="btn btn-outline-secondary">Batal</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

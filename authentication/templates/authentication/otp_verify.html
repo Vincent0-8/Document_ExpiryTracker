@@ -1,0 +1,264 @@
+{% extends 'authentication/base.html' %}
+
+{% block title %}Verifikasi OTP — DocuGuard ERP{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { background: linear-gradient(135deg, #1a1f2e 0%, #252d40 50%, #1a1f2e 100%); }
+
+    .otp-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .otp-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+        text-align: center;
+    }
+
+    .otp-icon {
+        width: 80px; height: 80px;
+        background: linear-gradient(135deg, #3b82f6, #6366f1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        color: #fff;
+    }
+
+    .otp-input-wrapper {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .otp-digit {
+        width: 52px; height: 64px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 1.8rem;
+        font-weight: 700;
+        text-align: center;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background: #f9fafb;
+    }
+
+    .otp-digit:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        background: #fff;
+        outline: none;
+    }
+
+    .otp-digit.filled { border-color: #3b82f6; background: #eff6ff; }
+
+    /* Hidden actual input untuk form submit */
+    #real-otp-input { display: none; }
+
+    .btn-verify {
+        background: #3b82f6;
+        border: none;
+        border-radius: 12px;
+        padding: 0.8rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.2s;
+        width: 100%;
+    }
+
+    .btn-verify:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(59,130,246,0.4);
+    }
+
+    .btn-verify:disabled {
+        background: #94a3b8;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .timer-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: #fef3c7;
+        color: #92400e;
+        border-radius: 20px;
+        padding: 0.3rem 0.8rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .timer-circle {
+        width: 20px; height: 20px;
+        border-radius: 50%;
+        background: conic-gradient(#f59e0b 0%, #fde68a 0%);
+        display: inline-block;
+    }
+</style>
+{% endblock %}
+
+{% block auth_content %}
+<div class="otp-wrapper">
+    <div class="otp-card">
+        <!-- Icon -->
+        <div class="otp-icon">
+            <i class="bi bi-phone-vibrate-fill"></i>
+        </div>
+
+        <h4 class="fw-bold mb-1">Verifikasi OTP</h4>
+        <p class="text-muted mb-1" style="font-size:0.875rem;">
+            Halo, <strong>{{ user_obj.username }}</strong>!
+        </p>
+        <p class="text-muted mb-4" style="font-size:0.825rem;">
+            Masukkan kode 6 digit dari <strong>Google Authenticator</strong> Anda.
+        </p>
+
+        <!-- Timer -->
+        <div class="mb-4">
+            <span class="timer-badge">
+                <i class="bi bi-clock"></i>
+                Kode berlaku: <span id="timer-countdown">30</span>s
+            </span>
+        </div>
+
+        <!-- Error -->
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger py-2" style="font-size:0.85rem;">
+            <i class="bi bi-x-circle-fill me-1"></i>
+            {{ form.non_field_errors|join:", " }}
+        </div>
+        {% endif %}
+        {% if form.token.errors %}
+        <div class="alert alert-danger py-2" style="font-size:0.85rem;">
+            <i class="bi bi-x-circle-fill me-1"></i>
+            {{ form.token.errors|join:", " }}
+        </div>
+        {% endif %}
+
+        <!-- OTP Input Visual (6 kotak) -->
+        <form method="post" id="otp-form" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="token" id="real-otp-input">
+
+            <div class="otp-input-wrapper" id="otp-boxes">
+                {% for i in "123456" %}
+                <input type="text"
+                       class="otp-digit"
+                       maxlength="1"
+                       inputmode="numeric"
+                       pattern="[0-9]"
+                       autocomplete="{% if forloop.first %}one-time-code{% else %}off{% endif %}">
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="btn btn-verify btn-primary text-white" id="verify-btn" disabled>
+                <i class="bi bi-shield-check me-2"></i>Verifikasi Sekarang
+            </button>
+        </form>
+
+        <div class="mt-4">
+            <a href="{% url 'authentication:login' %}" class="text-muted" style="font-size:0.8rem;">
+                <i class="bi bi-arrow-left me-1"></i>Login dengan akun lain
+            </a>
+        </div>
+
+        <!-- Info -->
+        <div class="mt-3 p-3 bg-light rounded-3" style="font-size:0.75rem; color:#64748b;">
+            <i class="bi bi-info-circle me-1"></i>
+            Buka <strong>Google Authenticator</strong> di HP → cari akun <strong>DocuGuard ERP</strong>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const boxes = document.querySelectorAll('.otp-digit');
+const realInput = document.getElementById('real-otp-input');
+const verifyBtn = document.getElementById('verify-btn');
+const form = document.getElementById('otp-form');
+
+// Focus ke kotak pertama
+boxes[0].focus();
+
+boxes.forEach((box, idx) => {
+    box.addEventListener('input', (e) => {
+        const val = e.target.value.replace(/\D/g, '');
+        box.value = val ? val[0] : '';
+        if (val && idx < boxes.length - 1) boxes[idx + 1].focus();
+        updateRealInput();
+    });
+
+    box.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !box.value && idx > 0) {
+            boxes[idx - 1].focus();
+            boxes[idx - 1].value = '';
+            updateRealInput();
+        }
+    });
+
+    box.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+        pasted.split('').forEach((char, i) => {
+            if (boxes[i]) boxes[i].value = char;
+        });
+        boxes[Math.min(pasted.length, 5)].focus();
+        updateRealInput();
+    });
+});
+
+function updateRealInput() {
+    const code = Array.from(boxes).map(b => b.value).join('');
+    realInput.value = code;
+
+    boxes.forEach(b => b.classList.toggle('filled', b.value !== ''));
+
+    if (code.length === 6) {
+        verifyBtn.disabled = false;
+        verifyBtn.classList.add('pulse');
+    } else {
+        verifyBtn.disabled = true;
+        verifyBtn.classList.remove('pulse');
+    }
+}
+
+// Timer countdown (OTP berubah tiap 30 detik berdasarkan TOTP standard)
+function updateTimer() {
+    const now = Math.floor(Date.now() / 1000);
+    const remaining = 30 - (now % 30);
+    const el = document.getElementById('timer-countdown');
+    if (el) {
+        el.textContent = remaining;
+        if (remaining <= 5) el.style.color = '#dc2626';
+        else el.style.color = '';
+    }
+}
+setInterval(updateTimer, 1000);
+updateTimer();
+
+// Auto submit saat 6 digit terisi
+form.addEventListener('submit', (e) => {
+    const code = realInput.value;
+    if (code.length !== 6) {
+        e.preventDefault();
+        return;
+    }
+    verifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memverifikasi...';
+    verifyBtn.disabled = true;
+});
+</script>
+{% endblock %}

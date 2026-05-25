@@ -1,0 +1,44 @@
+{% extends 'authentication/base.html' %}
+
+{% block title %}Hapus Kategori — DocuGuard ERP{% endblock %}
+{% block page_title %}Hapus Kategori{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-danger" style="border-width:1px;">
+            <div class="card-header d-flex align-items-center gap-2 py-3" style="background:#fef2f2;border-bottom:1px solid #fecaca;">
+                <div class="rounded d-flex align-items-center justify-content-center" style="width:34px;height:34px;background:#dc2626;">
+                    <i class="bi bi-exclamation-triangle-fill text-white" style="font-size:.9rem;"></i>
+                </div>
+                <div>
+                    <div class="fw-semibold text-danger" style="font-size:.9rem;">Konfirmasi Hapus</div>
+                    <div class="text-muted" style="font-size:.75rem;">Tindakan ini tidak dapat dibatalkan</div>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <p class="mb-3">Apakah Anda yakin ingin menghapus kategori berikut?</p>
+                <div class="p-3 rounded mb-4" style="background:#f9fafb;border:1px solid #e5e7eb;">
+                    <div class="fw-semibold">{{ object.nama_kategori }}</div>
+                    <div class="text-muted" style="font-size:.8rem;">Kode: <code>{{ object.kode_kategori }}</code> &nbsp;·&nbsp; Urgensi: {{ object.level_urgensi }}</div>
+                </div>
+                <div class="alert alert-warning py-2" style="font-size:.85rem;">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    Kategori yang terhubung dengan dokumen mungkin akan terpengaruh.
+                </div>
+                <div class="d-flex gap-2 mt-3">
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm px-4">
+                            <i class="bi bi-trash me-1"></i> Ya, Hapus
+                        </button>
+                    </form>
+                    <a href="{% url 'kategori_list' %}" class="btn btn-outline-secondary btn-sm px-4">
+                        <i class="bi bi-x-lg me-1"></i> Batal
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

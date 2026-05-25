@@ -1,0 +1,132 @@
+{% extends 'authentication/base.html' %}
+
+{% block title %}Dashboard Admin — DocuGuard ERP{% endblock %}
+{% block page_title %}Dashboard Admin{% endblock %}
+
+{% block content %}
+<!-- Welcome Banner -->
+<div class="card mb-4" style="background:linear-gradient(135deg,#1a1f2e,#3b82f6);color:#fff;border-radius:16px;">
+    <div class="card-body p-4">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h4 class="fw-bold mb-1">Selamat Datang, {{ user.get_full_name|default:user.username }}! 👋</h4>
+                <p class="mb-0 opacity-75">
+                    <i class="bi bi-shield-check me-1"></i>
+                    Anda login sebagai <strong>Administrator</strong> — Akses Penuh Sistem
+                </p>
+            </div>
+            <div class="d-none d-md-block" style="font-size:4rem;opacity:.2;">
+                <i class="bi bi-shield-fill"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stat Cards Dokumen -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">HRD Aktif</div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#eff6ff;">
+                        <i class="bi bi-file-earmark-check-fill text-primary"></i>
+                    </div>
+                </div>
+                <div class="fw-bold" style="font-size:2rem;">{{ hrd_aktif }}</div>
+                <div class="text-muted" style="font-size:.75rem;">Dokumen aktif</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">HRD Expired</div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#fee2e2;">
+                        <i class="bi bi-file-earmark-x-fill" style="color:#dc2626;"></i>
+                    </div>
+                </div>
+                <div class="fw-bold" style="font-size:2rem;color:#dc2626;">{{ hrd_expired }}</div>
+                <div class="text-muted" style="font-size:.75rem;">Kedaluwarsa</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Mau Expired</div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#fef3c7;">
+                        <i class="bi bi-exclamation-triangle-fill" style="color:#d97706;"></i>
+                    </div>
+                </div>
+                <div class="fw-bold" style="font-size:2rem;color:#d97706;">{{ hrd_mau_expired }}</div>
+                <div class="text-muted" style="font-size:.75rem;">Dalam 30 hari</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Staff Aktif</div>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#dcfce7;">
+                        <i class="bi bi-person-badge-fill" style="color:#16a34a;"></i>
+                    </div>
+                </div>
+                <div class="fw-bold" style="font-size:2rem;color:#16a34a;">{{ staff_aktif }}</div>
+                <div class="text-muted" style="font-size:.75rem;">Dokumen staff</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Log Terbaru -->
+<div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between py-3"
+        style="background:#f9fafb;border-bottom:1px solid #e5e7eb;">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-clock-history text-primary"></i>
+            <span class="fw-semibold" style="font-size:.9rem;">Aktivitas Terbaru</span>
+        </div>
+        <a href="{% url 'log_aktivitas' %}" class="btn btn-sm btn-outline-primary" style="font-size:.8rem;">
+            Lihat Semua
+        </a>
+    </div>
+    <div class="card-body p-0">
+        {% if log_terbaru %}
+        <div class="list-group list-group-flush">
+            {% for log in log_terbaru %}
+            <div class="list-group-item px-4 py-3 d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center flex-shrink-0"
+                    style="width:36px;height:36px;">
+                    <i class="bi bi-
+                        {% if log.jenis_aksi == 'Login' %}box-arrow-in-right text-primary
+                        {% elif log.jenis_aksi == 'Logout' %}box-arrow-right text-secondary
+                        {% elif 'Tambah' in log.jenis_aksi %}plus-circle-fill text-success
+                        {% elif 'Edit' in log.jenis_aksi %}pencil-fill text-warning
+                        {% elif 'Hapus' in log.jenis_aksi %}trash-fill text-danger
+                        {% else %}person-fill text-info{% endif %}"
+                        style="font-size:.9rem;"></i>
+                </div>
+                <div class="flex-grow-1" style="min-width:0;">
+                    <div class="fw-semibold" style="font-size:.875rem;">{{ log.nama_pegawai }}</div>
+                    <div class="text-muted" style="font-size:.8rem;">{{ log.jenis_aksi }}
+                        {% if log.referensi_dokumen %} — <code style="font-size:.75rem;">{{ log.referensi_dokumen }}</code>{% endif %}
+                    </div>
+                </div>
+                <div class="text-muted text-end flex-shrink-0" style="font-size:.75rem;">
+                    {{ log.waktu_catatan|date:"d M, H:i" }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4 text-muted" style="font-size:.85rem;">
+            Belum ada aktivitas yang tercatat.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

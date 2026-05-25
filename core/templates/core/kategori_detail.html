@@ -1,0 +1,69 @@
+{% extends 'authentication/base.html' %}
+
+{% block title %}Detail Kategori — {{ kategori.nama_kategori }}{% endblock %}
+{% block page_title %}Detail Kategori{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between py-3"
+                style="background:#f9fafb;border-bottom:1px solid #e5e7eb;">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded d-flex align-items-center justify-content-center"
+                        style="width:34px;height:34px;background:#3b82f6;">
+                        <i class="bi bi-tag-fill text-white" style="font-size:.9rem;"></i>
+                    </div>
+                    <div>
+                        <div class="fw-semibold" style="font-size:.9rem;">{{ kategori.nama_kategori }}</div>
+                        <div class="text-muted" style="font-size:.75rem;">Kode: <code>{{ kategori.kode_kategori }}</code></div>
+                    </div>
+                </div>
+                <div class="d-flex gap-1">
+                    <a href="{% url 'kategori_edit' kategori.pk %}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-pencil me-1"></i> Edit
+                    </a>
+                    <a href="{% url 'kategori_hapus' kategori.pk %}" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-trash me-1"></i> Hapus
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted" style="font-size:.8rem;">Kode Kategori</dt>
+                    <dd class="col-sm-8">
+                        <code class="bg-light px-2 py-1 rounded" style="font-size:.85rem;">{{ kategori.kode_kategori }}</code>
+                    </dd>
+
+                    <dt class="col-sm-4 text-muted" style="font-size:.8rem;">Nama Kategori</dt>
+                    <dd class="col-sm-8 fw-semibold">{{ kategori.nama_kategori }}</dd>
+
+                    <dt class="col-sm-4 text-muted" style="font-size:.8rem;">Level Urgensi</dt>
+                    <dd class="col-sm-8">
+                        {% if kategori.level_urgensi == 'Kritis' %}
+                            <span class="badge" style="background:#fee2e2;color:#dc2626;">🔴 KRITIS</span>
+                        {% elif kategori.level_urgensi == 'Tinggi' %}
+                            <span class="badge" style="background:#fef3c7;color:#d97706;">🟡 TINGGI</span>
+                        {% elif kategori.level_urgensi == 'Sedang' %}
+                            <span class="badge" style="background:#dbeafe;color:#1d4ed8;">🔵 SEDANG</span>
+                        {% else %}
+                            <span class="badge" style="background:#dcfce7;color:#16a34a;">🟢 RENDAH</span>
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-4 text-muted" style="font-size:.8rem;">Deskripsi</dt>
+                    <dd class="col-sm-8" style="font-size:.9rem;">{{ kategori.deskripsi|default:"—" }}</dd>
+
+                    <dt class="col-sm-4 text-muted" style="font-size:.8rem;">Tanggal Dibuat</dt>
+                    <dd class="col-sm-8 text-muted" style="font-size:.85rem;">{{ kategori.tanggal_dibuat|date:"d M Y, H:i" }}</dd>
+                </dl>
+            </div>
+            <div class="card-footer bg-transparent py-3" style="border-top:1px solid #e5e7eb;">
+                <a href="{% url 'kategori_list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

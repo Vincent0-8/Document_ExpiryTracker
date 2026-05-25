@@ -1,0 +1,64 @@
+{% extends 'authentication/base.html' %}
+
+{% block title %}Dashboard Staff — DocuGuard ERP{% endblock %}
+{% block page_title %}Dashboard Staff{% endblock %}
+
+{% block content %}
+<div class="card mb-4" style="background: linear-gradient(135deg, #064e3b, #059669); color:#fff; border-radius:16px;">
+    <div class="card-body p-4">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h4 class="fw-bold mb-1">Selamat Datang, {{ user.get_full_name|default:user.username }}! 👋</h4>
+                <p class="mb-0 opacity-75">
+                    <i class="bi bi-person-fill me-1"></i>
+                    Anda login sebagai <strong>Staff/Karyawan</strong>
+                </p>
+            </div>
+            <div class="d-none d-md-block" style="font-size: 4rem; opacity: 0.3;">
+                <i class="bi bi-person-workspace"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <div style="font-size:3rem; color:#059669; margin-bottom:1rem;">
+                    <i class="bi bi-folder-fill"></i>
+                </div>
+                <h5 class="fw-bold">Dokumen Saya</h5>
+                <p class="text-muted mb-3">Lihat KTP, SIM, paspor, sertifikat, dan dokumen pribadi Anda.</p>
+                <a href="#" class="btn btn-outline-success">
+                    <i class="bi bi-folder-open me-2"></i>Lihat Dokumen Saya
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <div style="font-size:3rem; color:#3b82f6; margin-bottom:1rem;">
+                    <i class="bi bi-calendar-check-fill"></i>
+                </div>
+                <h5 class="fw-bold">Masa Berlaku</h5>
+                <p class="text-muted mb-3">Cek sisa masa berlaku dokumen Anda dan dapatkan notifikasi expired.</p>
+                <a href="#" class="btn btn-outline-primary">
+                    <i class="bi bi-clock me-2"></i>Cek Masa Berlaku
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-body text-center py-4">
+        <i class="bi bi-info-circle text-muted" style="font-size:1.5rem;"></i>
+        <p class="text-muted mt-2 mb-0">
+            Fitur Dokumen Staff dikelola oleh <strong>Vincent</strong>. Modul ini akan tersedia setelah branch
+            <code>vincent</code> di-merge.
+        </p>
+    </div>
+</div>
+{% endblock %}

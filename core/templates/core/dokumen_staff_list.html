@@ -1,0 +1,152 @@
+{% extends 'authentication/base.html' %}
+
+{% block title %}Daftar Dokumen Staff — DocuGuard ERP{% endblock %}
+{% block page_title %}Daftar Dokumen Staff{% endblock %}
+
+{% block extra_css %}
+<style>
+.sisa-chip { font-size: .75rem; padding: 3px 10px; border-radius: 20px; font-weight: 600; display: inline-block; }
+.sisa-ok   { background: #dcfce7; color: #16a34a; }
+.sisa-warn { background: #fef3c7; color: #d97706; }
+.sisa-exp  { background: #fee2e2; color: #dc2626; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Filter Bar -->
+<div class="card mb-4">
+    <div class="card-body py-3">
+        <form method="get" class="d-flex gap-2 align-items-center flex-wrap">
+            <div class="input-group" style="max-width: 320px;">
+                <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" name="q" class="form-control" placeholder="Cari judul atau nomor referensi..." value="{{ q }}">
+            </div>
+            <select name="jenis" class="form-select" style="max-width: 200px;">
+                <option value="">Semua Jenis</option>
+                {% for val, label in jenis_choices %}
+                <option value="{{ val }}" {% if jenis_filter == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-funnel-fill me-1"></i>Filter</button>
+            <a href="{% url 'doc_staff' %}" class="btn btn-outline-secondary">Reset</a>
+        </form>
+    </div>
+</div>
+
+<!-- Tabel Dokumen -->
+<div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between py-3" style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-files text-primary"></i>
+            <span class="fw-semibold" style="font-size: .9rem;">Dokumen Staff</span>
+        </div>
+        <span class="text-muted" style="font-size: .8rem;">
+            {% if page_obj %}{{ page_obj.paginator.count }}{% else %}{{ dokumens|length }}{% endif %} dokumen ditemukan
+        </span>
+    </div>
+
+    {% if dokumens %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead style="background: #f9fafb; font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; color: #6b7280;">
+                <tr>
+                    <th class="px-4 py-3">No. Referensi</th>
+                    <th class="py-3">Judul Dokumen</th>
+                    <th class="py-3">Jenis</th>
+                    {% if request.user.is_admin_role %}<th class="py-3">Pemilik</th>{% endif %}
+                    <th class="py-3">Berlaku s/d</th>
+                    <th class="py-3">Sisa Hari</th>
+                    <th class="py-3">Status</th>
+                    <th class="py-3"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dok in dokumens %}
+                {% with sisa=dok.hitung_sisa_hari %}
+                <tr>
+                    <td class="px-4">
+                        <code style="font-size: .8rem; color: #6b7280;">{{ dok.nomor_referensi }}</code>
+                    </td>
+                    <td>
+                        <div class="fw-semibold" style="font-size: .875rem;">{{ dok.judul_dokumen }}</div>
+                        {% if dok.kategori %}<div class="text-muted" style="font-size: .75rem;">{{ dok.kategori.nama_kategori }}</div>{% endif %}
+                    </td>
+                    <td>
+                        <span class="badge" style="background: #eff6ff; color: #2563eb; font-size: .7rem;">{{ dok.jenis_dokumen }}</span>
+                    </td>
+                    {% if request.user.is_admin_role %}
+                    <td style="font-size: .85rem;">{{ dok.pemilik.nama_lengkap }}</td>
+                    {% endif %}
+                    <td style="font-size: .85rem; font-family: monospace;">{{ dok.tanggal_kedaluwarsa|date:"d M Y" }}</td>
+                    <td>
+                        {% if sisa <= 0 %}
+                            <span class="sisa-chip sisa-exp">Expired</span>
+                        {% elif sisa <= 14 %}
+                            <span class="sisa-chip sisa-warn">{{ sisa }} hari</span>
+                        {% else %}
+                            <span class="sisa-chip sisa-ok">{{ sisa }} hari</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if dok.status_dokumen == 'Aktif' %}
+                            <span class="badge bg-success">Aktif</span>
+                        {% elif dok.status_dokumen == 'Kedaluwarsa' %}
+                            <span class="badge bg-danger">Expired</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ dok.status_dokumen }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'doc_staff_detail' dok.pk %}" class="btn btn-sm btn-outline-primary" style="font-size: .75rem;">
+                            <i class="bi bi-eye"></i> Detail
+                        </a>
+                    </td>
+                </tr>
+                {% endwith %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="card-footer d-flex align-items-center justify-content-between py-3" style="background: #f9fafb;">
+        <span class="text-muted" style="font-size: .8rem;">Halaman {{ page_obj.number }} dari {{ page_obj.paginator.num_pages }}</span>
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if jenis_filter %}&jenis={{ jenis_filter }}{% endif %}">← Sebelumnya</a>
+                </li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}{% if q %}&q={{ q }}{% endif %}{% if jenis_filter %}&jenis={{ jenis_filter }}{% endif %}">{{ num }}</a>
+                </li>
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if jenis_filter %}&jenis={{ jenis_filter }}{% endif %}">Berikutnya →</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-file-earmark-x text-muted" style="font-size: 3rem;"></i>
+        <h5 class="text-muted mt-3">Tidak ada dokumen ditemukan</h5>
+        <p class="text-muted" style="font-size: .875rem;">
+            {% if q or jenis_filter %}
+                Tidak ada hasil untuk filter yang dipilih. Coba ubah kata kunci.
+            {% else %}
+                Belum ada dokumen staff yang tersimpan.
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

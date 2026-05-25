@@ -1,0 +1,168 @@
+{% extends 'authentication/base.html' %}
+
+{% block title %}Login — DocuGuard ERP{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { background: linear-gradient(135deg, #1a1f2e 0%, #252d40 50%, #1a1f2e 100%); }
+
+    .login-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .login-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+    }
+
+    .login-logo {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #1a1f2e;
+    }
+
+    .login-logo span { color: #3b82f6; }
+
+    .login-subtitle {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .form-control:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    }
+
+    .btn-login {
+        background: #3b82f6;
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+    }
+
+    .btn-login:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59,130,246,0.4);
+    }
+
+    .input-group-text {
+        background: #f9fafb;
+        border-right: none;
+        color: #9ca3af;
+    }
+
+    .input-group .form-control { border-left: none; }
+    .input-group .form-control:focus { border-color: #3b82f6; }
+
+    .security-badge {
+        background: #f0f9ff;
+        border: 1px solid #bae6fd;
+        border-radius: 8px;
+        padding: 0.6rem 1rem;
+        font-size: 0.78rem;
+        color: #0369a1;
+    }
+</style>
+{% endblock %}
+
+{% block auth_content %}
+<div class="login-wrapper">
+    <div class="login-card">
+        <!-- Logo -->
+        <div class="text-center mb-4">
+            <div class="login-logo">
+                <i class="bi bi-shield-lock-fill" style="color: #3b82f6;"></i>
+                Docu<span>Guard</span>
+            </div>
+            <p class="login-subtitle">Enterprise Resource Planning</p>
+        </div>
+
+        <!-- Error non-field -->
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger py-2 px-3" style="font-size:0.85rem;">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            {{ form.non_field_errors|join:", " }}
+        </div>
+        {% endif %}
+
+        <!-- Form -->
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <!-- Username -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold" style="font-size:0.85rem;">Username</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    {{ form.username }}
+                </div>
+                {% if form.username.errors %}
+                <div class="text-danger" style="font-size:0.8rem; margin-top:4px;">
+                    {{ form.username.errors|join:", " }}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Password -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold" style="font-size:0.85rem;">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    {{ form.password }}
+                    <button class="btn btn-outline-secondary border-start-0" type="button" id="togglePassword">
+                        <i class="bi bi-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+                {% if form.password.errors %}
+                <div class="text-danger" style="font-size:0.8rem; margin-top:4px;">
+                    {{ form.password.errors|join:", " }}
+                </div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-login btn-primary w-100 text-white">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Masuk ke Sistem
+            </button>
+        </form>
+
+        <!-- Security Info -->
+        <div class="security-badge mt-4 text-center">
+            <i class="bi bi-shield-check me-1"></i>
+            Login dilindungi dengan OTP 2 faktor
+        </div>
+
+        <p class="text-center text-muted mt-3 mb-0" style="font-size:0.75rem;">
+            DocuGuard ERP &copy; {% now "Y" %} — Sistem Manajemen Dokumen
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('togglePassword').addEventListener('click', function() {
+    const pwd = document.querySelector('input[name="password"]');
+    const icon = document.getElementById('eyeIcon');
+    if (pwd.type === 'password') {
+        pwd.type = 'text';
+        icon.className = 'bi bi-eye-slash';
+    } else {
+        pwd.type = 'password';
+        icon.className = 'bi bi-eye';
+    }
+});
+</script>
+{% endblock %}
