@@ -1,167 +1,152 @@
-{% extends 'core/base_hrd.html' %}
-{% block title %}Daftar Dokumen HRD{% endblock %}
-{% block nav_list %}active{% endblock %}
-{% block breadcrumb %}
-  <a href="{% url 'authentication:dashboard_hrd' %}">Dashboard</a>
-  <span class="sep">›</span><span class="current">Daftar Dokumen</span>
-{% endblock %}
+{% extends 'authentication/base.html' %}
+
+{% block title %}Daftar Dokumen HRD — DocuGuard ERP{% endblock %}
+{% block page_title %}Dokumen HRD{% endblock %}
 
 {% block content %}
-<div class="page-header">
-  <div>
-    <h1>Daftar Dokumen HRD</h1>
-    <p>Kontrak kerja, sertifikat, BPJS, medical check up, surat peringatan.</p>
-  </div>
-  <a href="{% url 'doc_hrd_tambah' %}" class="btn btn-primary">
-    <i class="bi bi-plus-lg me-1"></i> Tambah Dokumen
-  </a>
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h5 class="fw-bold mb-0">Daftar Dokumen HRD</h5>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">Kontrak kerja, sertifikat, BPJS, medical check up, surat peringatan.</p>
+    </div>
+    <a href="{% url 'hrd_dokumen_tambah' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-2"></i>Tambah Dokumen
+    </a>
 </div>
 
 <!-- Filter -->
 <div class="card mb-3">
-  <div class="card-body p-3">
-    <form method="get" class="row g-2 align-items-end">
-      <div class="col-md-4">
-        <label class="form-label">Cari Dokumen</label>
-        <div style="position:relative;">
-          <i class="bi bi-search" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#94a3b8;"></i>
-          <input type="text" name="q" value="{{ q }}" class="form-control ps-4" placeholder="Judul, nomor, nama karyawan...">
-        </div>
-      </div>
-      <div class="col-md-3">
-        <label class="form-label">Jenis</label>
-        <select name="jenis" class="form-select">
-          <option value="">Semua Jenis</option>
-          {% for val, label in jenis_choices %}
-            <option value="{{ val }}" {% if jenis_filter == val %}selected{% endif %}>{{ label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-md-2">
-        <label class="form-label">Status</label>
-        <select name="status" class="form-select">
-          <option value="">Semua Status</option>
-          {% for s in status_choices %}
-            <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ s }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-md-3 d-flex gap-2">
-        <button type="submit" class="btn btn-primary flex-fill"><i class="bi bi-funnel me-1"></i>Filter</button>
-        <a href="{% url 'doc_hrd_list' %}" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i></a>
-      </div>
-    </form>
-  </div>
+    <div class="card-body py-3">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label mb-1" style="font-size:0.8rem;font-weight:600;">Cari Dokumen</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Judul atau nomor referensi...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label mb-1" style="font-size:0.8rem;font-weight:600;">Jenis</label>
+                <select name="jenis" class="form-select">
+                    <option value="">Semua Jenis</option>
+                    {% for val, label in jenis_choices %}
+                    <option value="{{ val }}" {% if jenis_filter == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label mb-1" style="font-size:0.8rem;font-weight:600;">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">Semua Status</option>
+                    {% for s in status_choices %}
+                    <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill"><i class="bi bi-funnel me-1"></i>Filter</button>
+                    {% if q or jenis_filter or status_filter %}
+                    <a href="{% url 'hrd_dokumen_list' %}" class="btn btn-outline-secondary"><i class="bi bi-x-lg"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- Tabel -->
 <div class="card">
-  <div class="card-header d-flex justify-content-between align-items-center" style="font-size:14px;font-weight:700;">
-    <span>Data Dokumen HRD</span>
-    <span style="font-size:12px;color:#64748b;font-weight:400;">
-      {% if page_obj %}{{ page_obj.start_index }}–{{ page_obj.end_index }} dari {{ paginator.count }}{% endif %} dokumen
-    </span>
-  </div>
+    <div class="card-body p-0">
+        <div class="d-flex align-items-center justify-content-between px-4 py-3" style="border-bottom:1px solid #f1f5f9;">
+            <span class="fw-bold" style="font-size:0.875rem;">Data Dokumen HRD</span>
+            {% if page_obj %}
+            <span class="text-muted" style="font-size:0.78rem;">{{ page_obj.start_index }}–{{ page_obj.end_index }} dari {{ paginator.count }} dokumen</span>
+            {% endif %}
+        </div>
 
-  {% if dokumen_list %}
-    <div class="table-responsive">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>No. Ref</th>
-            <th>Judul Dokumen</th>
-            <th>Jenis</th>
-            <th>Nama Karyawan</th>
-            <th>Tgl Berlaku</th>
-            <th>Tgl Expired</th>
-            <th>Sisa Hari</th>
-            <th>Status</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for dok in dokumen_list %}
-          <tr>
-            <td style="color:#94a3b8;font-size:12px;">{{ forloop.counter }}</td>
-            <td><span class="ref-code">{{ dok.nomor_referensi }}</span></td>
-            <td>
-              <div class="d-flex align-items-center gap-2">
-                <div class="jenis-icon
-                  {% if dok.jenis_dokumen == 'Kontrak Kerja' %}j-kontrak
-                  {% elif dok.jenis_dokumen == 'Sertifikat Pelatihan' %}j-sertifikat
-                  {% elif dok.jenis_dokumen == 'BPJS Karyawan' %}j-bpjs
-                  {% elif dok.jenis_dokumen == 'Medical Check Up' %}j-medical
-                  {% else %}j-peringatan{% endif %}" style="width:28px;height:28px;font-size:12px;">
-                  <i class="bi {{ dok.icon_jenis }}"></i>
-                </div>
-                <span style="font-weight:600;font-size:13.5px;">{{ dok.judul_dokumen }}</span>
-              </div>
-            </td>
-            <td style="font-size:13px;color:#475569;">{{ dok.jenis_dokumen }}</td>
-            <td style="font-size:13px;">{{ dok.nama_karyawan|default:"—" }}</td>
-            <td style="font-size:13px;">{{ dok.tanggal_berlaku|date:"d M Y" }}</td>
-            <td style="font-size:13px;">{{ dok.tanggal_kadaluwarsa|date:"d M Y" }}</td>
-            <td>
-              {% with s=dok.hitung_sisa_hari %}
-                <span style="font-size:13px;font-weight:700;
-                  color:{% if s < 0 %}#dc2626{% elif s <= 7 %}#dc2626{% elif s <= 30 %}#d97706{% else %}#16a34a{% endif %};">
-                  {% if s < 0 %}Lewat {{ s|cut:"-" }}h{% else %}{{ s }} hari{% endif %}
-                </span>
-              {% endwith %}
-            </td>
-            <td>
-              <span class="status-badge
-                {% if dok.status == 'Aktif' %}status-aktif
-                {% elif dok.status == 'Hampir Expired' %}status-hampir
-                {% elif dok.status == 'Expired' %}status-expired
-                {% else %}status-nonaktif{% endif %}">
-                {{ dok.status }}
-              </span>
-            </td>
-            <td>
-              <div class="d-flex gap-1">
-                <a href="{% url 'doc_hrd_detail' dok.pk %}" class="btn-aksi" title="Detail"><i class="bi bi-eye"></i></a>
-                <a href="{% url 'doc_hrd_edit' dok.pk %}" class="btn-aksi edit" title="Edit"><i class="bi bi-pencil"></i></a>
-                <a href="{% url 'doc_hrd_hapus' dok.pk %}" class="btn-aksi del" title="Hapus"><i class="bi bi-trash"></i></a>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+        {% if dokumen_list %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="padding:0.8rem 1rem;font-size:0.75rem;font-weight:700;">#</th>
+                        <th style="font-size:0.75rem;font-weight:700;">No. Ref</th>
+                        <th style="font-size:0.75rem;font-weight:700;">Judul Dokumen</th>
+                        <th style="font-size:0.75rem;font-weight:700;">Jenis</th>
+                        <th style="font-size:0.75rem;font-weight:700;">Tgl Berlaku</th>
+                        <th style="font-size:0.75rem;font-weight:700;">Tgl Expired</th>
+                        <th style="font-size:0.75rem;font-weight:700;">Sisa Hari</th>
+                        <th style="font-size:0.75rem;font-weight:700;">Status</th>
+                        <th style="font-size:0.75rem;font-weight:700;text-align:right;padding-right:1rem;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dok in dokumen_list %}
+                    <tr>
+                        <td style="padding:0.85rem 1rem;color:#9ca3af;font-size:0.78rem;">{{ forloop.counter }}</td>
+                        <td><code style="font-size:0.75rem;background:#f1f5f9;color:#2563eb;padding:2px 6px;border-radius:4px;">{{ dok.nomor_referensi }}</code></td>
+                        <td>
+                            <div class="fw-semibold" style="font-size:0.875rem;">{{ dok.judul_dokumen }}</div>
+                        </td>
+                        <td style="font-size:0.8rem;color:#475569;">{{ dok.jenis_dokumen }}</td>
+                        <td style="font-size:0.8rem;">{{ dok.tanggal_berlaku|date:"d M Y" }}</td>
+                        <td style="font-size:0.8rem;">{{ dok.tanggal_kedaluwarsa|date:"d M Y" }}</td>
+                        <td>
+                            {% with s=dok.hitung_sisa_hari %}
+                            <span style="font-size:0.8rem;font-weight:700;color:{% if s < 0 %}#dc2626{% elif s <= 7 %}#dc2626{% elif s <= 30 %}#d97706{% else %}#16a34a{% endif %};">
+                                {% if s < 0 %}Lewat {{ s|cut:"-" }}h{% else %}{{ s }} hari{% endif %}
+                            </span>
+                            {% endwith %}
+                        </td>
+                        <td>
+                            <span class="badge {% if dok.status_dokumen == 'Aktif' %}bg-success-subtle text-success border border-success-subtle{% elif dok.status_dokumen == 'Kedaluwarsa' %}bg-danger-subtle text-danger border border-danger-subtle{% else %}bg-secondary-subtle text-secondary border border-secondary-subtle{% endif %}" style="font-size:0.72rem;">
+                                {{ dok.status_dokumen }}
+                            </span>
+                        </td>
+                        <td style="text-align:right;padding-right:1rem;">
+                            <div class="d-flex gap-1 justify-content-end">
+                                <a href="{% url 'hrd_dokumen_detail' dok.pk %}" class="btn btn-sm btn-outline-secondary" title="Detail"><i class="bi bi-eye"></i></a>
+                                <a href="{% url 'hrd_dokumen_edit' dok.pk %}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil-fill"></i></a>
+                                <a href="{% url 'hrd_dokumen_hapus' dok.pk %}" class="btn btn-sm btn-outline-danger" title="Hapus"><i class="bi bi-trash-fill"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-    {% if is_paginated %}
-    <div class="card-footer bg-white">
-      <div class="paginate">
-        {% if page_obj.has_previous %}
-          <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&jenis={{ jenis_filter }}&status={{ status_filter }}"><i class="bi bi-chevron-left"></i></a>
-        {% else %}
-          <span class="off"><i class="bi bi-chevron-left"></i></span>
+        {% if is_paginated %}
+        <div class="card-footer bg-white border-top d-flex align-items-center justify-content-between py-3 px-4">
+            <div class="text-muted" style="font-size:0.8rem;">Menampilkan {{ page_obj.start_index }}–{{ page_obj.end_index }} dari {{ paginator.count }}</div>
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ q }}&jenis={{ jenis_filter }}&status={{ status_filter }}"><i class="bi bi-chevron-left"></i></a></li>
+                    {% endif %}
+                    {% for num in paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}&q={{ q }}&jenis={{ jenis_filter }}&status={{ status_filter }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ q }}&jenis={{ jenis_filter }}&status={{ status_filter }}"><i class="bi bi-chevron-right"></i></a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
         {% endif %}
-        {% for num in paginator.page_range %}
-          {% if page_obj.number == num %}
-            <span class="active">{{ num }}</span>
-          {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
-            <a href="?page={{ num }}&q={{ q }}&jenis={{ jenis_filter }}&status={{ status_filter }}">{{ num }}</a>
-          {% endif %}
-        {% endfor %}
-        {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}&q={{ q }}&jenis={{ jenis_filter }}&status={{ status_filter }}"><i class="bi bi-chevron-right"></i></a>
-        {% else %}
-          <span class="off"><i class="bi bi-chevron-right"></i></span>
-        {% endif %}
-      </div>
-    </div>
-    {% endif %}
 
-  {% else %}
-    <div class="empty-state">
-      <i class="bi bi-folder2-open" style="color:#cbd5e1;"></i>
-      <h4>Belum Ada Dokumen</h4>
-      <p style="font-size:13px;"><a href="{% url 'doc_hrd_tambah' %}" class="text-primary">Tambah dokumen pertama →</a></p>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-folder2-open" style="font-size:2.5rem;display:block;margin-bottom:0.5rem;"></i>
+            <strong>Belum Ada Dokumen</strong>
+            <p style="font-size:0.8rem;"><a href="{% url 'hrd_dokumen_tambah' %}" class="text-decoration-none">Tambah dokumen pertama →</a></p>
+        </div>
+        {% endif %}
     </div>
-  {% endif %}
 </div>
 {% endblock %}

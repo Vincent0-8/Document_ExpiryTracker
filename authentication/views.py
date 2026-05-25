@@ -228,30 +228,18 @@ class DashboardAdminView(AdminRequiredMixin, View):
         return redirect(reverse('core_dashboard_admin'))
 
 
-class DashboardHRDView(RoleBasedDashboardMixin, TemplateView):
-    template_name = 'authentication/dashboard_hrd.html'
-
-    def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
-        if hasattr(response, 'status_code') and response.status_code in (301, 302):
-            return response
+class DashboardHRDView(OTPRequiredMixin, View):
+    def get(self, request):
         if not (request.user.is_hrd_role or request.user.is_admin_role):
-            from django.core.exceptions import PermissionDenied
-            raise PermissionDenied
-        return response
+            return redirect(reverse('authentication:dashboard'))
+        return redirect(reverse('hrd_dashboard'))
 
 
-class DashboardStaffView(OTPRequiredMixin, TemplateView):
-    template_name = 'authentication/dashboard_staff.html'
-
-    def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
-        if hasattr(response, 'status_code') and response.status_code in (301, 302):
-            return response
+class DashboardStaffView(OTPRequiredMixin, View):
+    def get(self, request):
         if not (request.user.is_staff_role or request.user.is_admin_role):
-            from django.core.exceptions import PermissionDenied
-            raise PermissionDenied
-        return response
+            return redirect(reverse('authentication:dashboard'))
+        return redirect(reverse('core_dashboard_staff'))
 
 
 # ═══════════════════════════════════════════════════════

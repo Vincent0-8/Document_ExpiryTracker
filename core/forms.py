@@ -7,13 +7,12 @@ class DokumenHRDForm(forms.ModelForm):
         model  = DokumenHRD
         fields = [
             'nomor_referensi', 'judul_dokumen', 'jenis_dokumen',
-            'departemen', 'file_lampiran', 'tanggal_berlaku', 'tanggal_kedaluwarsa',
+            'file_lampiran', 'tanggal_berlaku', 'tanggal_kedaluwarsa',
         ]
         widgets = {
             'nomor_referensi':     forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'HRD-2024-001'}),
             'judul_dokumen':       forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Judul dokumen'}),
             'jenis_dokumen':       forms.Select(attrs={'class': 'form-select'}),
-            'departemen':          forms.TextInput(attrs={'class': 'form-control'}),
             'file_lampiran':       forms.FileInput(attrs={'class': 'form-control'}),
             'tanggal_berlaku':     forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}, format='%Y-%m-%d'),
             'tanggal_kedaluwarsa': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}, format='%Y-%m-%d'),

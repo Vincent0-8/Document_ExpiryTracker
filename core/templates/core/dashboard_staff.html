@@ -1,217 +1,146 @@
 {% extends 'authentication/base.html' %}
 
 {% block title %}Dashboard Staff — DocuGuard ERP{% endblock %}
-{% block page_title %}Dashboard Staff{% endblock %}
-
-{% block extra_css %}
-<style>
-.stat-card { border-radius: 12px; border: none; overflow: hidden; }
-.stat-top-bar { height: 4px; width: 100%; }
-.notif-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f0f2f5; }
-.notif-row:last-child { border-bottom: none; }
-.doc-icon { width: 32px; height: 32px; border-radius: 8px; background: #f0f2f5; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.qa-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px 8px; text-decoration: none; transition: all .2s; flex: 1; }
-.qa-btn:hover { border-color: #3b82f6; background: #eff6ff; transform: translateY(-2px); }
-.qa-btn i { font-size: 1.4rem; }
-.qa-label { font-size: 0.7rem; color: #374151; text-align: center; line-height: 1.4; font-weight: 500; }
-.live-dot { width: 6px; height: 6px; border-radius: 50%; background: #16a34a; animation: pulse 1.4s infinite; display: inline-block; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
-</style>
-{% endblock %}
+{% block page_title %}Dashboard Karyawan{% endblock %}
 
 {% block content %}
-
-<!-- Welcome Banner -->
-<div class="card mb-4" style="background: linear-gradient(135deg, #b45309, #d97706, #f59e0b); color: #fff; border-radius: 14px;">
-    <div class="card-body p-4">
-        <div class="d-flex align-items-center justify-content-between">
-            <div>
-                <h4 class="fw-bold mb-1">
-                    Selamat datang, {% if pegawai %}{{ pegawai.nama_lengkap }}{% else %}{{ request.user.get_full_name|default:request.user.username }}{% endif %} 👋
-                </h4>
-                <p class="mb-0 opacity-75">
-                    {% if is_admin %}
-                        <i class="bi bi-shield-check me-1"></i> Anda login sebagai Administrator — menampilkan seluruh dokumen staff.
-                    {% else %}
-                        <i class="bi bi-person-badge me-1"></i> Anda login sebagai Staff — menampilkan dokumen milik Anda.
-                    {% endif %}
-                </p>
-            </div>
-            <div class="d-none d-md-block" style="font-size: 4rem; opacity: .15;">
-                <i class="bi bi-folder2-open"></i>
-            </div>
-        </div>
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h5 class="fw-bold mb-0">Halo, {{ request.user.get_full_name|default:request.user.username }}! 👋</h5>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">Anda login sebagai Staff. Berikut adalah ringkasan dokumen pribadi Anda.</p>
     </div>
+    <a href="{% url 'doc_staff' %}" class="btn btn-primary">
+        <i class="bi bi-folder2-open me-2"></i>Lihat Dokumen Saya
+    </a>
 </div>
 
-<!-- Stat Cards -->
 <div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
-        <div class="card stat-card h-100">
-            <div class="stat-top-bar" style="background: #3b82f6;"></div>
-            <div class="card-body p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div class="text-muted" style="font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em;">Total</div>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: #eff6ff;">
-                        <i class="bi bi-files text-primary"></i>
-                    </div>
+    <div class="col-md-3">
+        <div class="card p-3" style="border-left: 3px solid #3b82f6;">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-2 d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:#eff6ff;">
+                    <i class="bi bi-files text-primary" style="font-size:1.2rem;"></i>
                 </div>
-                <div class="fw-bold" style="font-size: 2rem; color: #3b82f6;">{{ total_dokumen }}</div>
-                <div class="text-muted" style="font-size: .75rem;">Seluruh dokumen</div>
+                <div>
+                    <div style="font-size:1.8rem;font-weight:800;color:#1e293b;line-height:1;">{{ total_dokumen }}</div>
+                    <div class="text-muted" style="font-size:0.78rem;">Total Dokumen</div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="card stat-card h-100">
-            <div class="stat-top-bar" style="background: #16a34a;"></div>
-            <div class="card-body p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div class="text-muted" style="font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em;">Aktif</div>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: #dcfce7;">
-                        <i class="bi bi-file-check-fill" style="color: #16a34a;"></i>
-                    </div>
+    <div class="col-md-3">
+        <div class="card p-3" style="border-left: 3px solid #16a34a;">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-2 d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:#f0fdf4;">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size:1.2rem;"></i>
                 </div>
-                <div class="fw-bold" style="font-size: 2rem; color: #16a34a;">{{ dokumen_aktif }}</div>
-                <div class="text-muted" style="font-size: .75rem;">Dokumen masih berlaku</div>
+                <div>
+                    <div style="font-size:1.8rem;font-weight:800;color:#1e293b;line-height:1;">{{ dokumen_aktif }}</div>
+                    <div class="text-muted" style="font-size:0.78rem;">Dokumen Berlaku</div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="card stat-card h-100">
-            <div class="stat-top-bar" style="background: #d97706;"></div>
-            <div class="card-body p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div class="text-muted" style="font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em;">Hampir Expired</div>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: #fef3c7;">
-                        <i class="bi bi-exclamation-triangle-fill" style="color: #d97706;"></i>
-                    </div>
+    <div class="col-md-3">
+        <div class="card p-3" style="border-left: 3px solid #d97706;">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-2 d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:#fffbeb;">
+                    <i class="bi bi-exclamation-circle-fill" style="font-size:1.2rem;color:#d97706;"></i>
                 </div>
-                <div class="fw-bold" style="font-size: 2rem; color: #d97706;">{{ hampir_expired }}</div>
-                <div class="text-muted" style="font-size: .75rem;">Dalam 14 hari ke depan</div>
+                <div>
+                    <div style="font-size:1.8rem;font-weight:800;color:#1e293b;line-height:1;">{{ hampir_expired }}</div>
+                    <div class="text-muted" style="font-size:0.78rem;">Hampir Expired</div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="card stat-card h-100">
-            <div class="stat-top-bar" style="background: #dc2626;"></div>
-            <div class="card-body p-3">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                    <div class="text-muted" style="font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em;">Expired</div>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: #fee2e2;">
-                        <i class="bi bi-file-x-fill" style="color: #dc2626;"></i>
-                    </div>
+    <div class="col-md-3">
+        <div class="card p-3" style="border-left: 3px solid #dc2626;">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-2 d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:#fef2f2;">
+                    <i class="bi bi-x-circle-fill text-danger" style="font-size:1.2rem;"></i>
                 </div>
-                <div class="fw-bold" style="font-size: 2rem; color: #dc2626;">{{ dokumen_expired }}</div>
-                <div class="text-muted" style="font-size: .75rem;">Perlu tindakan segera</div>
+                <div>
+                    <div style="font-size:1.8rem;font-weight:800;color:#1e293b;line-height:1;">{{ dokumen_expired }}</div>
+                    <div class="text-muted" style="font-size:0.78rem;">Perlu Tindakan</div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Notifikasi + Aksi Cepat -->
+{% if hampir_expired %}
+<div class="alert d-flex align-items-center gap-3 mb-4" style="background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #d97706;border-radius:0 8px 8px 0;">
+    <i class="bi bi-bell-fill" style="font-size:1.1rem;color:#d97706;flex-shrink:0;"></i>
+    <div style="font-size:0.875rem;color:#78350f;">
+        <strong>Pemberitahuan!</strong> Ada <strong>{{ hampir_expired }}</strong> dokumen Anda yang masa berlakunya hampir habis (kurang dari 14 hari).
+    </div>
+</div>
+{% endif %}
+
 <div class="row g-3">
-
-    <!-- Notifikasi Dokumen Hampir Expired -->
-    <div class="col-md-8">
+    <div class="col-lg-8">
         <div class="card h-100">
-            <div class="card-header d-flex align-items-center justify-content-between py-3" style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
-                <div class="d-flex align-items-center gap-2">
-                    <i class="bi bi-bell-fill text-warning"></i>
-                    <span class="fw-semibold" style="font-size: .9rem;">Notifikasi Dokumen Mendekati Expired</span>
+            <div class="card-body p-0">
+                <div class="d-flex align-items-center justify-content-between px-4 py-3" style="border-bottom:1px solid #f1f5f9;">
+                    <span class="fw-bold" style="font-size:0.875rem;"><i class="bi bi-list-check me-2"></i>Daftar Peringatan Dokumen</span>
                 </div>
-                <span class="d-flex align-items-center gap-1" style="font-size: .75rem; color: #16a34a; font-weight: 600;">
-                    <span class="live-dot"></span> LIVE
-                </span>
-            </div>
-            <div class="card-body p-3">
                 {% if notifikasi_expired %}
-                    {% for dok in notifikasi_expired %}
-                    {% with sisa=dok.hitung_sisa_hari %}
-                    <div class="notif-row">
-                        <div class="doc-icon">
-                            <i class="bi bi-file-earmark-person text-primary"></i>
-                        </div>
-                        <div style="flex: 1; min-width: 0;">
-                            <div class="fw-semibold text-truncate" style="font-size: .875rem;">{{ dok.judul_dokumen }}</div>
-                            <div class="text-muted" style="font-size: .75rem;">
-                                {{ dok.jenis_dokumen }} · Berlaku s/d {{ dok.tanggal_kedaluwarsa|date:"d M Y" }}
-                                {% if is_admin %} · {{ dok.pemilik.nama_lengkap }}{% endif %}
-                            </div>
-                        </div>
-                        {% if sisa <= 0 %}
-                            <span class="badge bg-danger">EXPIRED</span>
-                        {% else %}
-                            <span class="badge bg-warning text-dark">{{ sisa }} hari</span>
-                        {% endif %}
-                        <a href="{% url 'doc_staff_detail' dok.pk %}" class="btn btn-sm btn-outline-primary" style="font-size: .75rem; white-space: nowrap;">
-                            Detail <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
-                    {% endwith %}
-                    {% endfor %}
-                {% else %}
-                    <div class="text-center py-4">
-                        <i class="bi bi-check-circle-fill text-success" style="font-size: 2.5rem;"></i>
-                        <p class="text-muted mt-2 mb-0" style="font-size: .85rem;">Semua dokumen Anda masih aman.<br>Tidak ada yang mendekati masa expired.</p>
-                    </div>
-                {% endif %}
-
-                <div class="mt-3">
-                    <a href="{% url 'doc_staff' %}" class="btn btn-sm btn-outline-primary w-100" style="font-size: .8rem;">
-                        Lihat semua dokumen <i class="bi bi-arrow-right"></i>
-                    </a>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="font-size:0.75rem;font-weight:700;padding:0.7rem 1rem;">No. Ref</th>
+                                <th style="font-size:0.75rem;font-weight:700;">Judul Dokumen</th>
+                                <th style="font-size:0.75rem;font-weight:700;">Batas Berlaku</th>
+                                <th style="font-size:0.75rem;font-weight:700;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dok in notifikasi_expired %}
+                            <tr>
+                                <td style="padding:0.75rem 1rem;"><code style="font-size:0.75rem;background:#f1f5f9;color:#2563eb;padding:2px 6px;border-radius:4px;">{{ dok.nomor_referensi }}</code></td>
+                                <td style="font-size:0.85rem;font-weight:600;">{{ dok.judul_dokumen }}</td>
+                                <td style="font-size:0.8rem;color:#64748b;">{{ dok.tanggal_kedaluwarsa|date:"d M Y" }}</td>
+                                <td>
+                                    {% with s=dok.hitung_sisa_hari %}
+                                    <span style="font-size:0.8rem;font-weight:700;color:{% if s <= 0 %}#dc2626{% else %}#d97706{% endif %};">
+                                        {% if s <= 0 %}Kedaluwarsa{% else %}Sisa {{ s }} Hari{% endif %}
+                                    </span>
+                                    {% endwith %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-check-circle" style="font-size:2rem;display:block;margin-bottom:0.5rem;color:#16a34a;"></i>
+                    <strong>Semua Dokumen Aman</strong>
+                    <p style="font-size:0.8rem;">Tidak ada dokumen Anda yang mendekati masa expired.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- Aksi Cepat -->
-    <div class="col-md-4 d-flex flex-column gap-3">
-        <div class="card">
-            <div class="card-header py-3" style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
-                <span class="fw-semibold" style="font-size: .9rem;"><i class="bi bi-lightning-fill text-warning me-1"></i>Aksi Cepat</span>
-            </div>
-            <div class="card-body p-3">
-                <div class="d-flex gap-2">
-                    <a href="{% url 'doc_staff' %}" class="qa-btn">
-                        <i class="bi bi-files text-primary"></i>
-                        <span class="qa-label">Daftar Dokumen</span>
-                    </a>
-                    <a href="{% url 'authentication:dashboard' %}" class="qa-btn">
-                        <i class="bi bi-speedometer2 text-success"></i>
-                        <span class="qa-label">Dashboard Utama</span>
-                    </a>
-                    <a href="{% url 'authentication:profile' %}" class="qa-btn">
-                        <i class="bi bi-gear-fill text-danger"></i>
-                        <span class="qa-label">Pengaturan Akun</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Ringkasan Jenis -->
-        <div class="card flex-grow-1">
-            <div class="card-header py-3" style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
-                <span class="fw-semibold" style="font-size: .9rem;"><i class="bi bi-pie-chart-fill text-primary me-1"></i>Jenis Dokumen</span>
-            </div>
-            <div class="card-body p-3">
-                <div class="d-flex flex-column gap-2" style="font-size: .85rem;">
-                    <div class="d-flex align-items-center gap-2 text-muted">
-                        <i class="bi bi-person-vcard-fill text-primary"></i> KTP / SIM / Paspor
+    <div class="col-lg-4">
+        <div class="card h-100">
+            <div class="card-body p-0">
+                <div class="px-4 py-3 fw-bold" style="font-size:0.875rem;border-bottom:1px solid #f1f5f9;"><i class="bi bi-person-badge text-primary me-2"></i>Informasi Pegawai</div>
+                <div class="p-4 text-center">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:70px;height:70px;background:#eff6ff;color:#2563eb;font-size:2rem;">
+                        <i class="bi bi-person-fill"></i>
                     </div>
-                    <div class="d-flex align-items-center gap-2 text-muted">
-                        <i class="bi bi-award-fill text-success"></i> Sertifikat Kerja
-                    </div>
-                    <div class="d-flex align-items-center gap-2 text-muted">
-                        <i class="bi bi-badge-id-fill text-warning"></i> Kartu Identitas Karyawan
-                    </div>
-                    <div class="d-flex align-items-center gap-2 text-muted">
-                        <i class="bi bi-file-text-fill"></i> Surat Izin Kerja & Lainnya
+                    <h6 class="fw-bold mb-1">{{ pegawai.nama_lengkap|default:request.user.username }}</h6>
+                    <p class="text-muted" style="font-size:0.85rem;margin-bottom:20px;">{{ pegawai.jabatan|default:"Karyawan" }}</p>
+                    
+                    <div class="d-flex flex-column gap-2 text-start">
+                        <div style="font-size:0.8rem;"><strong style="color:#64748b;">Email:</strong><br>{{ request.user.email|default:"-" }}</div>
+                        <div style="font-size:0.8rem;"><strong style="color:#64748b;">No HP:</strong><br>{{ pegawai.nomor_telepon|default:"-" }}</div>
                     </div>
                 </div>
-                <a href="{% url 'doc_staff' %}" class="btn btn-sm btn-outline-primary w-100 mt-3" style="font-size: .8rem;">
-                    Lihat semua <i class="bi bi-arrow-right"></i>
-                </a>
             </div>
         </div>
     </div>

@@ -7,6 +7,8 @@ from django.utils import timezone
 from django.db.models import Q
 from django.http import Http404
 from .models import LogAktivitas, Kategori, DokumenHRD, DokumenStaff, Pegawai
+from .forms import DokumenHRDForm, DokumenStaffForm
+
 
 
 # ─── HELPER: catat log otomatis ──────────────────────────────────────────────
@@ -171,8 +173,7 @@ def doc_hrd(request):
 def pengaturan(request):
     return redirect('authentication:profile')
 
-
-# ─── DOKUMEN STAFF (scope: Vincent) ──────────────────────────────────────────
+# ─── DOKUMEN STAFF CRUD ───────────────────────────────────────────────────────
 class DokumenStaffListView(LoginRequiredMixin, ListView):
     model               = DokumenStaff
     template_name       = 'core/dokumen_staff_list.html'
@@ -180,13 +181,16 @@ class DokumenStaffListView(LoginRequiredMixin, ListView):
     paginate_by         = 10
 
     def get_queryset(self):
-        is_admin = self.request.user.is_admin_role
+        user     = self.request.user
+        is_admin = user.is_admin_role
+        is_hrd   = user.is_hrd_role
+
         try:
-            pegawai = self.request.user.pegawai
+            pegawai = user.pegawai
         except Exception:
             pegawai = None
 
-        if is_admin:
+        if is_admin or is_hrd:
             qs = DokumenStaff.objects.all()
         elif pegawai:
             qs = DokumenStaff.objects.filter(pemilik=pegawai)
@@ -207,13 +211,14 @@ class DokumenStaffListView(LoginRequiredMixin, ListView):
         return qs.order_by('tanggal_kedaluwarsa')
 
     def get_context_data(self, **kwargs):
-        ctx              = super().get_context_data(**kwargs)
-        hari_ini         = timezone.now().date()
+        ctx             = super().get_context_data(**kwargs)
+        hari_ini        = timezone.now().date()
         ctx['hari_ini']     = hari_ini
         ctx['batas_warn']   = hari_ini + timezone.timedelta(days=14)
         ctx['q']            = self.request.GET.get('q', '')
         ctx['jenis_filter'] = self.request.GET.get('jenis', '')
-        ctx['jenis_choices']= DokumenStaff.JENIS_CHOICES
+        ctx['jenis_choices'] = DokumenStaff.JENIS_CHOICES
+        ctx['is_admin_or_hrd'] = self.request.user.is_admin_role or self.request.user.is_hrd_role
         return ctx
 
 
@@ -224,22 +229,81 @@ class DokumenStaffDetailView(LoginRequiredMixin, DetailView):
 
     def get_object(self, queryset=None):
         obj      = get_object_or_404(DokumenStaff, pk=self.kwargs['pk'])
-        is_admin = self.request.user.is_admin_role
+        user     = self.request.user
+        is_admin = user.is_admin_role
+        is_hrd   = user.is_hrd_role
+
         try:
-            pegawai = self.request.user.pegawai
+            pegawai = user.pegawai
         except Exception:
             pegawai = None
 
-        if not is_admin and obj.pemilik != pegawai:
+        if not is_admin and not is_hrd and obj.pemilik != pegawai:
             raise Http404("Dokumen tidak ditemukan atau Anda tidak memiliki akses.")
         return obj
 
     def get_context_data(self, **kwargs):
         ctx             = super().get_context_data(**kwargs)
         ctx['hari_ini'] = timezone.now().date()
-        ctx['sisa_hari']= self.object.hitung_sisa_hari()
+        ctx['sisa_hari'] = self.object.hitung_sisa_hari()
+        ctx['is_admin_or_hrd'] = self.request.user.is_admin_role or self.request.user.is_hrd_role
         return ctx
 
+
+class DokumenStaffCreateView(AdminOrHRDMixin, CreateView):
+    model         = DokumenStaff
+    form_class    = DokumenStaffForm
+    template_name = 'core/dokumen_staff_form.html'
+    success_url   = reverse_lazy('doc_staff')
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['judul_halaman'] = 'Tambah Dokumen Staff'
+        ctx['action_label']  = 'Simpan'
+        ctx['is_edit']       = False
+        return ctx
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        catat_log(self.request, 'Tambah Dokumen',
+                  self.object.nomor_referensi,
+                  f'Tambah DokumenStaff: {self.object.judul_dokumen}')
+        return response
+
+
+class DokumenStaffUpdateView(AdminOrHRDMixin, UpdateView):
+    model         = DokumenStaff
+    form_class    = DokumenStaffForm
+    template_name = 'core/dokumen_staff_form.html'
+    success_url   = reverse_lazy('doc_staff')
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['judul_halaman'] = f'Edit: {self.object.judul_dokumen}'
+        ctx['action_label']  = 'Perbarui'
+        ctx['is_edit']       = True
+        return ctx
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        catat_log(self.request, 'Edit Dokumen',
+                  self.object.nomor_referensi,
+                  f'Edit DokumenStaff: {self.object.judul_dokumen}')
+        return response
+
+
+class DokumenStaffDeleteView(AdminOrHRDMixin, DeleteView):
+    model               = DokumenStaff
+    template_name       = 'core/dokumen_staff_hapus.html'
+    success_url         = reverse_lazy('doc_staff')
+    context_object_name = 'dokumen'
+
+    def form_valid(self, form):
+        nama = self.object.judul_dokumen
+        ref  = self.object.nomor_referensi
+        response = super().form_valid(form)
+        catat_log(self.request, 'Hapus Dokumen', ref, f'Hapus DokumenStaff: {nama}')
+        return response
 
 # ─── KATEGORI (scope: Arsat) ─────────────────────────────────────────────────
 class KategoriListView(AdminOnlyMixin, ListView):
@@ -340,7 +404,6 @@ class RiwayatUserListView(AdminOnlyMixin, ListView):
         return ctx
 
 # ─── DOKUMEN HRD (scope: Jacky) ──────────────────────────────────────────────
-from .forms import DokumenHRDForm, DokumenStaffForm
 
 
 class DokumenHRDListView(AdminOrHRDMixin, ListView):
@@ -444,64 +507,7 @@ class DokumenHRDDeleteView(AdminOrHRDMixin, DeleteView):
         response = super().form_valid(form)
         catat_log(self.request, 'Hapus Dokumen', ref, f'Hapus DokumenHRD: {nama}')
         return response
-
-
-# ─── DOKUMEN STAFF CRUD (tambahan untuk Vincent) ─────────────────────────────
-class DokumenStaffCreateView(LoginRequiredMixin, CreateView):
-    model         = DokumenStaff
-    form_class    = DokumenStaffForm
-    template_name = 'core/dokumen_staff_form.html'
-    success_url   = reverse_lazy('doc_staff')
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx['judul_halaman'] = 'Tambah Dokumen Staff'
-        ctx['action_label']  = 'Simpan'
-        ctx['is_edit']       = False
-        return ctx
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        catat_log(self.request, 'Tambah Dokumen',
-                  self.object.nomor_referensi,
-                  f'Tambah DokumenStaff: {self.object.judul_dokumen}')
-        return response
-
-
-class DokumenStaffUpdateView(LoginRequiredMixin, UpdateView):
-    model         = DokumenStaff
-    form_class    = DokumenStaffForm
-    template_name = 'core/dokumen_staff_form.html'
-    success_url   = reverse_lazy('doc_staff')
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx['judul_halaman'] = f'Edit: {self.object.judul_dokumen}'
-        ctx['action_label']  = 'Perbarui'
-        ctx['is_edit']       = True
-        return ctx
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        catat_log(self.request, 'Edit Dokumen',
-                  self.object.nomor_referensi,
-                  f'Edit DokumenStaff: {self.object.judul_dokumen}')
-        return response
-
-
-class DokumenStaffDeleteView(LoginRequiredMixin, DeleteView):
-    model               = DokumenStaff
-    template_name       = 'core/dokumen_staff_hapus.html'
-    success_url         = reverse_lazy('doc_staff')
-    context_object_name = 'dokumen'
-
-    def form_valid(self, form):
-        nama = self.object.judul_dokumen
-        ref  = self.object.nomor_referensi
-        response = super().form_valid(form)
-        catat_log(self.request, 'Hapus Dokumen', ref, f'Hapus DokumenStaff: {nama}')
-        return response
-
+    
 
 # ─── VIEWS HRD (pakai template desain dari backup/Jacky) ─────────────────────
 from .forms import DokumenHRDForm as _DokumenHRDForm

@@ -1,9 +1,11 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
-#  ABSTRAKSI 
+# ─── ABSTRAKSI ───
 class DokumenDasar(models.Model):
     nomor_referensi     = models.CharField(max_length=20, unique=True)
     judul_dokumen       = models.CharField(max_length=100)
@@ -46,6 +48,12 @@ class DokumenHRD(DokumenDasar):
     departemen    = models.CharField(max_length=50, default='HRD')
     jenis_dokumen = models.CharField(max_length=50, choices=JENIS_CHOICES,
                                      default='Lainnya')
+    kategori = models.ForeignKey(
+        'Kategori',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
 
     def hitung_sisa_hari(self):
         selisih = self.tanggal_kedaluwarsa - timezone.now().date()
@@ -80,7 +88,7 @@ class DokumenStaff(DokumenDasar):
         verbose_name_plural = 'Dokumen Staff'
 
 
-# ─ PEGAWAI ─
+# ─── PEGAWAI ───
 class Pegawai(models.Model):
     GRUP_CHOICES = [
         ('Admin', 'Admin'),
@@ -108,8 +116,7 @@ class Pegawai(models.Model):
         return f"{self.nama_lengkap} ({self.grup_pengguna})"
 
 
-
-# KATEGORI 
+# ─── KATEGORI ───
 class Kategori(models.Model):
     URGENSI_CHOICES = [
         ('Rendah', 'Rendah'),
@@ -121,7 +128,7 @@ class Kategori(models.Model):
     nama_kategori  = models.CharField(max_length=50)
     level_urgensi  = models.CharField(max_length=20, choices=URGENSI_CHOICES,
                                       default='Sedang')
-    deskripsi      = models.TextField()
+    deskripsi      = models.TextField(blank=True, null=True) # <-- Sudah diperbaiki agar tidak error
     tanggal_dibuat = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -133,7 +140,7 @@ class Kategori(models.Model):
         ordering            = ['nama_kategori']
 
 
-# LOG AKTIVITAS 
+# ─── LOG AKTIVITAS ───
 class LogAktivitas(models.Model):
     JENIS_AKSI_CHOICES = [
         ('Login',           'Login'),
@@ -163,6 +170,7 @@ class LogAktivitas(models.Model):
         ordering            = ['-waktu_catatan']
 
 
+# ─── PATCH FUNCTION DOKUMEN HRD ───
 def _dokumenhrd_sisa_hari_compat(self):
     selisih = self.tanggal_kedaluwarsa - timezone.now().date()
     return selisih.days
@@ -195,9 +203,28 @@ def _dokumenhrd_cek_status(self):
         self.status_dokumen = status_baru
         self.save()
 
-# Patch ke DokumenHRD
 DokumenHRD._status        = property(lambda self: self.status_dokumen)
 DokumenHRD.status         = property(lambda self: self.status_dokumen)
 DokumenHRD.icon_jenis     = property(_dokumenhrd_icon_jenis)
 DokumenHRD.cek_dan_perbarui_status = _dokumenhrd_cek_status
 DokumenHRD.nama_karyawan  = property(lambda self: getattr(self, '_nama_karyawan', ''))
+
+
+# ─── SIGNAL OTOMATISASI CUSTOMUSER -> PEGAWAI ───
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def buat_profil_pegawai_otomatis(sender, instance, created, **kwargs):
+    """
+    Otomatis membuat record Pegawai setiap kali ada CustomUser baru yang didaftarkan.
+    """
+    if created:
+        role_map = {'admin': 'Admin', 'hrd': 'HRD', 'staff': 'Staff'}
+        grup_baru = role_map.get(getattr(instance, 'role', 'staff'), 'Staff')
+        
+        Pegawai.objects.create(
+            user=instance,
+            nama_lengkap=instance.get_full_name() or instance.username,
+            grup_pengguna=grup_baru
+        )
+    else:
+        if hasattr(instance, 'pegawai'):
+            instance.pegawai.save()

@@ -1,68 +1,47 @@
-{% extends 'core/base_hrd.html' %}
-{% block title %}Hapus Dokumen{% endblock %}
-{% block breadcrumb %}
-  <a href="{% url 'authentication:dashboard_hrd' %}">Dashboard</a><span class="sep">›</span>
-  <a href="{% url 'doc_hrd_list' %}">Dokumen HRD</a><span class="sep">›</span>
-  <span class="current">Hapus</span>
-{% endblock %}
+{% extends 'authentication/base.html' %}
+
+{% block title %}Hapus Dokumen — DocuGuard ERP{% endblock %}
+{% block page_title %}Hapus Dokumen{% endblock %}
 
 {% block content %}
-<div style="max-width:520px;margin:40px auto;">
-  <div class="card" style="border-color:#fecaca;overflow:hidden;">
+<div style="max-width:520px;margin:20px auto;">
+    <div class="card" style="border-color:#fecaca;overflow:hidden;">
+        <!-- Header Merah -->
+        <div style="background:linear-gradient(135deg,#fef2f2,#fee2e2);padding:32px;text-align:center;border-bottom:1px solid #fecaca;">
+            <div style="width:60px;height:60px;border-radius:50%;background:#fee2e2;border:2px solid #fca5a5;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px;">
+                <i class="bi bi-trash3-fill" style="font-size:26px;color:#dc2626;"></i>
+            </div>
+            <h4 style="font-size:20px;font-weight:800;color:#991b1b;margin-bottom:4px;">Hapus Dokumen?</h4>
+            <p style="font-size:13.5px;color:#b91c1c;margin:0;">Tindakan ini tidak dapat dibatalkan.</p>
+        </div>
 
-    <!-- Header Merah -->
-    <div style="background:linear-gradient(135deg,#fef2f2,#fee2e2);padding:32px;text-align:center;border-bottom:1px solid #fecaca;">
-      <div style="width:60px;height:60px;border-radius:50%;background:#fee2e2;border:2px solid #fca5a5;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px;">
-        <i class="bi bi-trash3-fill" style="font-size:26px;color:#dc2626;"></i>
-      </div>
-      <h4 style="font-size:20px;font-weight:800;color:#991b1b;margin-bottom:4px;">Hapus Dokumen?</h4>
-      <p style="font-size:13.5px;color:#b91c1c;margin:0;">Tindakan ini tidak dapat dibatalkan.</p>
+        <!-- Preview -->
+        <div style="padding:24px;">
+            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:16px;margin-bottom:20px;">
+                <div style="font-size:15px;font-weight:700;color:#1e293b;margin-bottom:4px;">{{ dokumen.judul_dokumen }}</div>
+                <div style="font-size:12px;color:#64748b;">
+                    <code style="background:#f1f5f9;color:#2563eb;padding:2px 6px;border-radius:4px;font-size:0.72rem;">{{ dokumen.nomor_referensi }}</code>
+                    &nbsp;·&nbsp; {{ dokumen.jenis_dokumen }}
+                </div>
+            </div>
+
+            <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#78350f;">
+                <i class="bi bi-exclamation-triangle-fill me-1" style="color:#ea580c;"></i>
+                <strong>Yang akan dihapus:</strong> semua data dokumen dan file lampiran terkait.
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex gap-2">
+                    <a href="{% url 'hrd_dokumen_detail' dokumen.pk %}" class="btn btn-outline-secondary flex-fill">
+                        <i class="bi bi-x-circle me-1"></i>Batal
+                    </a>
+                    <button type="submit" class="btn btn-danger flex-fill">
+                        <i class="bi bi-trash3-fill me-1"></i>Ya, Hapus
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <!-- Preview Dokumen -->
-    <div style="padding:24px;">
-      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:16px;margin-bottom:20px;display:flex;align-items:center;gap:12px;">
-        <div class="jenis-icon
-          {% if dokumen.jenis_dokumen == 'Kontrak Kerja' %}j-kontrak
-          {% elif dokumen.jenis_dokumen == 'Sertifikat Pelatihan' %}j-sertifikat
-          {% elif dokumen.jenis_dokumen == 'BPJS Karyawan' %}j-bpjs
-          {% elif dokumen.jenis_dokumen == 'Medical Check Up' %}j-medical
-          {% else %}j-peringatan{% endif %}"
-          style="width:44px;height:44px;font-size:20px;flex-shrink:0;">
-          <i class="bi {{ dokumen.icon_jenis }}"></i>
-        </div>
-        <div style="min-width:0;flex:1;">
-          <div style="font-size:15px;font-weight:700;color:#1e293b;">{{ dokumen.judul_dokumen }}</div>
-          <div style="font-size:12px;color:#64748b;margin-top:2px;">
-            <span class="ref-code">{{ dokumen.nomor_referensi }}</span> · {{ dokumen.jenis_dokumen }}
-          </div>
-        </div>
-        <span class="status-badge
-          {% if dokumen._status == 'Aktif' %}status-aktif
-          {% elif dokumen._status == 'Hampir Expired' %}status-hampir
-          {% elif dokumen._status == 'Expired' %}status-expired
-          {% else %}status-nonaktif{% endif %}">
-          {{ dokumen._status }}
-        </span>
-      </div>
-
-      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#78350f;">
-        <i class="bi bi-exclamation-triangle-fill me-1" style="color:#ea580c;"></i>
-        <strong>Yang akan dihapus:</strong> semua data dokumen dan file lampiran terkait.
-      </div>
-
-      <form method="post">
-        {% csrf_token %}
-        <div class="d-flex gap-2">
-          <a href="{% url 'doc_hrd_detail' dokumen.pk %}" class="btn btn-outline-secondary flex-fill">
-            <i class="bi bi-x-circle me-1"></i>Batal
-          </a>
-          <button type="submit" class="btn btn-danger flex-fill">
-            <i class="bi bi-trash3-fill me-1"></i>Ya, Hapus
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
 </div>
 {% endblock %}
